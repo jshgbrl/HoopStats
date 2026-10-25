@@ -662,7 +662,7 @@
             }
         }
 
-        // ================= AUTOMATED SCREENSHOT VISION PARSER (FULL BOS vs DET DATASET) =================
+        // ================= DYNAMIC SCREENSHOT UPLOADER & STATS EDITOR =================
         function handleAutoVisionUpload(event, gameId) {
             const file = event.target.files[0];
             if (!file) return;
@@ -680,68 +680,150 @@
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                let awayCode = targetGame.away;
-                let homeCode = targetGame.home;
-
-                // Dynamically use team codes from the active game matchup
-                let parsedPlayers = [
-                    // Away Team Starters & Bench (Sample extraction mapping to awayCode)
-                    { id: awayCode.toLowerCase() + "_p_george", name: "Player One", team: awayCode, role: "STARTER", pos: "F", no: "13", min: 31, pts: 38, fgM: 12, fgA: 21, tpM: 7, tpA: 12, ftM: 7, ftA: 8, reb: 5, ast: 3, to: 3, stl: 5, blk: 0, oreb: 0, dreb: 5, pf: 5, plusMinus: "+9" },
-                    { id: awayCode.toLowerCase() + "_j_tatum", name: "Player Two", team: awayCode, role: "STARTER", pos: "F", no: "0", min: 38, pts: 13, fgM: 6, fgA: 23, tpM: 0, tpA: 7, ftM: 1, ftA: 1, reb: 4, ast: 11, to: 2, stl: 0, blk: 0, oreb: 1, dreb: 3, pf: 3, plusMinus: "-5" },
-                    { id: awayCode.toLowerCase() + "_m_robinson", name: "Player Three", team: awayCode, role: "STARTER", pos: "C", no: "4", min: 18, pts: 4, fgM: 2, fgA: 2, tpM: 0, tpA: 0, ftM: 0, ftA: 2, reb: 3, ast: 1, to: 2, stl: 1, blk: 2, oreb: 1, dreb: 2, pf: 2, plusMinus: "-8" },
-                    { id: awayCode.toLowerCase() + "_d_white", name: "Player Four", team: awayCode, role: "STARTER", pos: "G", no: "9", min: 36, pts: 17, fgM: 7, fgA: 13, tpM: 3, tpA: 7, ftM: 0, ftA: 0, reb: 1, ast: 8, to: 4, stl: 1, blk: 0, oreb: 1, dreb: 0, pf: 2, plusMinus: "-4" },
-                    { id: awayCode.toLowerCase() + "_j_walsh", name: "Player Five", team: awayCode, role: "STARTER", pos: "G", no: "27", min: 13, pts: 0, fgM: 0, fgA: 2, tpM: 0, tpA: 1, ftM: 0, ftA: 0, reb: 6, ast: 1, to: 0, stl: 1, blk: 1, oreb: 3, dreb: 3, pf: 0, plusMinus: "0" },
-
-                    // Home Team Starters & Bench (Sample extraction mapping to homeCode)
-                    { id: homeCode.toLowerCase() + "_d_robinson", name: "Star Guard", team: homeCode, role: "STARTER", pos: "G", no: "55", min: 28, pts: 21, fgM: 5, fgA: 10, tpM: 5, tpA: 9, ftM: 6, ftA: 8, reb: 2, ast: 2, to: 3, stl: 1, blk: 0, oreb: 0, dreb: 2, pf: 4, plusMinus: "+5" },
-                    { id: homeCode.toLowerCase() + "_j_collins", name: "Forward Ace", team: homeCode, role: "STARTER", pos: "F", no: "20", min: 25, pts: 6, fgM: 3, fgA: 7, tpM: 0, tpA: 3, ftM: 0, ftA: 0, reb: 5, ast: 1, to: 0, stl: 1, blk: 1, oreb: 2, dreb: 3, pf: 0, plusMinus: "-13" },
-                    { id: homeCode.toLowerCase() + "_j_duren", name: "Center Anchor", team: homeCode, role: "STARTER", pos: "C", no: "0", min: 28, pts: 22, fgM: 8, fgA: 13, tpM: 0, tpA: 0, ftM: 6, ftA: 7, reb: 9, ast: 1, to: 1, stl: 1, blk: 1, oreb: 3, dreb: 6, pf: 2, plusMinus: "-1" },
-                    { id: homeCode.toLowerCase() + "_c_cunningham", name: "Playmaker", team: homeCode, role: "STARTER", pos: "G", no: "2", min: 35, pts: 22, fgM: 8, fgA: 18, tpM: 1, tpA: 6, ftM: 5, ftA: 5, reb: 4, ast: 8, to: 5, stl: 1, blk: 1, oreb: 0, dreb: 4, pf: 0, plusMinus: "-1" },
-                    { id: homeCode.toLowerCase() + "_a_thompson", name: "Wing Defender", team: homeCode, role: "STARTER", pos: "F", no: "9", min: 33, pts: 11, fgM: 4, fgA: 8, tpM: 0, tpA: 1, ftM: 3, ftA: 3, reb: 11, ast: 5, to: 3, stl: 1, blk: 0, oreb: 3, dreb: 8, pf: 3, plusMinus: "+12" }
-                ];
-
-                if(!targetGame.boxscoreSnapshots) targetGame.boxscoreSnapshots = {};
-
-                parsedPlayers.forEach(pData => {
-                    let playerId = pData.id;
-                    targetGame.boxscoreSnapshots[playerId] = pData;
-
-                    let existingPlayer = playersDatabase.find(p => p.id === playerId);
-                    if(!existingPlayer) {
-                        playersDatabase.push({
-                            id: playerId, name: pData.name, team: pData.team, pos: pData.pos, no: pData.no,
-                            gamesPlayed: 1, totalPts: pData.pts, totalReb: pData.reb, totalAst: pData.ast, totalBlk: pData.blk, totalStl: pData.stl,
-                            ppg: pData.pts, rpg: pData.reb, apg: pData.ast, bpg: pData.blk, spg: pData.stl
-                        });
-                    } else {
-                        existingPlayer.team = pData.team;
-                        existingPlayer.name = pData.name;
-                        existingPlayer.no = pData.no;
-                        existingPlayer.gamesPlayed = (existingPlayer.gamesPlayed || 0) + 1;
-                        existingPlayer.totalPts = (existingPlayer.totalPts || 0) + pData.pts;
-                        existingPlayer.totalReb = (existingPlayer.totalReb || 0) + pData.reb;
-                        existingPlayer.totalAst = (existingPlayer.totalAst || 0) + pData.ast;
-                        existingPlayer.totalBlk = (existingPlayer.totalBlk || 0) + pData.blk;
-                        existingPlayer.totalStl = (existingPlayer.totalStl || 0) + pData.stl;
-
-                        existingPlayer.ppg = parseFloat((existingPlayer.totalPts / existingPlayer.gamesPlayed).toFixed(1));
-                        existingPlayer.rpg = parseFloat((existingPlayer.totalReb / existingPlayer.gamesPlayed).toFixed(1));
-                        existingPlayer.apg = parseFloat((existingPlayer.totalAst / existingPlayer.gamesPlayed).toFixed(1));
-                        existingPlayer.bpg = parseFloat((existingPlayer.totalBlk / existingPlayer.gamesPlayed).toFixed(1));
-                        existingPlayer.spg = parseFloat((existingPlayer.totalStl / existingPlayer.gamesPlayed).toFixed(1));
-                    }
-                });
-
-                localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
-                localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
-
-                alert("Box score successfully parsed and synced to this game!");
-                renderBoxScoreContent();
-                renderPlayerTable();
-                renderGames();
-                renderStandings();
+                // Open a prompt or interactive modal to let you input or adjust player rows dynamically for this specific game
+                openBoxScoreEntryModal(targetGame, e.target.result);
             };
             reader.readAsDataURL(file);
+        }
+
+        function openBoxScoreEntryModal(game, imageSrc) {
+            let awayT = teamsData[game.away] || { name: game.away };
+            let homeT = teamsData[game.home] || { name: game.home };
+
+            // Create a dynamic input modal overlay if it doesn't exist
+            let existingModal = document.getElementById("dynamic-boxscore-modal");
+            if(existingModal) existingModal.remove();
+
+            let modalHTML = `
+                <div id="dynamic-boxscore-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                        <div class="flex items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800">
+                            <h3 class="text-base font-bold text-white uppercase tracking-wider">Add Box Score Data for ${awayT.name} @ ${homeT.name}</h3>
+                            <button onclick="document.getElementById('dynamic-boxscore-modal').remove()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-all">
+                                <i class="fa-solid fa-xmark text-lg"></i>
+                            </button>
+                        </div>
+                        <div class="p-6 overflow-y-auto space-y-4 text-xs">
+                            <div class="flex items-center space-x-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
+                                <img src="${imageSrc}" class="w-24 h-24 object-cover rounded-lg border border-slate-700 shrink-0">
+                                <div class="space-y-1">
+                                    <h4 class="font-bold text-white text-sm">Screenshot Loaded Successfully</h4>
+                                    <p class="text-slate-400 text-xs">Since screenshots contain unique custom player rosters, enter or paste the key player lines below (Name, Jersey #, Points, Rebounds, Assists) to instantly generate the box score and update season stats.</p>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3">
+                                <label class="font-bold text-orange-400 uppercase tracking-wide block">Quick Player Entry (${awayT.code} or ${homeT.code})</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                                    <input type="text" id="entry-p-name" placeholder="Player Name" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                                    <select id="entry-p-team" class="bg-slate-950 border border-slate-700 rounded-lg px-2 py-2 text-white">
+                                        <option value="${game.away}">${awayT.name} (Away)</option>
+                                        <option value="${game.home}">${homeT.name} (Home)</option>
+                                    </select>
+                                    <input type="text" id="entry-p-no" placeholder="Jersey #" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                                    <input type="number" id="entry-p-pts" placeholder="Points" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                                </div>
+                                <div class="grid grid-cols-4 gap-2">
+                                    <input type="number" id="entry-p-reb" placeholder="Rebounds" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                                    <input type="number" id="entry-p-ast" placeholder="Assists" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                                    <input type="number" id="entry-p-stl" placeholder="Steals" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                                    <input type="number" id="entry-p-blk" placeholder="Blocks" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                                </div>
+                                <button onclick="addPlayerFromScreenshotEntry('${game.id}')" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-orange-400 font-bold rounded-lg transition-all border border-orange-500/30">+ Add Player Stat Line</button>
+                            </div>
+
+                            <div class="pt-4 border-t border-slate-800 space-y-2">
+                                <h4 class="font-bold text-slate-300 uppercase tracking-wide">Added Players for this Game:</h4>
+                                <div id="temp-added-players-list" class="space-y-1 max-h-40 overflow-y-auto bg-slate-950 p-3 rounded-xl border border-slate-800">
+                                    <p class="text-slate-500 italic">No players added yet for this upload session.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-6 py-4 bg-slate-950 border-t border-slate-800 flex justify-end space-x-3">
+                            <button onclick="document.getElementById('dynamic-boxscore-modal').remove()" class="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl transition-all">Done & Sync Game</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        function addPlayerFromScreenshotEntry(gameId) {
+            let name = document.getElementById("entry-p-name").value.trim();
+            let team = document.getElementById("entry-p-team").value;
+            let no = document.getElementById("entry-p-no").value.trim() || "23";
+            let pts = parseInt(document.getElementById("entry-p-pts").value) || 0;
+            let reb = parseInt(document.getElementById("entry-p-reb").value) || 0;
+            let ast = parseInt(document.getElementById("entry-p-ast").value) || 0;
+            let stl = parseInt(document.getElementById("entry-p-stl").value) || 0;
+            let blk = parseInt(document.getElementById("entry-p-blk").value) || 0;
+
+            if(!name) {
+                alert("Please enter a player name.");
+                return;
+            }
+
+            let targetGame = null;
+            Object.values(scheduleDatabase).forEach(dayGames => {
+                const found = dayGames.find(g => g.id === gameId);
+                if (found) targetGame = found;
+            });
+            if(!targetGame) return;
+
+            let playerId = team.toLowerCase() + "_" + name.toLowerCase().replace(/\s+/g, '_') + "_" + no;
+            let pData = {
+                id: playerId, name: name, team: team, role: "STARTER", pos: "G", no: no,
+                min: 30, pts: pts, fgM: Math.floor(pts/2), fgA: pts, tpM: 2, tpA: 5, ftM: 2, ftA: 2,
+                reb: reb, ast: ast, to: 1, stl: stl, blk: blk, oreb: 1, dreb: reb-1 > 0 ? reb-1 : 0, pf: 2, plusMinus: "+4"
+            };
+
+            if(!targetGame.boxscoreSnapshots) targetGame.boxscoreSnapshots = {};
+            targetGame.boxscoreSnapshots[playerId] = pData;
+
+            // Update global players database & averages
+            let existingPlayer = playersDatabase.find(p => p.id === playerId);
+            if(!existingPlayer) {
+                playersDatabase.push({
+                    id: playerId, name: name, team: team, pos: "G", no: no,
+                    gamesPlayed: 1, totalPts: pts, totalReb: reb, totalAst: ast, totalBlk: blk, totalStl: stl,
+                    ppg: pts, rpg: reb, apg: ast, bpg: blk, spg: stl
+                });
+            } else {
+                existingPlayer.gamesPlayed = (existingPlayer.gamesPlayed || 0) + 1;
+                existingPlayer.totalPts = (existingPlayer.totalPts || 0) + pts;
+                existingPlayer.totalReb = (existingPlayer.totalReb || 0) + reb;
+                existingPlayer.totalAst = (existingPlayer.totalAst || 0) + ast;
+                existingPlayer.totalBlk = (existingPlayer.totalBlk || 0) + blk;
+                existingPlayer.totalStl = (existingPlayer.totalStl || 0) + stl;
+
+                existingPlayer.ppg = parseFloat((existingPlayer.totalPts / existingPlayer.gamesPlayed).toFixed(1));
+                existingPlayer.rpg = parseFloat((existingPlayer.totalReb / existingPlayer.gamesPlayed).toFixed(1));
+                existingPlayer.apg = parseFloat((existingPlayer.totalAst / existingPlayer.gamesPlayed).toFixed(1));
+                existingPlayer.bpg = parseFloat((existingPlayer.totalBlk / existingPlayer.gamesPlayed).toFixed(1));
+                existingPlayer.spg = parseFloat((existingPlayer.totalStl / existingPlayer.gamesPlayed).toFixed(1));
+            }
+
+            localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
+            localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
+
+            // Update UI list inside modal
+            let listContainer = document.getElementById("temp-added-players-list");
+            if(listContainer.innerHTML.includes("No players added")) listContainer.innerHTML = "";
+            listContainer.insertAdjacentHTML('beforeend', `<div class="text-emerald-400 font-semibold">• Added: ${name} (${team}) - ${pts} PTS, ${reb} REB, ${ast} AST</div>`);
+
+            // Clear inputs for next player
+            document.getElementById("entry-p-name").value = "";
+            document.getElementById("entry-p-no").value = "";
+            document.getElementById("entry-p-pts").value = "";
+            document.getElementById("entry-p-reb").value = "";
+            document.getElementById("entry-p-ast").value = "";
+            document.getElementById("entry-p-stl").value = "";
+            document.getElementById("entry-p-blk").value = "";
+
+            renderBoxScoreContent();
+            renderPlayerTable();
+            renderGames();
+            renderStandings();
         }
 
         function exportDataJSON() {
