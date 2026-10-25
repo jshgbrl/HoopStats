@@ -472,12 +472,10 @@
             const newGame = {
                 id: "g_" + Date.now(),
                 status: "FINAL",
-                time: "7:00 PM",
                 home: homeCode,
                 away: awayCode,
                 homeScore: homeScore,
                 awayScore: awayScore,
-                arena: "Custom NBA Arena"
             };
 
             if (!scheduleDatabase[dateStr]) scheduleDatabase[dateStr] = [];
