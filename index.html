@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HoopStats Central | Pro Box Score & Roster Editor Edition</title>
+    <title>HoopStats</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome Icons -->
@@ -139,7 +139,7 @@
                     </div>
                     <div>
                         <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Position</label>
-                        <select id="adm-player-pos" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white">
+                        <select id="adm-player-pos" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
                             <option value="G">G (Guard)</option>
                             <option value="F">F (Forward)</option>
                             <option value="C">C (Center)</option>
@@ -256,7 +256,7 @@
     <!-- FOOTER -->
     <footer class="bg-slate-900 border-t border-slate-800 mt-12 py-8 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4 space-y-2">
-            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Box Score & Roster Editor Edition</p>
+            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Box Score & DNP Edition</p>
             <p>Automatic team totals, shooting percentages, and synced player profile averages.</p>
         </div>
     </footer>
@@ -580,64 +580,70 @@
                 return;
             }
 
-            const min = parseInt(document.getElementById("stat-min").value) || 0;
-            const pts = parseInt(document.getElementById("stat-pts").value) || 0;
-            const fgStr = document.getElementById("stat-fg").value.split("-");
-            const fgM = parseInt(fgStr[0]) || 0;
-            const fgA = parseInt(fgStr[1]) || 0;
-            const tpStr = document.getElementById("stat-3pt").value.split("-");
-            const tpM = parseInt(tpStr[0]) || 0;
-            const tpA = parseInt(tpStr[1]) || 0;
-            const ftStr = document.getElementById("stat-ft").value.split("-");
-            const ftM = parseInt(ftStr[0]) || 0;
-            const ftA = parseInt(ftStr[1]) || 0;
-            const reb = parseInt(document.getElementById("stat-reb").value) || 0;
-            const ast = parseInt(document.getElementById("stat-ast").value) || 0;
-            const to = parseInt(document.getElementById("stat-to").value) || 0;
-            const stl = parseInt(document.getElementById("stat-stl").value) || 0;
-            const blk = parseInt(document.getElementById("stat-blk").value) || 0;
-            const oreb = parseInt(document.getElementById("stat-oreb").value) || 0;
-            const dreb = parseInt(document.getElementById("stat-dreb").value) || 0;
-            const pf = parseInt(document.getElementById("stat-pf").value) || 0;
-            const plusMinus = document.getElementById("stat-pm").value || "+0";
             const role = document.getElementById("stat-role").value;
-
             let p = playersDatabase.find(x => x.id === playerSelId);
+
             if(p) {
                 p.role = role;
-                p.min = min;
-                p.pts = pts;
-                p.fgM = fgM;
-                p.fgA = fgA;
-                p.tpM = tpM;
-                p.tpA = tpA;
-                p.ftM = ftM;
-                p.ftA = ftA;
-                p.reb = reb;
-                p.ast = ast;
-                p.to = to;
-                p.stl = stl;
-                p.blk = blk;
-                p.oreb = oreb;
-                p.dreb = dreb;
-                p.pf = pf;
-                p.plusMinus = plusMinus;
 
-                p.gamesPlayed = (p.gamesPlayed || 0) + 1;
-                p.totalPts = (p.totalPts || 0) + pts;
-                p.totalReb = (p.totalReb || 0) + reb;
-                p.totalAst = (p.totalAst || 0) + ast;
-                p.totalBlk = (p.totalBlk || 0) + blk;
-                p.totalStl = (p.totalStl || 0) + stl;
+                if (role === 'DNP') {
+                    p.min = 0; p.pts = 0; p.fgM = 0; p.fgA = 0; p.tpM = 0; p.tpA = 0; p.ftM = 0; p.ftA = 0; p.reb = 0; p.ast = 0; p.to = 0; p.stl = 0; p.blk = 0; p.oreb = 0; p.dreb = 0; p.pf = 0; p.plusMinus = "+0";
+                } else {
+                    const min = parseInt(document.getElementById("stat-min").value) || 0;
+                    const pts = parseInt(document.getElementById("stat-pts").value) || 0;
+                    const fgStr = document.getElementById("stat-fg").value.split("-");
+                    const fgM = parseInt(fgStr[0]) || 0;
+                    const fgA = parseInt(fgStr[1]) || 0;
+                    const tpStr = document.getElementById("stat-3pt").value.split("-");
+                    const tpM = parseInt(tpStr[0]) || 0;
+                    const tpA = parseInt(tpStr[1]) || 0;
+                    const ftStr = document.getElementById("stat-ft").value.split("-");
+                    const ftM = parseInt(ftStr[0]) || 0;
+                    const ftA = parseInt(ftStr[1]) || 0;
+                    const reb = parseInt(document.getElementById("stat-reb").value) || 0;
+                    const ast = parseInt(document.getElementById("stat-ast").value) || 0;
+                    const to = parseInt(document.getElementById("stat-to").value) || 0;
+                    const stl = parseInt(document.getElementById("stat-stl").value) || 0;
+                    const blk = parseInt(document.getElementById("stat-blk").value) || 0;
+                    const oreb = parseInt(document.getElementById("stat-oreb").value) || 0;
+                    const dreb = parseInt(document.getElementById("stat-dreb").value) || 0;
+                    const pf = parseInt(document.getElementById("stat-pf").value) || 0;
+                    const plusMinus = document.getElementById("stat-pm").value || "+0";
 
-                p.ppg = parseFloat((p.totalPts / p.gamesPlayed).toFixed(1));
-                p.rpg = parseFloat((p.totalReb / p.gamesPlayed).toFixed(1));
-                p.apg = parseFloat((p.totalAst / p.gamesPlayed).toFixed(1));
-                p.bpg = parseFloat((p.totalBlk / p.gamesPlayed).toFixed(1));
-                p.spg = parseFloat((p.totalStl / p.gamesPlayed).toFixed(1));
+                    p.min = min;
+                    p.pts = pts;
+                    p.fgM = fgM;
+                    p.fgA = fgA;
+                    p.tpM = tpM;
+                    p.tpA = tpA;
+                    p.ftM = ftM;
+                    p.ftA = ftA;
+                    p.reb = reb;
+                    p.ast = ast;
+                    p.to = to;
+                    p.stl = stl;
+                    p.blk = blk;
+                    p.oreb = oreb;
+                    p.dreb = dreb;
+                    p.pf = pf;
+                    p.plusMinus = plusMinus;
+
+                    p.gamesPlayed = (p.gamesPlayed || 0) + 1;
+                    p.totalPts = (p.totalPts || 0) + pts;
+                    p.totalReb = (p.totalReb || 0) + reb;
+                    p.totalAst = (p.totalAst || 0) + ast;
+                    p.totalBlk = (p.totalBlk || 0) + blk;
+                    p.totalStl = (p.totalStl || 0) + stl;
+
+                    p.ppg = parseFloat((p.totalPts / p.gamesPlayed).toFixed(1));
+                    p.rpg = parseFloat((p.totalReb / p.gamesPlayed).toFixed(1));
+                    p.apg = parseFloat((p.totalAst / p.gamesPlayed).toFixed(1));
+                    p.bpg = parseFloat((p.totalBlk / p.gamesPlayed).toFixed(1));
+                    p.spg = parseFloat((p.totalStl / p.gamesPlayed).toFixed(1));
+                }
 
                 localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
-                alert("Stat line added successfully and player averages synced!");
+                alert("Stat line updated successfully!");
                 renderBoxScoreContent();
                 renderPlayerTable();
             }
@@ -919,27 +925,29 @@
 
                 const renderTeamProBoxScore = (teamInfo, players, teamTotalScore) => {
                     const starters = players.filter(p => p.role === 'STARTER');
-                    // Bench sorted by minutes played (highest minutes on top)
                     const bench = players.filter(p => p.role === 'BENCH').sort((a, b) => (b.min || 0) - (a.min || 0));
+                    const dnp = players.filter(p => p.role === 'DNP');
 
                     let tMin = 0, tPts = 0, tFgM = 0, tFgA = 0, t3pM = 0, t3pA = 0, tftM = 0, tftA = 0, tReb = 0, tAst = 0, tTo = 0, tStl = 0, tBlk = 0, tOreb = 0, tDreb = 0, tPf = 0;
                     players.forEach(p => {
-                        tMin += (p.min || 0);
-                        tPts += (p.pts || 0);
-                        tFgM += (p.fgM || 0);
-                        tFgA += (p.fgA || 0);
-                        t3pM += (p.tpM || 0);
-                        t3pA += (p.tpA || 0);
-                        tftM += (p.ftM || 0);
-                        tftA += (p.ftA || 0);
-                        tReb += (p.reb || 0);
-                        tAst += (p.ast || 0);
-                        tTo += (p.to || 0);
-                        tStl += (p.stl || 0);
-                        tBlk += (p.blk || 0);
-                        tOreb += (p.oreb || 0);
-                        tDreb += (p.dreb || 0);
-                        tPf += (p.pf || 0);
+                        if (p.role !== 'DNP') {
+                            tMin += (p.min || 0);
+                            tPts += (p.pts || 0);
+                            tFgM += (p.fgM || 0);
+                            tFgA += (p.fgA || 0);
+                            t3pM += (p.tpM || 0);
+                            t3pA += (p.tpA || 0);
+                            tftM += (p.ftM || 0);
+                            tftA += (p.ftA || 0);
+                            tReb += (p.reb || 0);
+                            tAst += (p.ast || 0);
+                            tTo += (p.to || 0);
+                            tStl += (p.stl || 0);
+                            tBlk += (p.blk || 0);
+                            tOreb += (p.oreb || 0);
+                            tDreb += (p.dreb || 0);
+                            tPf += (p.pf || 0);
+                        }
                     });
 
                     const fgPct = tFgA > 0 ? ((tFgM / tFgA) * 100).toFixed(1) + '%' : '0.0%';
@@ -949,6 +957,18 @@
                     const renderRows = (list) => {
                         if(list.length === 0) return `<tr><td colspan="15" class="py-2 px-3 text-xs text-slate-500 italic">No players listed.</td></tr>`;
                         return list.map(p => {
+                            if (p.role === 'DNP') {
+                                return `
+                                    <tr class="hover:bg-slate-900/80 text-xs">
+                                        <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap flex items-center space-x-2">
+                                            <span class="cursor-pointer hover:underline" onclick="openPlayerModal('${p.id}')">${p.name} #${p.no}</span>
+                                            ${isAdmin ? `<button onclick="adminRemovePlayerStatLine('${p.id}')" class="text-red-400 hover:text-red-300 text-[10px]"><i class="fa-solid fa-trash"></i></button>` : ''}
+                                        </td>
+                                        <td colspan="14" class="py-2.5 px-2 text-center text-slate-400 italic font-semibold tracking-wider">DNP-COACH'S DECISION</td>
+                                    </tr>
+                                `;
+                            }
+
                             let pmVal = p.plusMinus || "+0";
                             let pmColor = "text-slate-300";
                             if(pmVal.startsWith("-")) pmColor = "text-red-400 font-bold";
@@ -1013,8 +1033,12 @@
                                     <tbody class="divide-y divide-slate-900">
                                         <tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-orange-400 tracking-widest">Starters</td></tr>
                                         ${renderRows(starters)}
-                                        <tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-orange-400 tracking-widest">Bench (Sorted by Minutes)</td></tr>
+                                        <tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-orange-400 tracking-widest">Bench</td></tr>
                                         ${renderRows(bench)}
+                                        ${dnp.length > 0 ? `
+                                            <tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-slate-400 tracking-widest">Did Not Play (DNP)</td></tr>
+                                            ${renderRows(dnp)}
+                                        ` : ''}
                                     </tbody>
                                     <tfoot>
                                         <tr class="border-t-2 border-slate-700 bg-slate-950 font-bold text-xs text-white">
@@ -1053,15 +1077,15 @@
 
                     adminStatEntryForm = `
                         <div class="bg-orange-950/40 border-2 border-orange-600/60 p-4 rounded-2xl space-y-3">
-                            <h4 class="text-xs font-black font-teko uppercase text-orange-400 tracking-wider">🔒 Admin Stat-Sheet Entry (Add Player Stats for this Game)</h4>
+                            <h4 class="text-xs font-black font-teko uppercase text-orange-400 tracking-wider">🔒 Admin Stat-Sheet Entry (Add Player Stats or DNP for this Game)</h4>
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                                 <div>
                                     <label class="text-[10px] text-slate-400 block mb-1">Select Player</label>
                                     <select id="stat-player-select" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white">${rosterOptions || '<option value="">No players in roster for these teams</option>'}</select>
                                 </div>
                                 <div>
-                                    <label class="text-[10px] text-slate-400 block mb-1">Role</label>
-                                    <select id="stat-role" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"><option value="STARTER">Starter</option><option value="BENCH">Bench</option></select>
+                                    <label class="text-[10px] text-slate-400 block mb-1">Role / Status</label>
+                                    <select id="stat-role" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"><option value="STARTER">Starter</option><option value="BENCH">Bench</option><option value="DNP">DNP (Did Not Play)</option></select>
                                 </div>
                                 <div><label class="text-[10px] text-slate-400 block mb-1">MIN</label><input type="number" id="stat-min" value="28" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"></div>
                                 <div><label class="text-[10px] text-slate-400 block mb-1">PTS</label><input type="number" id="stat-pts" value="15" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"></div>
@@ -1078,7 +1102,7 @@
                                 <div><label class="text-[10px] text-slate-400 block mb-1">PF</label><input type="number" id="stat-pf" value="2" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"></div>
                                 <div><label class="text-[10px] text-slate-400 block mb-1">+/-</label><input type="text" id="stat-pm" value="+4" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"></div>
                             </div>
-                            <button onclick="adminAddGameStatLine('${game.id}')" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all text-xs">Add Stat Line & Sync Averages</button>
+                            <button onclick="adminAddGameStatLine('${game.id}')" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all text-xs">Submit Stat Line / DNP Status</button>
                         </div>
                     `;
                 }
