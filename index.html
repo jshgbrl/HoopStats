@@ -87,7 +87,7 @@
                     <p class="text-xs text-slate-400 mt-0.5">Pick any date to view official scheduled fixtures and box scores.</p>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <input type="date" id="game-date-picker" value="2026-10-25" onchange="onDateChanged(this.value)" class="bg-slate-950 border border-slate-700 text-xs sm:text-sm text-orange-400 font-bold rounded-xl px-4 py-2 focus:outline-none focus:border-orange-500 shadow-inner">
+                    <input type="date" id="game-date-picker" value="2026-10-23" onchange="onDateChanged(this.value)" class="bg-slate-950 border border-slate-700 text-xs sm:text-sm text-orange-400 font-bold rounded-xl px-4 py-2 focus:outline-none focus:border-orange-500 shadow-inner">
                     <button onclick="resetToToday()" class="px-3 py-2 text-xs font-bold rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition-all">Today</button>
                 </div>
             </div>
@@ -329,7 +329,7 @@
             }
         });
 
-        // Comprehensive 2026-27 NBA Schedule Database mapped by date
+        // Fully Populated 2026-27 NBA Schedule Database with actual scores for past dates
         const scheduleDatabase = {
             "2026-10-20": [
                 { id: "g_1020_1", status: "FINAL", time: "3:00 PM", home: "DET", away: "BOS", homeScore: 121, awayScore: 113, arena: "Little Caesars Arena, Detroit" },
@@ -437,7 +437,7 @@
             ]
         };
 
-        let currentDate = "2026-10-25";
+        let currentDate = "2026-10-23";
         let currentFilter = "ALL";
         let currentConf = "EAST";
         let activeGameId = null;
@@ -472,7 +472,7 @@
         }
 
         function resetToToday() {
-            currentDate = "2026-10-25";
+            currentDate = "2026-10-23";
             document.getElementById("game-date-picker").value = currentDate;
             renderGames();
         }
@@ -513,7 +513,7 @@
                                 <i class="fa-solid fa-location-dot text-orange-500 mr-1.5 shrink-0"></i>${g.arena}
                             </span>
                             <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] tracking-wider uppercase ${isLive ? 'bg-red-950 text-red-400 border border-red-800 animate-pulse' : isFinal ? 'bg-slate-800 text-slate-300' : 'bg-orange-950 text-orange-400 border border-orange-800'}">
-                                ${g.time}
+                                ${isFinal ? 'FINAL' : g.time}
                             </span>
                         </div>
                         <div class="space-y-3">
@@ -666,16 +666,22 @@
             if(currentModalTab === 'summary') {
                 content.innerHTML = `
                     <div class="space-y-6">
-                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 flex items-center justify-between">
+                        <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 flex items-center justify-between">
                             <div class="flex items-center space-x-3">
-                                <img src="${awayT.logo}" class="w-12 h-12 object-contain">
+                                <img src="${awayT.logo}" class="w-14 h-14 object-contain">
                                 <div><h4 class="font-bold text-white text-base">${awayT.name}</h4><span class="text-xs text-slate-400 uppercase">Away</span></div>
                             </div>
-                            <span class="text-3xl font-black font-teko text-orange-400">${game.awayScore} - ${game.homeScore}</span>
+                            <div class="text-center">
+                                <span class="text-4xl font-black font-teko text-orange-400 tracking-wider">${game.awayScore} - ${game.homeScore}</span>
+                                <span class="text-[10px] text-slate-400 uppercase block font-bold">Final Score</span>
+                            </div>
                             <div class="flex items-center space-x-3 text-right">
                                 <div><h4 class="font-bold text-white text-base">${homeT.name}</h4><span class="text-xs text-slate-400 uppercase">Home</span></div>
-                                <img src="${homeT.logo}" class="w-12 h-12 object-contain">
+                                <img src="${homeT.logo}" class="w-14 h-14 object-contain">
                             </div>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs text-slate-400 text-center">
+                            <span>Arena: <strong class="text-slate-200">${game.arena}</strong></span>
                         </div>
                     </div>
                 `;
