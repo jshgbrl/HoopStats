@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HoopStats Central | Pro Box Score & Dynamic Standings Edition</title>
+    <title>HoopStats Central | Pro Box Score & Roster Editor Edition</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome Icons -->
@@ -123,7 +123,7 @@
                     <button onclick="adminUpdateStandings()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Update Standings</button>
                 </div>
 
-                <!-- 3. ADD PLAYER TO ROSTER (Starter dropdown removed) -->
+                <!-- 3. ADD PLAYER TO ROSTER -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                     <h3 class="font-bold text-orange-400 uppercase">3. Add Player to Roster</h3>
                     <input type="text" id="adm-player-name" placeholder="Player Full Name" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
@@ -240,6 +240,8 @@
                                 <th class="py-3 px-4 font-bold text-center">PPG</th>
                                 <th class="py-3 px-4 font-bold text-center">RPG</th>
                                 <th class="py-3 px-4 font-bold text-center">APG</th>
+                                <th class="py-3 px-4 font-bold text-center">BPG</th>
+                                <th class="py-3 px-4 font-bold text-center">SPG</th>
                                 <th class="py-3 px-4 font-bold text-center">ACTION</th>
                             </tr>
                         </thead>
@@ -254,7 +256,7 @@
     <!-- FOOTER -->
     <footer class="bg-slate-900 border-t border-slate-800 mt-12 py-8 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4 space-y-2">
-            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Box Score & Dynamic Standings Edition</p>
+            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Box Score & Roster Editor Edition</p>
             <p>Automatic team totals, shooting percentages, and synced player profile averages.</p>
         </div>
     </footer>
@@ -289,6 +291,40 @@
                 </button>
             </div>
             <div class="p-6 overflow-y-auto space-y-6 flex-grow" id="player-modal-content"></div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: EDIT PLAYER ================= -->
+    <div id="edit-player-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div class="flex items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800">
+                <h3 class="text-base font-bold text-white uppercase tracking-wider">Edit Player Information</h3>
+                <button onclick="closeEditPlayerModal()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-all">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4 text-xs" id="edit-player-form-content">
+                <input type="hidden" id="edit-player-id">
+                <div>
+                    <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Player Full Name</label>
+                    <input type="text" id="edit-name" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Jersey #</label>
+                        <input type="text" id="edit-no" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Position</label>
+                        <select id="edit-pos" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                            <option value="G">G (Guard)</option>
+                            <option value="F">F (Forward)</option>
+                            <option value="C">C (Center)</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="saveEditedPlayer()" class="w-full py-2.5 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Save Changes</button>
+            </div>
         </div>
     </div>
 
@@ -330,8 +366,8 @@
         const nbaTeamsAlphabetical = Object.values(teamsData).sort((a, b) => a.name.localeCompare(b.name));
 
         const defaultPlayersDatabase = [
-            { id: "bos_0", name: "Jayson Tatum", team: "BOS", role: "STARTER", pos: "F", no: "0", min: 38, pts: 27, fgM: 9, fgA: 20, tpM: 4, tpA: 9, ftM: 5, ftA: 6, reb: 8, ast: 5, to: 2, stl: 1, blk: 1, oreb: 1, dreb: 7, pf: 2, plusMinus: "+8", ppg: 27.0, rpg: 8.0, apg: 5.0, gamesPlayed: 1 },
-            { id: "det_2", name: "Cade Cunningham", team: "DET", role: "STARTER", pos: "G", no: "2", min: 36, pts: 28, fgM: 10, fgA: 21, tpM: 3, tpA: 7, ftM: 5, ftA: 6, reb: 5, ast: 9, to: 4, stl: 1, blk: 1, oreb: 0, dreb: 5, pf: 1, plusMinus: "-1", ppg: 28.0, rpg: 5.0, apg: 9.0, gamesPlayed: 1 }
+            { id: "bos_0", name: "Jayson Tatum", team: "BOS", role: "STARTER", pos: "F", no: "0", min: 38, pts: 27, fgM: 9, fgA: 20, tpM: 4, tpA: 9, ftM: 5, ftA: 6, reb: 8, ast: 5, blk: 1, stl: 1, to: 2, oreb: 1, dreb: 7, pf: 2, plusMinus: "+8", ppg: 27.0, rpg: 8.0, apg: 5.0, bpg: 1.0, spg: 1.0, gamesPlayed: 1 },
+            { id: "det_2", name: "Cade Cunningham", team: "DET", role: "STARTER", pos: "G", no: "2", min: 36, pts: 28, fgM: 10, fgA: 21, tpM: 3, tpA: 7, ftM: 5, ftA: 6, reb: 5, ast: 9, blk: 1, stl: 1, to: 4, oreb: 0, dreb: 5, pf: 1, plusMinus: "-1", ppg: 28.0, rpg: 5.0, apg: 9.0, bpg: 1.0, spg: 1.0, gamesPlayed: 1 }
         ];
 
         const defaultScheduleDatabase = {
@@ -465,7 +501,7 @@
         }
 
         function adminUpdateStandings() {
-            alert("Standings are now automatically calculated based on entered game scores!");
+            alert("Standings are automatically calculated based on entered game scores!");
         }
 
         function adminSavePlayer() {
@@ -495,7 +531,7 @@
                     pos: pos,
                     no: no,
                     min: 0, pts: 0, fgM: 0, fgA: 0, tpM: 0, tpA: 0, ftM: 0, ftA: 0, reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, plusMinus: "+0",
-                    ppg: 0.0, rpg: 0.0, apg: 0.0, gamesPlayed: 0
+                    ppg: 0.0, rpg: 0.0, apg: 0.0, bpg: 0.0, spg: 0.0, gamesPlayed: 0
                 });
             }
 
@@ -505,6 +541,36 @@
             document.getElementById("adm-player-name").value = "";
             document.getElementById("adm-player-no").value = "";
             renderPlayerTable();
+        }
+
+        function openEditPlayerModal(playerId) {
+            let p = playersDatabase.find(x => x.id === playerId);
+            if(!p) return;
+            document.getElementById("edit-player-id").value = p.id;
+            document.getElementById("edit-name").value = p.name;
+            document.getElementById("edit-no").value = p.no;
+            document.getElementById("edit-pos").value = p.pos;
+            document.getElementById("edit-player-modal").classList.remove("hidden");
+            document.getElementById("edit-player-modal").classList.add("flex");
+        }
+
+        function closeEditPlayerModal() {
+            document.getElementById("edit-player-modal").classList.remove("flex");
+            document.getElementById("edit-player-modal").classList.add("hidden");
+        }
+
+        function saveEditedPlayer() {
+            let id = document.getElementById("edit-player-id").value;
+            let p = playersDatabase.find(x => x.id === id);
+            if(p) {
+                p.name = document.getElementById("edit-name").value.trim();
+                p.no = document.getElementById("edit-no").value.trim();
+                p.pos = document.getElementById("edit-pos").value;
+                localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
+                alert("Player information updated successfully!");
+                closeEditPlayerModal();
+                renderPlayerTable();
+            }
         }
 
         function adminAddGameStatLine(gameId) {
@@ -561,10 +627,14 @@
                 p.totalPts = (p.totalPts || 0) + pts;
                 p.totalReb = (p.totalReb || 0) + reb;
                 p.totalAst = (p.totalAst || 0) + ast;
+                p.totalBlk = (p.totalBlk || 0) + blk;
+                p.totalStl = (p.totalStl || 0) + stl;
 
                 p.ppg = parseFloat((p.totalPts / p.gamesPlayed).toFixed(1));
                 p.rpg = parseFloat((p.totalReb / p.gamesPlayed).toFixed(1));
                 p.apg = parseFloat((p.totalAst / p.gamesPlayed).toFixed(1));
+                p.bpg = parseFloat((p.totalBlk / p.gamesPlayed).toFixed(1));
+                p.spg = parseFloat((p.totalStl / p.gamesPlayed).toFixed(1));
 
                 localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
                 alert("Stat line added successfully and player averages synced!");
@@ -695,7 +765,6 @@
             renderStandings();
         }
 
-        // Dynamically compute standings based strictly on entered games
         function renderStandings() {
             const tbody = document.getElementById("standings-tbody");
             let teamRecords = {};
@@ -756,7 +825,7 @@
             const filtered = playersDatabase.filter(p => p.team === filterTeam);
 
             if(filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-500">No players found for this team. Use Admin Panel to add players.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="py-6 text-center text-slate-500">No players found for this team. Use Admin Panel to add players.</td></tr>`;
                 return;
             }
 
@@ -771,9 +840,12 @@
                     <td class="py-3 px-4 text-center font-bold text-orange-400">${p.ppg || 0.0}</td>
                     <td class="py-3 px-4 text-center text-slate-300">${p.rpg || 0.0}</td>
                     <td class="py-3 px-4 text-center text-slate-300">${p.apg || 0.0}</td>
+                    <td class="py-3 px-4 text-center text-slate-300">${p.bpg || 0.0}</td>
+                    <td class="py-3 px-4 text-center text-slate-300">${p.spg || 0.0}</td>
                     <td class="py-3 px-4 text-center space-x-1">
-                        <button onclick="openPlayerModal('${p.id}')" class="px-2.5 py-1 text-xs font-semibold rounded bg-slate-800 text-slate-300 hover:bg-orange-600 hover:text-white transition-all">Profile</button>
-                        ${isAdmin ? `<button onclick="adminDeletePlayer('${p.id}')" class="px-2.5 py-1 text-xs font-semibold rounded bg-red-950 text-red-400 hover:bg-red-900 transition-all">Delete</button>` : ''}
+                        <button onclick="openPlayerModal('${p.id}')" class="px-2 py-1 text-xs font-semibold rounded bg-slate-800 text-slate-300 hover:bg-orange-600 hover:text-white transition-all">Profile</button>
+                        ${isAdmin ? `<button onclick="openEditPlayerModal('${p.id}')" class="px-2 py-1 text-xs font-semibold rounded bg-slate-700 text-slate-200 hover:bg-slate-600 transition-all">Edit</button>` : ''}
+                        ${isAdmin ? `<button onclick="adminDeletePlayer('${p.id}')" class="px-2 py-1 text-xs font-semibold rounded bg-red-950 text-red-400 hover:bg-red-900 transition-all">Delete</button>` : ''}
                     </td>
                 </tr>
             `).join('');
@@ -847,7 +919,8 @@
 
                 const renderTeamProBoxScore = (teamInfo, players, teamTotalScore) => {
                     const starters = players.filter(p => p.role === 'STARTER');
-                    const bench = players.filter(p => p.role === 'BENCH');
+                    // Bench sorted by minutes played (highest minutes on top)
+                    const bench = players.filter(p => p.role === 'BENCH').sort((a, b) => (b.min || 0) - (a.min || 0));
 
                     let tMin = 0, tPts = 0, tFgM = 0, tFgA = 0, t3pM = 0, t3pA = 0, tftM = 0, tftA = 0, tReb = 0, tAst = 0, tTo = 0, tStl = 0, tBlk = 0, tOreb = 0, tDreb = 0, tPf = 0;
                     players.forEach(p => {
@@ -940,7 +1013,7 @@
                                     <tbody class="divide-y divide-slate-900">
                                         <tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-orange-400 tracking-widest">Starters</td></tr>
                                         ${renderRows(starters)}
-                                        <tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-orange-400 tracking-widest">Bench</td></tr>
+                                        <tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-orange-400 tracking-widest">Bench (Sorted by Minutes)</td></tr>
                                         ${renderRows(bench)}
                                     </tbody>
                                     <tfoot>
@@ -975,7 +1048,6 @@
 
                 let adminStatEntryForm = "";
                 if(isAdmin) {
-                    // Filter player dropdown to ONLY show players from the two teams playing in this game
                     const eligiblePlayers = playersDatabase.filter(p => p.team === game.away || p.team === game.home);
                     const rosterOptions = eligiblePlayers.map(p => `<option value="${p.id}">${p.name} (${p.team})</option>`).join('');
 
@@ -984,7 +1056,7 @@
                             <h4 class="text-xs font-black font-teko uppercase text-orange-400 tracking-wider">🔒 Admin Stat-Sheet Entry (Add Player Stats for this Game)</h4>
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                                 <div>
-                                    <label class="text-[10px] text-slate-400 block mb-1">Select Player (Match Teams Only)</label>
+                                    <label class="text-[10px] text-slate-400 block mb-1">Select Player</label>
                                     <select id="stat-player-select" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white">${rosterOptions || '<option value="">No players in roster for these teams</option>'}</select>
                                 </div>
                                 <div>
@@ -1024,7 +1096,7 @@
         function openPlayerModal(playerId) {
             let p = playersDatabase.find(x => x.id === playerId);
             if(!p) {
-                p = { name: playerId, team: "NBA", pos: "G", ppg: 0.0, rpg: 0.0, apg: 0.0, no: "23", college: "NBA" };
+                p = { name: playerId, team: "NBA", pos: "G", ppg: 0.0, rpg: 0.0, apg: 0.0, bpg: 0.0, spg: 0.0, no: "23", college: "NBA" };
             }
             document.getElementById("player-modal-content").innerHTML = `
                 <div class="flex items-center space-x-5 bg-slate-950 p-5 rounded-2xl border border-slate-800">
@@ -1037,10 +1109,12 @@
                 </div>
                 <div class="space-y-3">
                     <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Synced Season Averages</h4>
-                    <div class="grid grid-cols-3 gap-3 text-center">
-                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800"><span class="text-[10px] text-slate-400 uppercase block font-bold">PPG (Points)</span><span class="text-2xl font-black font-teko text-orange-400">${p.ppg || 0.0}</span></div>
-                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800"><span class="text-[10px] text-slate-400 uppercase block font-bold">RPG (Rebounds)</span><span class="text-2xl font-black font-teko text-slate-200">${p.rpg || 0.0}</span></div>
-                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800"><span class="text-[10px] text-slate-400 uppercase block font-bold">APG (Assists)</span><span class="text-2xl font-black font-teko text-slate-200">${p.apg || 0.0}</span></div>
+                    <div class="grid grid-cols-5 gap-2 text-center">
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-[9px] text-slate-400 uppercase block font-bold">PPG</span><span class="text-xl font-black font-teko text-orange-400">${p.ppg || 0.0}</span></div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-[9px] text-slate-400 uppercase block font-bold">RPG</span><span class="text-xl font-black font-teko text-slate-200">${p.rpg || 0.0}</span></div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-[9px] text-slate-400 uppercase block font-bold">APG</span><span class="text-xl font-black font-teko text-slate-200">${p.apg || 0.0}</span></div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-[9px] text-slate-400 uppercase block font-bold">BPG</span><span class="text-xl font-black font-teko text-slate-200">${p.bpg || 0.0}</span></div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-[9px] text-slate-400 uppercase block font-bold">SPG</span><span class="text-xl font-black font-teko text-slate-200">${p.spg || 0.0}</span></div>
                     </div>
                 </div>
             `;
