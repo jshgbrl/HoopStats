@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HoopStats Central | Pro Admin Dropdowns Edition</title>
+    <title>HoopStats Central | Pro Box Score & Stat-Sheet Editor Edition</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome Icons -->
@@ -81,7 +81,7 @@
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-                <!-- 1. ADD GAME SCORE (Red Box Dropdowns) -->
+                <!-- 1. ADD GAME SCORE -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                     <h3 class="font-bold text-orange-400 uppercase">1. Add Game Score</h3>
                     <input type="date" id="adm-game-date" value="2026-10-25" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
@@ -102,7 +102,7 @@
                     <button onclick="adminAddGame()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Publish Game</button>
                 </div>
 
-                <!-- 2. UPDATE STANDINGS (Yellow Box Cascading Dropdowns) -->
+                <!-- 2. UPDATE STANDINGS -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                     <h3 class="font-bold text-orange-400 uppercase">2. Update Standings</h3>
                     <div>
@@ -123,12 +123,11 @@
                     <button onclick="adminUpdateStandings()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Update Standings</button>
                 </div>
 
-                <!-- 3. ADD / EDIT PLAYER STATS (White & Blue Box Dropdowns) -->
+                <!-- 3. ADD / EDIT PLAYER STATS (Yellow line elements removed) -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
-                    <h3 class="font-bold text-orange-400 uppercase">3. Add / Edit Player Stats</h3>
+                    <h3 class="font-bold text-orange-400 uppercase">3. Add Player to Roster</h3>
                     <input type="text" id="adm-player-name" placeholder="Player Full Name" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
                     <div class="flex space-x-2">
-                        <!-- White Box Roster Team Dropdown -->
                         <div class="w-2/3">
                             <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Team</label>
                             <select id="adm-player-team" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white"></select>
@@ -139,7 +138,6 @@
                         </div>
                     </div>
                     <div class="flex space-x-2">
-                        <!-- Blue Box Position Dropdown (G, F, C only) -->
                         <div class="w-1/2">
                             <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Position</label>
                             <select id="adm-player-pos" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white">
@@ -155,11 +153,6 @@
                                 <option value="BENCH">Bench</option>
                             </select>
                         </div>
-                    </div>
-                    <div class="flex space-x-2">
-                        <input type="number" step="0.1" id="adm-player-ppg" placeholder="PPG" class="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white">
-                        <input type="number" step="0.1" id="adm-player-rpg" placeholder="RPG" class="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white">
-                        <input type="number" step="0.1" id="adm-player-apg" placeholder="APG" class="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white">
                     </div>
                     <button onclick="adminSavePlayer()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Save Player to Roster</button>
                 </div>
@@ -194,10 +187,6 @@
                 <div>
                     <h1 class="text-2xl sm:text-3xl font-black font-teko uppercase tracking-wide text-white" id="scoreboard-title">Game Scoreboard</h1>
                     <p class="text-xs sm:text-sm text-slate-400">Click any game card to view pro box scores with automatic calculations.</p>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <button onclick="filterGames('ALL')" id="filter-all" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-orange-600 text-white transition-all">All Games</button>
-                    <button onclick="filterGames('LIVE')" id="filter-live" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800 transition-all">Live Only</button>
                 </div>
             </div>
 
@@ -274,12 +263,12 @@
     <!-- FOOTER -->
     <footer class="bg-slate-900 border-t border-slate-800 mt-12 py-8 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4 space-y-2">
-            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Admin Dropdowns Edition</p>
+            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Box Score & Stat-Sheet Editor Edition</p>
             <p>Automatic team totals, shooting percentages, and synced player profile averages.</p>
         </div>
     </footer>
 
-    <!-- ================= MODAL: PRO BOX SCORE ================= -->
+    <!-- ================= MODAL: PRO BOX SCORE & STAT-SHEET ENTRY ================= -->
     <div id="boxscore-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-2 sm:p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-7xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div class="flex items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800 shrink-0">
@@ -350,8 +339,8 @@
         const nbaTeamsAlphabetical = Object.values(teamsData).sort((a, b) => a.name.localeCompare(b.name));
 
         const defaultPlayersDatabase = [
-            { id: "bos_0", name: "Jayson Tatum", team: "BOS", role: "STARTER", pos: "F", no: "0", min: 38, pts: 27, fgM: 9, fgA: 20, tpM: 4, tpA: 9, ftM: 5, ftA: 6, reb: 8, ast: 5, to: 2, stl: 1, blk: 1, oreb: 1, dreb: 7, pf: 2, plusMinus: "+8", college: "Duke", ppg: 27.0, rpg: 8.0, apg: 5.0, img: "" },
-            { id: "det_2", name: "Cade Cunningham", team: "DET", role: "STARTER", pos: "G", no: "2", min: 36, pts: 28, fgM: 10, fgA: 21, tpM: 3, tpA: 7, ftM: 5, ftA: 6, reb: 5, ast: 9, to: 4, stl: 1, blk: 1, oreb: 0, dreb: 5, pf: 1, plusMinus: "-1", college: "Oklahoma State", ppg: 28.0, rpg: 5.0, apg: 9.0, img: "" }
+            { id: "bos_0", name: "Jayson Tatum", team: "BOS", role: "STARTER", pos: "F", no: "0", min: 38, pts: 27, fgM: 9, fgA: 20, tpM: 4, tpA: 9, ftM: 5, ftA: 6, reb: 8, ast: 5, to: 2, stl: 1, blk: 1, oreb: 1, dreb: 7, pf: 2, plusMinus: "+8", ppg: 27.0, rpg: 8.0, apg: 5.0, gamesPlayed: 1 },
+            { id: "det_2", name: "Cade Cunningham", team: "DET", role: "STARTER", pos: "G", no: "2", min: 36, pts: 28, fgM: 10, fgA: 21, tpM: 3, tpA: 7, ftM: 5, ftA: 6, reb: 5, ast: 9, to: 4, stl: 1, blk: 1, oreb: 0, dreb: 5, pf: 1, plusMinus: "-1", ppg: 28.0, rpg: 5.0, apg: 9.0, gamesPlayed: 1 }
         ];
 
         const defaultScheduleDatabase = {
@@ -376,10 +365,9 @@
         let standingsData = JSON.parse(localStorage.getItem("hoopStatsStandings")) || defaultStandingsData;
 
         let currentDate = "2026-10-25";
-        let currentFilter = "ALL";
         let currentConf = "EAST";
         let activeGameId = null;
-        let currentModalTab = 'summary';
+        let currentModalTab = 'players';
         let isAdmin = localStorage.getItem("hoopStatsAdmin") === "true";
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -393,7 +381,6 @@
         });
 
         function populateAdminDropdowns() {
-            // 1. Populate Red Box Away & Home Team Dropdowns
             const awaySel = document.getElementById("adm-away-team");
             const homeSel = document.getElementById("adm-home-team");
             const playerTeamSel = document.getElementById("adm-player-team");
@@ -405,7 +392,6 @@
             awaySel.value = "BOS";
             homeSel.value = "DET";
 
-            // 2. Populate Yellow Box Conference Team Dropdown
             onAdminConfChanged();
         }
 
@@ -432,6 +418,7 @@
                 alert("Logged out of admin session.");
             }
             updateAdminUIState();
+            renderGames();
             renderPlayerTable();
         }
 
@@ -486,6 +473,16 @@
             renderGames();
         }
 
+        function adminDeleteGame(gameId) {
+            if(confirm("Are you sure you want to delete this game?")) {
+                for(let date in scheduleDatabase) {
+                    scheduleDatabase[date] = scheduleDatabase[date].filter(g => g.id !== gameId);
+                }
+                localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
+                renderGames();
+            }
+        }
+
         function adminUpdateStandings() {
             const conf = document.getElementById("adm-standings-conf").value;
             const team = document.getElementById("adm-team-name-select").value;
@@ -512,11 +509,8 @@
             const name = document.getElementById("adm-player-name").value.trim();
             const team = document.getElementById("adm-player-team").value;
             const no = document.getElementById("adm-player-no").value.trim() || "23";
-            const pos = document.getElementById("adm-player-pos").value; // G, F, or C
+            const pos = document.getElementById("adm-player-pos").value;
             const role = document.getElementById("adm-player-role").value;
-            const ppg = parseFloat(document.getElementById("adm-player-ppg").value) || 15.0;
-            const rpg = parseFloat(document.getElementById("adm-player-rpg").value) || 5.0;
-            const apg = parseFloat(document.getElementById("adm-player-apg").value) || 4.0;
 
             if(!name) {
                 alert("Please enter a player name.");
@@ -524,55 +518,110 @@
             }
 
             const playerId = team.toLowerCase() + "_" + no;
-            const existingIndex = playersDatabase.findIndex(p => p.id === playerId || p.name.toLowerCase() === name.toLowerCase());
+            const existing = playersDatabase.find(p => p.id === playerId);
 
-            const playerObj = {
-                id: playerId,
-                name: name,
-                team: team,
-                role: role,
-                pos: pos,
-                no: no,
-                min: 30,
-                pts: Math.round(ppg),
-                fgM: Math.round(ppg / 2),
-                fgA: Math.round(ppg),
-                tpM: 2,
-                tpA: 5,
-                ftM: 3,
-                ftA: 4,
-                reb: Math.round(rpg),
-                ast: Math.round(apg),
-                to: 2,
-                stl: 1,
-                blk: 1,
-                oreb: 1,
-                dreb: Math.round(rpg) - 1,
-                pf: 2,
-                plusMinus: "+3",
-                ppg: ppg,
-                rpg: rpg,
-                apg: apg,
-                college: "NBA",
-                img: ""
-            };
-
-            if(existingIndex >= 0) {
-                playersDatabase[existingIndex] = playerObj;
+            if(existing) {
+                existing.name = name;
+                existing.team = team;
+                existing.pos = pos;
+                existing.role = role;
             } else {
-                playersDatabase.push(playerObj);
+                playersDatabase.push({
+                    id: playerId,
+                    name: name,
+                    team: team,
+                    role: role,
+                    pos: pos,
+                    no: no,
+                    min: 0, pts: 0, fgM: 0, fgA: 0, tpM: 0, tpA: 0, ftM: 0, ftA: 0, reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, plusMinus: "0",
+                    ppg: 0.0, rpg: 0.0, apg: 0.0, gamesPlayed: 0
+                });
             }
 
             localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
-            alert(`Player ${name} saved successfully! Profile averages automatically synced.`);
+            alert(`Player ${name} successfully saved to roster!`);
             
             document.getElementById("adm-player-name").value = "";
             document.getElementById("adm-player-no").value = "";
-            document.getElementById("adm-player-ppg").value = "";
-            document.getElementById("adm-player-rpg").value = "";
-            document.getElementById("adm-player-apg").value = "";
-
             renderPlayerTable();
+        }
+
+        function adminAddGameStatLine(gameId) {
+            const playerSelId = document.getElementById("stat-player-select").value;
+            if(!playerSelId) {
+                alert("Please select a player.");
+                return;
+            }
+
+            const min = parseInt(document.getElementById("stat-min").value) || 0;
+            const pts = parseInt(document.getElementById("stat-pts").value) || 0;
+            const fgStr = document.getElementById("stat-fg").value.split("-");
+            const fgM = parseInt(fgStr[0]) || 0;
+            const fgA = parseInt(fgStr[1]) || 0;
+            const tpStr = document.getElementById("stat-3pt").value.split("-");
+            const tpM = parseInt(tpStr[0]) || 0;
+            const tpA = parseInt(tpStr[1]) || 0;
+            const ftStr = document.getElementById("stat-ft").value.split("-");
+            const ftM = parseInt(ftStr[0]) || 0;
+            const ftA = parseInt(ftStr[1]) || 0;
+            const reb = parseInt(document.getElementById("stat-reb").value) || 0;
+            const ast = parseInt(document.getElementById("stat-ast").value) || 0;
+            const to = parseInt(document.getElementById("stat-to").value) || 0;
+            const stl = parseInt(document.getElementById("stat-stl").value) || 0;
+            const blk = parseInt(document.getElementById("stat-blk").value) || 0;
+            const oreb = parseInt(document.getElementById("stat-oreb").value) || 0;
+            const dreb = parseInt(document.getElementById("stat-dreb").value) || 0;
+            const pf = parseInt(document.getElementById("stat-pf").value) || 0;
+            const plusMinus = document.getElementById("stat-pm").value || "+0";
+            const role = document.getElementById("stat-role").value;
+
+            let p = playersDatabase.find(x => x.id === playerSelId);
+            if(p) {
+                p.role = role;
+                p.min = min;
+                p.pts = pts;
+                p.fgM = fgM;
+                p.fgA = fgA;
+                p.tpM = tpM;
+                p.tpA = tpA;
+                p.ftM = ftM;
+                p.ftA = ftA;
+                p.reb = reb;
+                p.ast = ast;
+                p.to = to;
+                p.stl = stl;
+                p.blk = blk;
+                p.oreb = oreb;
+                p.dreb = dreb;
+                p.pf = pf;
+                p.plusMinus = plusMinus;
+
+                // Automatically recalculate cumulative season averages (PPG, RPG, APG)
+                p.gamesPlayed = (p.gamesPlayed || 0) + 1;
+                p.totalPts = (p.totalPts || 0) + pts;
+                p.totalReb = (p.totalReb || 0) + reb;
+                p.totalAst = (p.totalAst || 0) + ast;
+
+                p.ppg = parseFloat((p.totalPts / p.gamesPlayed).toFixed(1));
+                p.rpg = parseFloat((p.totalReb / p.gamesPlayed).toFixed(1));
+                p.apg = parseFloat((p.totalAst / p.gamesPlayed).toFixed(1));
+
+                localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
+                alert("Stat line added successfully and player averages synced!");
+                renderBoxScoreContent();
+                renderPlayerTable();
+            }
+        }
+
+        function adminRemovePlayerStatLine(playerId) {
+            let p = playersDatabase.find(x => x.id === playerId);
+            if(p) {
+                p.min = 0; p.pts = 0; p.fgM = 0; p.fgA = 0; p.tpM = 0; p.tpA = 0; p.ftM = 0; p.ftA = 0; p.reb = 0; p.ast = 0; p.to = 0; p.stl = 0; p.blk = 0; p.oreb = 0; p.dreb = 0; p.pf = 0; p.plusMinus = "0";
+                localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
+                alert("Stat line removed.");
+                renderBoxScoreContent();
+                renderPlayerTable();
+            }
         }
 
         function adminDeletePlayer(playerId) {
@@ -622,40 +671,31 @@
             return scheduleDatabase[dateStr] || [];
         }
 
-        function filterGames(filter) {
-            currentFilter = filter;
-            document.getElementById("filter-all").className = `px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${filter === 'ALL' ? 'bg-orange-600 text-white' : 'bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800'}`;
-            document.getElementById("filter-live").className = `px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${filter === 'LIVE' ? 'bg-orange-600 text-white' : 'bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800'}`;
-            renderGames();
-        }
-
         function renderGames() {
             const container = document.getElementById("games-container");
             const games = getGamesForDate(currentDate);
-            const filtered = games.filter(g => currentFilter === 'ALL' || (currentFilter === 'LIVE' && g.status === 'LIVE'));
 
-            if (filtered.length === 0) {
+            if (games.length === 0) {
                 container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 bg-slate-900/40 rounded-2xl border border-slate-800">No scheduled games found for ${currentDate}.</div>`;
                 return;
             }
 
-            container.innerHTML = filtered.map(g => {
+            container.innerHTML = games.map(g => {
                 const homeT = teamsData[g.home] || { name: g.home, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
                 const awayT = teamsData[g.away] || { name: g.away, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
-                const isLive = g.status === 'LIVE';
                 const isFinal = g.status === 'FINAL';
 
                 return `
-                    <div onclick="openBoxScore('${g.id}')" class="bg-slate-900/80 border border-slate-800 hover:border-slate-700 rounded-2xl p-5 shadow-xl cursor-pointer transition-all hover:scale-[1.01] group space-y-4">
-                        <div class="flex items-center justify-between text-xs">
+                    <div class="bg-slate-900/80 border border-slate-800 hover:border-slate-700 rounded-2xl p-5 shadow-xl transition-all group space-y-4">
+                        <div class="flex items-center justify-between text-xs cursor-pointer" onclick="openBoxScore('${g.id}')">
                             <span class="font-semibold text-slate-400 flex items-center truncate max-w-[200px]">
                                 <i class="fa-solid fa-location-dot text-orange-500 mr-1.5 shrink-0"></i>${g.arena}
                             </span>
-                            <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] tracking-wider uppercase ${isLive ? 'bg-red-950 text-red-400 border border-red-800 animate-pulse' : isFinal ? 'bg-slate-800 text-slate-300' : 'bg-orange-950 text-orange-400 border border-orange-800'}">
+                            <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] tracking-wider uppercase bg-slate-800 text-slate-300">
                                 ${isFinal ? 'FINAL' : g.time}
                             </span>
                         </div>
-                        <div class="space-y-3">
+                        <div class="space-y-3 cursor-pointer" onclick="openBoxScore('${g.id}')">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
                                     <img src="${awayT.logo}" class="w-8 h-8 object-contain">
@@ -664,7 +704,7 @@
                                         <span class="text-[10px] text-slate-400 block uppercase">Away</span>
                                     </div>
                                 </div>
-                                <span class="text-xl font-black font-teko text-white">${isLive || isFinal ? g.awayScore : '-'}</span>
+                                <span class="text-xl font-black font-teko text-white">${g.awayScore}</span>
                             </div>
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
@@ -674,14 +714,14 @@
                                         <span class="text-[10px] text-slate-400 block uppercase">Home</span>
                                     </div>
                                 </div>
-                                <span class="text-xl font-black font-teko text-white">${isLive || isFinal ? g.homeScore : '-'}</span>
+                                <span class="text-xl font-black font-teko text-white">${g.homeScore}</span>
                             </div>
                         </div>
                         <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                            <span class="text-orange-400 font-semibold group-hover:underline flex items-center">
-                                <i class="fa-solid fa-chart-pie mr-1.5"></i>${isFinal ? 'View Pro Box Score' : 'View Game Details'}
+                            <span onclick="openBoxScore('${g.id}')" class="text-orange-400 font-semibold group-hover:underline flex items-center cursor-pointer">
+                                <i class="fa-solid fa-chart-pie mr-1.5"></i>View Pro Box Score
                             </span>
-                            <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+                            ${isAdmin ? `<button onclick="adminDeleteGame('${g.id}')" class="px-2.5 py-1 text-[11px] font-bold rounded bg-red-950 text-red-400 hover:bg-red-900 transition-all"><i class="fa-solid fa-trash mr-1"></i>Delete Game</button>` : ''}
                         </div>
                     </div>
                 `;
@@ -727,14 +767,14 @@
             tbody.innerHTML = filtered.map(p => `
                 <tr class="hover:bg-slate-800/40 transition-all">
                     <td class="py-3 px-4 flex items-center space-x-3 cursor-pointer" onclick="openPlayerModal('${p.id}')">
-                        ${p.img ? `<img src="${p.img}" class="w-9 h-9 rounded-lg object-cover bg-slate-950 border border-slate-700" onerror="this.style.display='none'">` : `<div class="w-9 h-9 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center text-slate-600 text-xs font-bold"><i class="fa-solid fa-user"></i></div>`}
+                        <div class="w-9 h-9 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center text-slate-400 text-xs font-bold"><i class="fa-solid fa-user"></i></div>
                         <span class="font-bold text-white hover:text-orange-400">#${p.no} ${p.name}</span>
                     </td>
                     <td class="py-3 px-4 text-slate-300 font-semibold">${p.team}</td>
                     <td class="py-3 px-4 text-slate-400">${p.pos}</td>
-                    <td class="py-3 px-4 text-center font-bold text-orange-400">${p.ppg || p.pts || 15.0}</td>
-                    <td class="py-3 px-4 text-center text-slate-300">${p.rpg || p.reb || 5.0}</td>
-                    <td class="py-3 px-4 text-center text-slate-300">${p.apg || p.ast || 4.0}</td>
+                    <td class="py-3 px-4 text-center font-bold text-orange-400">${p.ppg || 0.0}</td>
+                    <td class="py-3 px-4 text-center text-slate-300">${p.rpg || 0.0}</td>
+                    <td class="py-3 px-4 text-center text-slate-300">${p.apg || 0.0}</td>
                     <td class="py-3 px-4 text-center space-x-1">
                         <button onclick="openPlayerModal('${p.id}')" class="px-2.5 py-1 text-xs font-semibold rounded bg-slate-800 text-slate-300 hover:bg-orange-600 hover:text-white transition-all">Profile</button>
                         ${isAdmin ? `<button onclick="adminDeletePlayer('${p.id}')" class="px-2.5 py-1 text-xs font-semibold rounded bg-red-950 text-red-400 hover:bg-red-900 transition-all">Delete</button>` : ''}
@@ -777,35 +817,10 @@
 
             const homeT = teamsData[game.home] || { name: game.home, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
             const awayT = teamsData[game.away] || { name: game.away, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
-            const isUpcoming = game.status === 'UPCOMING';
 
             document.getElementById("modal-game-title").innerText = `${awayT.name} at ${homeT.name} (${game.time})`;
             const tabsContainer = document.getElementById("modal-tabs-container");
             const content = document.getElementById("modal-body-content");
-
-            if (isUpcoming) {
-                tabsContainer.classList.add('hidden');
-                content.innerHTML = `
-                    <div class="space-y-6">
-                        <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 text-center space-y-4">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold uppercase bg-orange-950 text-orange-400 border border-orange-800">UPCOMING GAME &bull; ${game.time}</span>
-                            <div class="flex items-center justify-between max-w-md mx-auto">
-                                <div class="flex flex-col items-center space-y-2">
-                                    <img src="${awayT.logo}" class="w-16 h-16 object-contain">
-                                    <h4 class="font-bold text-white text-sm">${awayT.name}</h4>
-                                </div>
-                                <span class="text-2xl font-black font-teko text-slate-500">VS</span>
-                                <div class="flex flex-col items-center space-y-2">
-                                    <img src="${homeT.logo}" class="w-16 h-16 object-contain">
-                                    <h4 class="font-bold text-white text-sm">${homeT.name}</h4>
-                                </div>
-                            </div>
-                            <p class="text-xs text-slate-400">Location: ${game.arena}</p>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
 
             tabsContainer.classList.remove('hidden');
             if(currentModalTab === 'summary') {
@@ -831,6 +846,7 @@
                     </div>
                 `;
             } else {
+                let gamePlayers = playersDatabase.filter(p => p.team === game.away || p.team === game.home);
                 let awayPlayers = playersDatabase.filter(p => p.team === game.away);
                 let homePlayers = playersDatabase.filter(p => p.team === game.home);
 
@@ -840,22 +856,22 @@
 
                     let tMin = 0, tPts = 0, tFgM = 0, tFgA = 0, t3pM = 0, t3pA = 0, tftM = 0, tftA = 0, tReb = 0, tAst = 0, tTo = 0, tStl = 0, tBlk = 0, tOreb = 0, tDreb = 0, tPf = 0;
                     players.forEach(p => {
-                        tMin += (p.min || 25);
-                        tPts += (p.pts || 15);
-                        tFgM += (p.fgM || 6);
-                        tFgA += (p.fgA || 12);
-                        t3pM += (p.tpM || 2);
-                        t3pA += (p.tpA || 5);
-                        tftM += (p.ftM || 3);
-                        tftA += (p.ftA || 4);
-                        tReb += (p.reb || 5);
-                        tAst += (p.ast || 4);
-                        tTo += (p.to || 2);
-                        tStl += (p.stl || 1);
-                        tBlk += (p.blk || 1);
-                        tOreb += (p.oreb || 1);
-                        tDreb += (p.dreb || 4);
-                        tPf += (p.pf || 2);
+                        tMin += (p.min || 0);
+                        tPts += (p.pts || 0);
+                        tFgM += (p.fgM || 0);
+                        tFgA += (p.fgA || 0);
+                        t3pM += (p.tpM || 0);
+                        t3pA += (p.tpA || 0);
+                        tftM += (p.ftM || 0);
+                        tftA += (p.ftA || 0);
+                        tReb += (p.reb || 0);
+                        tAst += (p.ast || 0);
+                        tTo += (p.to || 0);
+                        tStl += (p.stl || 0);
+                        tBlk += (p.blk || 0);
+                        tOreb += (p.oreb || 0);
+                        tDreb += (p.dreb || 0);
+                        tPf += (p.pf || 0);
                     });
 
                     const fgPct = tFgA > 0 ? ((tFgM / tFgA) * 100).toFixed(1) + '%' : '0.0%';
@@ -863,26 +879,27 @@
                     const ftPct = tftA > 0 ? ((tftM / tftA) * 100).toFixed(1) + '%' : '0.0%';
 
                     const renderRows = (list) => {
-                        if(list.length === 0) return `<tr><td colspan="15" class="py-2 px-3 text-xs text-slate-500 italic">No players listed.</td></tr>`;
+                        if(list.length === 0) return `<tr><td colspan="16" class="py-2 px-3 text-xs text-slate-500 italic">No players listed.</td></tr>`;
                         return list.map(p => `
-                            <tr class="hover:bg-slate-900/80 cursor-pointer text-xs" onclick="openPlayerModal('${p.id}')">
-                                <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap">
-                                    <span class="hover:underline">${p.name}</span> <span class="text-slate-400 font-normal">#${p.no}</span>
+                            <tr class="hover:bg-slate-900/80 text-xs">
+                                <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap flex items-center space-x-2">
+                                    <span class="cursor-pointer hover:underline" onclick="openPlayerModal('${p.id}')">${p.name} #${p.no}</span>
+                                    ${isAdmin ? `<button onclick="adminRemovePlayerStatLine('${p.id}')" class="text-red-400 hover:text-red-300 text-[10px]"><i class="fa-solid fa-trash"></i></button>` : ''}
                                 </td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.min || 28}</td>
-                                <td class="py-2.5 px-2 text-center font-bold text-orange-400">${p.pts || 15}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.fgM || 6}-${p.fgA || 12}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.tpM || 2}-${p.tpA || 5}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.ftM || 3}-${p.ftA || 4}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.reb || 5}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.ast || 4}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.to || 2}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.stl || 1}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.blk || 1}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.oreb || 1}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.dreb || 4}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.pf || 2}</td>
-                                <td class="py-2.5 px-2 text-center font-semibold text-emerald-400">${p.plusMinus || '+3'}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.min || 0}</td>
+                                <td class="py-2.5 px-2 text-center font-bold text-orange-400">${p.pts || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.fgM || 0}-${p.fgA || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.tpM || 0}-${p.tpA || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.ftM || 0}-${p.ftA || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.reb || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.ast || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.to || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.stl || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.blk || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.oreb || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.dreb || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.pf || 0}</td>
+                                <td class="py-2.5 px-2 text-center font-semibold text-emerald-400">${p.plusMinus || '+0'}</td>
                             </tr>
                         `).join('');
                     };
@@ -915,7 +932,6 @@
                                 <img src="${teamInfo.logo}" class="w-7 h-7 object-contain">
                                 <h4 class="font-black font-teko uppercase text-white text-lg tracking-wide">${teamInfo.name}</h4>
                             </div>
-                            
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left text-xs whitespace-nowrap">
                                     ${tableHeaders}
@@ -955,8 +971,44 @@
                     `;
                 };
 
+                let adminStatEntryForm = "";
+                if(isAdmin) {
+                    const rosterOptions = gamePlayers.map(p => `<option value="${p.id}">${p.name} (${p.team})</option>`).join('');
+                    adminStatEntryForm = `
+                        <div class="bg-orange-950/40 border-2 border-orange-600/60 p-4 rounded-2xl space-y-3">
+                            <h4 class="text-xs font-black font-teko uppercase text-orange-400 tracking-wider">🔒 Admin Stat-Sheet Entry (Add Player Stats for this Game)</h4>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                                <div>
+                                    <label class="text-[10px] text-slate-400 block mb-1">Select Player</label>
+                                    <select id="stat-player-select" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white">${rosterOptions}</select>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-slate-400 block mb-1">Role</label>
+                                    <select id="stat-role" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"><option value="STARTER">Starter</option><option value="BENCH">Bench</option></select>
+                                </div>
+                                <div><label class="text-[10px] text-slate-400 block mb-1">MIN</label><input type="number" id="stat-min" value="28" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"></div>
+                                <div><label class="text-[10px] text-slate-400 block mb-1">PTS</label><input type="number" id="stat-pts" value="15" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"></div>
+                                <div><label class="text-[10px] text-slate-400 block mb-1">FG (M-A)</label><input type="text" id="stat-fg" value="6-12" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"></div>
+                                <div><label class="text-[10px] text-slate-400 block mb-1">3PT (M-A)</label><input type="text" id="stat-3pt" value="2-5" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"></div>
+                                <div><label class="text-[10px] text-slate-400 block mb-1">FT (M-A)</label><input type="text" id="stat-ft" value="3-4" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"></div>
+                                <div><label class="text-[10px] text-slate-400 block mb-1">REB</label><input type="number" id="stat-reb" value="5" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"></div>
+                                <div><label class="text-[10px] text-slate-400 block mb-1">AST</label><input type="number" id="stat-ast" value="4" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"></div>
+                                <div><label class="text-[10px] text-slate-400 block mb-1">TO</label><input type="number" id="stat-to" value="2" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"></div>
+                                <div><label class="text-[10px] text-slate-400 block mb-1">STL</label><input type="number" id="stat-stl" value="1" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"></div>
+                                <div><label class="text-[10px] text-slate-400 block mb-1">BLK</label><input type="number" id="stat-blk" value="1" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"></div>
+                                <div><label class="text-[10px] text-slate-400 block mb-1">OREB</label><input type="number" id="stat-oreb" value="1" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"></div>
+                                <div><label class="text-[10px] text-slate-400 block mb-1">DREB</label><input type="number" id="stat-dreb" value="4" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"></div>
+                                <div><label class="text-[10px] text-slate-400 block mb-1">PF</label><input type="number" id="stat-pf" value="2" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"></div>
+                                <div><label class="text-[10px] text-slate-400 block mb-1">+/-</label><input type="text" id="stat-pm" value="+4" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white"></div>
+                            </div>
+                            <button onclick="adminAddGameStatLine('${game.id}')" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all text-xs">Add Stat Line & Sync Averages</button>
+                        </div>
+                    `;
+                }
+
                 content.innerHTML = `
                     <div class="space-y-6">
+                        ${adminStatEntryForm}
                         ${renderTeamProBoxScore(awayT, awayPlayers, game.awayScore)}
                         ${renderTeamProBoxScore(homeT, homePlayers, game.homeScore)}
                     </div>
@@ -967,11 +1019,11 @@
         function openPlayerModal(playerId) {
             let p = playersDatabase.find(x => x.id === playerId);
             if(!p) {
-                p = { name: playerId, team: "NBA", pos: "G", ppg: 15.0, rpg: 5.0, apg: 4.0, no: "23", college: "NBA", img: "" };
+                p = { name: playerId, team: "NBA", pos: "G", ppg: 0.0, rpg: 0.0, apg: 0.0, no: "23", college: "NBA" };
             }
             document.getElementById("player-modal-content").innerHTML = `
                 <div class="flex items-center space-x-5 bg-slate-950 p-5 rounded-2xl border border-slate-800">
-                    ${p.img ? `<img src="${p.img}" class="w-24 h-24 rounded-2xl object-cover bg-slate-900 border-2 border-orange-500" onerror="this.style.display='none'">` : `<div class="w-24 h-24 rounded-2xl bg-slate-900 border-2 border-orange-500 flex items-center justify-center text-slate-500 text-2xl"><i class="fa-solid fa-user"></i></div>`}
+                    <div class="w-24 h-24 rounded-2xl bg-slate-900 border-2 border-orange-500 flex items-center justify-center text-slate-500 text-2xl"><i class="fa-solid fa-user"></i></div>
                     <div>
                         <span class="text-xs font-bold uppercase text-orange-400">#${p.no || '23'} &bull; ${p.pos || 'G'}</span>
                         <h3 class="text-2xl font-black text-white">${p.name}</h3>
@@ -981,9 +1033,9 @@
                 <div class="space-y-3">
                     <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Synced Season Averages</h4>
                     <div class="grid grid-cols-3 gap-3 text-center">
-                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800"><span class="text-[10px] text-slate-400 uppercase block font-bold">PPG (Points)</span><span class="text-2xl font-black font-teko text-orange-400">${p.ppg || p.pts || 15.0}</span></div>
-                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800"><span class="text-[10px] text-slate-400 uppercase block font-bold">RPG (Rebounds)</span><span class="text-2xl font-black font-teko text-slate-200">${p.rpg || p.reb || 5.0}</span></div>
-                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800"><span class="text-[10px] text-slate-400 uppercase block font-bold">APG (Assists)</span><span class="text-2xl font-black font-teko text-slate-200">${p.apg || p.ast || 4.0}</span></div>
+                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800"><span class="text-[10px] text-slate-400 uppercase block font-bold">PPG (Points)</span><span class="text-2xl font-black font-teko text-orange-400">${p.ppg || 0.0}</span></div>
+                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800"><span class="text-[10px] text-slate-400 uppercase block font-bold">RPG (Rebounds)</span><span class="text-2xl font-black font-teko text-slate-200">${p.rpg || 0.0}</span></div>
+                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800"><span class="text-[10px] text-slate-400 uppercase block font-bold">APG (Assists)</span><span class="text-2xl font-black font-teko text-slate-200">${p.apg || 0.0}</span></div>
                     </div>
                 </div>
             `;
