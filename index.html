@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HoopStats Central | Pro Box Score & Backup Edition</title>
+    <title>HoopStats Central | Pro Box Score & Standings Edition</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome Icons -->
@@ -118,7 +118,7 @@
                     </div>
                     <div>
                         <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Position</label>
-                        <select id="adm-player-pos" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white">
+                        <select id="adm-player-pos" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
                             <option value="G">G (Guard)</option>
                             <option value="F">F (Forward)</option>
                             <option value="C">C (Center)</option>
@@ -127,7 +127,7 @@
                     <button onclick="adminSavePlayer()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Save Player to Roster</button>
                 </div>
 
-                <!-- 3. DATA BACKUP & RESTORE (JSON Export/Import) -->
+                <!-- 3. DATA BACKUP & SYNC -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 flex flex-col justify-between">
                     <div>
                         <h3 class="font-bold text-orange-400 uppercase">3. Data Backup & Sync</h3>
@@ -199,7 +199,6 @@
                                 <th class="py-3.5 px-4 font-bold text-center">W</th>
                                 <th class="py-3.5 px-4 font-bold text-center">L</th>
                                 <th class="py-3.5 px-4 font-bold text-center">PCT</th>
-                                <th class="py-3.5 px-4 font-bold text-center">GB</th>
                             </tr>
                         </thead>
                         <tbody id="standings-tbody" class="divide-y divide-slate-800/60 text-xs sm:text-sm"></tbody>
@@ -248,7 +247,7 @@
     <!-- FOOTER -->
     <footer class="bg-slate-900 border-t border-slate-800 mt-12 py-8 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4 space-y-2">
-            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Box Score & Backup Edition</p>
+            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Box Score & Standings Edition</p>
             <p>Automatic team totals, shooting percentages, and synced player profile averages.</p>
         </div>
     </footer>
@@ -270,6 +269,47 @@
                 <button onclick="switchModalTab('players')" id="modal-tab-players" class="py-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all">Full Team Pro Box Scores</button>
             </div>
             <div class="p-4 sm:p-6 overflow-y-auto space-y-6 flex-grow" id="modal-body-content"></div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: EDIT GAME ================= -->
+    <div id="edit-game-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div class="flex items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800">
+                <h3 class="text-base font-bold text-white uppercase tracking-wider">Edit Game Matchup & Score</h3>
+                <button onclick="closeEditGameModal()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-all">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4 text-xs">
+                <input type="hidden" id="edit-game-id">
+                <input type="hidden" id="edit-game-old-date">
+                <div>
+                    <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Game Date</label>
+                    <input type="date" id="edit-game-date" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Away Team</label>
+                        <select id="edit-game-away" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-2 text-white"></select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Home Team</label>
+                        <select id="edit-game-home" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-2 text-white"></select>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <div class="w-1/2">
+                        <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Away Score</label>
+                        <input type="number" id="edit-game-awayscore" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                    </div>
+                    <div class="w-1/2">
+                        <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Home Score</label>
+                        <input type="number" id="edit-game-homescore" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                    </div>
+                </div>
+                <button onclick="saveEditedGame()" class="w-full py-2.5 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Save Game Updates</button>
+            </div>
         </div>
     </div>
 
@@ -364,7 +404,7 @@
 
         const defaultScheduleDatabase = {
             "2026-10-25": [
-                { id: "g_1025_1", status: "FINAL", time: "5:00 PM", home: "DET", away: "BOS", homeScore: 108, awayScore: 116, arena: "Little Caesars Arena, Detroit" }
+                { id: "g_1025_1", status: "FINAL", time: "5:00 PM", gameDate: "2026-10-25", home: "DET", away: "BOS", homeScore: 108, awayScore: 116, arena: "Little Caesars Arena, Detroit" }
             ]
         };
 
@@ -391,11 +431,16 @@
             const awaySel = document.getElementById("adm-away-team");
             const homeSel = document.getElementById("adm-home-team");
             const playerTeamSel = document.getElementById("adm-player-team");
+            const editAwaySel = document.getElementById("edit-game-away");
+            const editHomeSel = document.getElementById("edit-game-home");
 
             const teamOptionsHTML = nbaTeamsAlphabetical.map(t => `<option value="${t.code}">${t.name} (${t.code})</option>`).join('');
             awaySel.innerHTML = teamOptionsHTML;
             homeSel.innerHTML = teamOptionsHTML;
             playerTeamSel.innerHTML = teamOptionsHTML;
+            editAwaySel.innerHTML = teamOptionsHTML;
+            editHomeSel.innerHTML = teamOptionsHTML;
+
             awaySel.value = "BOS";
             homeSel.value = "DET";
         }
@@ -469,6 +514,85 @@
             localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
 
             alert("Game published successfully!");
+            renderGames();
+            renderStandings();
+        }
+
+        function openEditGameModal(gameId, gameDate) {
+            let game = null;
+            if(scheduleDatabase[gameDate]) {
+                game = scheduleDatabase[gameDate].find(g => g.id === gameId);
+            }
+            if(!game) {
+                for(let d in scheduleDatabase) {
+                    let found = scheduleDatabase[d].find(g => g.id === gameId);
+                    if(found) { game = found; gameDate = d; break; }
+                }
+            }
+            if(!game) return;
+
+            document.getElementById("edit-game-id").value = game.id;
+            document.getElementById("edit-game-old-date").value = gameDate;
+            document.getElementById("edit-game-date").value = game.gameDate || gameDate;
+            document.getElementById("edit-game-away").value = game.away;
+            document.getElementById("edit-game-home").value = game.home;
+            document.getElementById("edit-game-awayscore").value = game.awayScore;
+            document.getElementById("edit-game-homescore").value = game.homeScore;
+
+            document.getElementById("edit-game-modal").classList.remove("hidden");
+            document.getElementById("edit-game-modal").classList.add("flex");
+        }
+
+        function closeEditGameModal() {
+            document.getElementById("edit-game-modal").classList.remove("flex");
+            document.getElementById("edit-game-modal").classList.add("hidden");
+        }
+
+        function saveEditedGame() {
+            const gameId = document.getElementById("edit-game-id").value;
+            const oldDate = document.getElementById("edit-game-old-date").value;
+            const newDate = document.getElementById("edit-game-date").value;
+            const awayCode = document.getElementById("edit-game-away").value;
+            const homeCode = document.getElementById("edit-game-home").value;
+            const awayScore = parseInt(document.getElementById("edit-game-awayscore").value) || 0;
+            const homeScore = parseInt(document.getElementById("edit-game-homescore").value) || 0;
+
+            if(!newDate || awayCode === homeCode) {
+                alert("Please select a valid date and distinct teams.");
+                return;
+            }
+
+            let targetGame = null;
+            if(scheduleDatabase[oldDate]) {
+                scheduleDatabase[oldDate] = scheduleDatabase[oldDate].filter(g => {
+                    if(g.id === gameId) {
+                        targetGame = g;
+                        return false;
+                    }
+                    return true;
+                });
+                if(scheduleDatabase[oldDate].length === 0) delete scheduleDatabase[oldDate];
+            }
+
+            if(!targetGame) {
+                targetGame = { id: gameId };
+            }
+
+            targetGame.gameDate = newDate;
+            targetGame.away = awayCode;
+            targetGame.home = homeCode;
+            targetGame.awayScore = awayScore;
+            targetGame.homeScore = homeScore;
+            targetGame.status = "FINAL";
+            targetGame.time = "7:00 PM";
+            targetGame.arena = "Custom NBA Arena";
+
+            if(!scheduleDatabase[newDate]) scheduleDatabase[newDate] = [];
+            scheduleDatabase[newDate].push(targetGame);
+
+            localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
+            alert("Game updated successfully!");
+            closeEditGameModal();
             renderGames();
             renderStandings();
         }
@@ -772,7 +896,12 @@
                             <span onclick="openBoxScore('${g.id}')" class="text-orange-400 font-semibold group-hover:underline flex items-center cursor-pointer">
                                 <i class="fa-solid fa-chart-pie mr-1.5"></i>View Pro Box Score
                             </span>
-                            ${isAdmin ? `<button onclick="adminDeleteGame('${g.id}')" class="px-2.5 py-1 text-[11px] font-bold rounded bg-red-950 text-red-400 hover:bg-red-900 transition-all"><i class="fa-solid fa-trash mr-1"></i>Delete Game</button>` : ''}
+                            ${isAdmin ? `
+                                <div class="flex space-x-1.5">
+                                    <button onclick="openEditGameModal('${g.id}', '${currentDate}')" class="px-2.5 py-1 text-[11px] font-bold rounded bg-slate-800 text-slate-200 hover:bg-slate-700 transition-all"><i class="fa-solid fa-pen mr-1"></i>Edit</button>
+                                    <button onclick="adminDeleteGame('${g.id}')" class="px-2.5 py-1 text-[11px] font-bold rounded bg-red-950 text-red-400 hover:bg-red-900 transition-all"><i class="fa-solid fa-trash mr-1"></i>Delete Game</button>
+                                </div>
+                            ` : ''}
                         </div>
                     </div>
                 `;
@@ -790,11 +919,16 @@
             const tbody = document.getElementById("standings-tbody");
             let teamRecords = {};
 
+            // Initialize all default teams so standings always show complete conference rosters
+            Object.values(teamsData).forEach(t => {
+                teamRecords[t.code] = { code: t.code, name: t.name, conf: t.conf, logo: t.logo, w: 0, l: 0 };
+            });
+
             Object.values(scheduleDatabase).forEach(dayGames => {
                 dayGames.forEach(g => {
                     if(g.status === 'FINAL') {
-                        if(!teamRecords[g.home]) teamRecords[g.home] = { name: teamsData[g.home]?.name || g.home, conf: teamsData[g.home]?.conf || 'EAST', w: 0, l: 0 };
-                        if(!teamRecords[g.away]) teamRecords[g.away] = { name: teamsData[g.away]?.name || g.away, conf: teamsData[g.away]?.conf || 'EAST', w: 0, l: 0 };
+                        if(!teamRecords[g.home]) teamRecords[g.home] = { code: g.home, name: teamsData[g.home]?.name || g.home, conf: teamsData[g.home]?.conf || 'EAST', logo: teamsData[g.home]?.logo || '', w: 0, l: 0 };
+                        if(!teamRecords[g.away]) teamRecords[g.away] = { code: g.away, name: teamsData[g.away]?.name || g.away, conf: teamsData[g.away]?.conf || 'EAST', logo: teamsData[g.away]?.logo || '', w: 0, l: 0 };
 
                         if(g.homeScore > g.awayScore) {
                             teamRecords[g.home].w += 1;
@@ -811,11 +945,12 @@
             confTeams.sort((a, b) => {
                 let pctA = (a.w + a.l > 0) ? (a.w / (a.w + a.l)) : 0;
                 let pctB = (b.w + b.l > 0) ? (b.w / (b.w + b.l)) : 0;
-                return pctB - pctA;
+                if(pctB !== pctA) return pctB - pctA;
+                return b.w - a.w;
             });
 
             if(confTeams.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500">No standings data available. Publish game scores to generate standings.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500">No standings data available.</td></tr>`;
                 return;
             }
 
@@ -825,11 +960,13 @@
                 return `
                     <tr class="hover:bg-slate-800/40 transition-all">
                         <td class="py-3 px-4 font-bold text-slate-400">${idx + 1}</td>
-                        <td class="py-3 px-4 font-bold text-white">${t.name}</td>
+                        <td class="py-3 px-4 font-bold text-white flex items-center space-x-3">
+                            <img src="${t.logo}" class="w-6 h-6 object-contain">
+                            <span>${t.name}</span>
+                        </td>
                         <td class="py-3 px-4 text-center font-bold text-emerald-400">${t.w}</td>
                         <td class="py-3 px-4 text-center text-slate-400">${t.l}</td>
                         <td class="py-3 px-4 text-center text-slate-300">${pct}</td>
-                        <td class="py-3 px-4 text-center text-slate-400">-</td>
                     </tr>
                 `;
             }).join('');
@@ -907,7 +1044,6 @@
             const homeT = teamsData[game.home] || { name: game.home, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
             const awayT = teamsData[game.away] || { name: game.away, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
 
-            // Modal Title without time
             document.getElementById("modal-game-title").innerText = `${awayT.name} AT ${homeT.name}`;
             const content = document.getElementById("modal-body-content");
 
@@ -961,7 +1097,7 @@
                             </div>
                         </div>
 
-                        <!-- TEAM COMPARISON STATS (Reference Image 3 Style) -->
+                        <!-- TEAM COMPARISON STATS -->
                         <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-6">
                             <h4 class="text-xs font-black font-teko uppercase text-slate-400 tracking-wider border-b border-slate-800 pb-2">Team Stats Comparison</h4>
                             
