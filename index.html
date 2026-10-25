@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HoopStats Central | Pro Box Score & Standings Edition</title>
+    <title>HoopStats Central | Pro Box Score & Free Agency Edition</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome Icons -->
@@ -70,7 +70,7 @@
     <!-- MAIN CONTENT CONTAINER -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-        <!-- ================= SECURE ADMIN CONTROL PANEL (Hidden until logged in) ================= -->
+        <!-- ================= SECURE ADMIN CONTROL PANEL ================= -->
         <section id="admin-control-panel" class="hidden bg-orange-950/40 border-2 border-orange-600/60 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4 animate-in fade-in duration-200">
             <div class="flex items-center justify-between border-b border-orange-800/60 pb-3">
                 <div class="flex items-center space-x-2">
@@ -211,12 +211,12 @@
         <section id="tab-leaders" class="hidden space-y-6">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-black font-teko uppercase tracking-wide text-white">Official 2026-27 NBA Team Rosters & Full 15-Man Stats</h1>
-                <p class="text-xs sm:text-sm text-slate-400">Select any team from the dropdown to view their complete active roster.</p>
+                <p class="text-xs sm:text-sm text-slate-400">Select any team or Free Agency from the dropdown to view active rosters and player stats.</p>
             </div>
 
             <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <h2 class="text-lg font-bold uppercase tracking-wider font-teko text-slate-200">Select Team Roster</h2>
+                    <h2 class="text-lg font-bold uppercase tracking-wider font-teko text-slate-200">Select Team / Free Agency</h2>
                     <div class="flex items-center space-x-2">
                         <select id="team-filter-select" onchange="filterPlayerTable()" class="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:border-orange-500 font-semibold"></select>
                     </div>
@@ -226,7 +226,6 @@
                         <thead>
                             <tr class="bg-slate-950/80 border-b border-slate-800 text-[11px] uppercase tracking-wider text-slate-400">
                                 <th class="py-3 px-4 font-bold">Player</th>
-                                <th class="py-3 px-4 font-bold">Team</th>
                                 <th class="py-3 px-4 font-bold">Pos</th>
                                 <th class="py-3 px-4 font-bold text-center">PPG</th>
                                 <th class="py-3 px-4 font-bold text-center">RPG</th>
@@ -247,7 +246,7 @@
     <!-- FOOTER -->
     <footer class="bg-slate-900 border-t border-slate-800 mt-12 py-8 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4 space-y-2">
-            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Box Score & Standings Edition</p>
+            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Box Score & Free Agency Edition</p>
             <p>Automatic team totals, shooting percentages, and synced player profile averages.</p>
         </div>
     </footer>
@@ -309,6 +308,26 @@
                     </div>
                 </div>
                 <button onclick="saveEditedGame()" class="w-full py-2.5 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Save Game Updates</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: MOVE PLAYER TO TEAM ================= -->
+    <div id="move-player-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div class="flex items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800">
+                <h3 class="text-base font-bold text-white uppercase tracking-wider">Sign / Move Player</h3>
+                <button onclick="closeMoveModal()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-all">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4 text-xs">
+                <input type="hidden" id="move-player-id">
+                <div>
+                    <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Select Destination Team</label>
+                    <select id="move-team-select" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white"></select>
+                </div>
+                <button onclick="confirmMovePlayer()" class="w-full py-2.5 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Confirm Signing</button>
             </div>
         </div>
     </div>
@@ -404,7 +423,7 @@
 
         const defaultScheduleDatabase = {
             "2026-10-25": [
-                { id: "g_1025_1", status: "FINAL", time: "5:00 PM", gameDate: "2026-10-25", home: "DET", away: "BOS", homeScore: 108, awayScore: 116, arena: "Little Caesars Arena, Detroit" }
+                { id: "g_1025_1", status: "FINAL", time: "5:00 PM", gameDate: "2026-10-25", home: "DET", away: "BOS", homeScore: 108, awayScore: 116, arena: "Little Caesars Arena, Detroit", boxscoreData: null }
             ]
         };
 
@@ -433,6 +452,7 @@
             const playerTeamSel = document.getElementById("adm-player-team");
             const editAwaySel = document.getElementById("edit-game-away");
             const editHomeSel = document.getElementById("edit-game-home");
+            const moveTeamSel = document.getElementById("move-team-select");
 
             const teamOptionsHTML = nbaTeamsAlphabetical.map(t => `<option value="${t.code}">${t.name} (${t.code})</option>`).join('');
             awaySel.innerHTML = teamOptionsHTML;
@@ -440,6 +460,7 @@
             playerTeamSel.innerHTML = teamOptionsHTML;
             editAwaySel.innerHTML = teamOptionsHTML;
             editHomeSel.innerHTML = teamOptionsHTML;
+            moveTeamSel.innerHTML = teamOptionsHTML;
 
             awaySel.value = "BOS";
             homeSel.value = "DET";
@@ -506,7 +527,8 @@
                 away: awayCode,
                 homeScore: homeScore,
                 awayScore: awayScore,
-                arena: "Custom NBA Arena"
+                arena: "Custom NBA Arena",
+                boxscoreData: null
             };
 
             if (!scheduleDatabase[dateStr]) scheduleDatabase[dateStr] = [];
@@ -631,10 +653,8 @@
                     id: playerId,
                     name: name,
                     team: team,
-                    role: "BENCH",
                     pos: pos,
                     no: no,
-                    min: 0, pts: 0, fgM: 0, fgA: 0, tpM: 0, tpA: 0, ftM: 0, ftA: 0, reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, plusMinus: "+0",
                     ppg: 0.0, rpg: 0.0, apg: 0.0, bpg: 0.0, spg: 0.0, gamesPlayed: 0
                 });
             }
@@ -645,6 +665,44 @@
             document.getElementById("adm-player-name").value = "";
             document.getElementById("adm-player-no").value = "";
             renderPlayerTable();
+        }
+
+        function releasePlayer(playerId) {
+            let p = playersDatabase.find(x => x.id === playerId);
+            if(p) {
+                if(confirm(`Are you sure you want to release ${p.name} to Free Agency?`)) {
+                    p.team = "FA";
+                    localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
+                    alert(`${p.name} has been released to Free Agency. Their historical game stats remain safely preserved.`);
+                    document.getElementById("team-filter-select").value = "FA";
+                    renderPlayerTable();
+                }
+            }
+        }
+
+        function openMovePlayerModal(playerId) {
+            document.getElementById("move-player-id").value = playerId;
+            document.getElementById("move-player-modal").classList.remove("hidden");
+            document.getElementById("move-player-modal").classList.add("flex");
+        }
+
+        function closeMoveModal() {
+            document.getElementById("move-player-modal").classList.remove("flex");
+            document.getElementById("move-player-modal").classList.add("hidden");
+        }
+
+        function confirmMovePlayer() {
+            const playerId = document.getElementById("move-player-id").value;
+            const destTeam = document.getElementById("move-team-select").value;
+            let p = playersDatabase.find(x => x.id === playerId);
+
+            if(p && destTeam) {
+                p.team = destTeam;
+                localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
+                alert(`${p.name} has been signed to ${destTeam}!`);
+                closeMoveModal();
+                renderPlayerTable();
+            }
         }
 
         function openEditPlayerModal(playerId) {
@@ -715,6 +773,13 @@
         }
 
         function adminAddGameStatLine(gameId) {
+            let game = null;
+            Object.values(scheduleDatabase).forEach(dayGames => {
+                const found = dayGames.find(g => g.id === gameId);
+                if(found) game = found;
+            });
+            if(!game) return;
+
             const playerSelId = document.getElementById("stat-player-select").value;
             if(!playerSelId) {
                 alert("Please select a player.");
@@ -723,81 +788,73 @@
 
             const role = document.getElementById("stat-role").value;
             let p = playersDatabase.find(x => x.id === playerSelId);
+            if(!p) return;
 
-            if(p) {
-                p.role = role;
+            // Initialize game boxscore snapshot storage if not present
+            if(!game.boxscoreSnapshots) game.boxscoreSnapshots = {};
 
-                if (role === 'DNP') {
-                    p.min = 0; p.pts = 0; p.fgM = 0; p.fgA = 0; p.tpM = 0; p.tpA = 0; p.ftM = 0; p.ftA = 0; p.reb = 0; p.ast = 0; p.to = 0; p.stl = 0; p.blk = 0; p.oreb = 0; p.dreb = 0; p.pf = 0; p.plusMinus = "+0";
-                } else {
-                    const min = parseInt(document.getElementById("stat-min").value) || 0;
-                    const pts = parseInt(document.getElementById("stat-pts").value) || 0;
-                    const fgStr = document.getElementById("stat-fg").value.split("-");
-                    const fgM = parseInt(fgStr[0]) || 0;
-                    const fgA = parseInt(fgStr[1]) || 0;
-                    const tpStr = document.getElementById("stat-3pt").value.split("-");
-                    const tpM = parseInt(tpStr[0]) || 0;
-                    const tpA = parseInt(tpStr[1]) || 0;
-                    const ftStr = document.getElementById("stat-ft").value.split("-");
-                    const ftM = parseInt(ftStr[0]) || 0;
-                    const ftA = parseInt(ftStr[1]) || 0;
-                    const reb = parseInt(document.getElementById("stat-reb").value) || 0;
-                    const ast = parseInt(document.getElementById("stat-ast").value) || 0;
-                    const to = parseInt(document.getElementById("stat-to").value) || 0;
-                    const stl = parseInt(document.getElementById("stat-stl").value) || 0;
-                    const blk = parseInt(document.getElementById("stat-blk").value) || 0;
-                    const oreb = parseInt(document.getElementById("stat-oreb").value) || 0;
-                    const dreb = parseInt(document.getElementById("stat-dreb").value) || 0;
-                    const pf = parseInt(document.getElementById("stat-pf").value) || 0;
-                    const plusMinus = document.getElementById("stat-pm").value || "+0";
+            let statEntry = {
+                id: p.id,
+                name: p.name,
+                no: p.no,
+                pos: p.pos,
+                team: p.team,
+                role: role,
+                min: role === 'DNP' ? 0 : (parseInt(document.getElementById("stat-min").value) || 0),
+                pts: role === 'DNP' ? 0 : (parseInt(document.getElementById("stat-pts").value) || 0),
+                fgM: role === 'DNP' ? 0 : (parseInt(document.getElementById("stat-fg").value.split("-")[0]) || 0),
+                fgA: role === 'DNP' ? 0 : (parseInt(document.getElementById("stat-fg").value.split("-")[1]) || 0),
+                tpM: role === 'DNP' ? 0 : (parseInt(document.getElementById("stat-3pt").value.split("-")[0]) || 0),
+                tpA: role === 'DNP' ? 0 : (parseInt(document.getElementById("stat-3pt").value.split("-")[1]) || 0),
+                ftM: role === 'DNP' ? 0 : (parseInt(document.getElementById("stat-ft").value.split("-")[0]) || 0),
+                ftA: role === 'DNP' ? 0 : (parseInt(document.getElementById("stat-ft").value.split("-")[1]) || 0),
+                reb: role === 'DNP' ? 0 : (parseInt(document.getElementById("stat-reb").value) || 0),
+                ast: role === 'DNP' ? 0 : (parseInt(document.getElementById("stat-ast").value) || 0),
+                to: role === 'DNP' ? 0 : (parseInt(document.getElementById("stat-to").value) || 0),
+                stl: role === 'DNP' ? 0 : (parseInt(document.getElementById("stat-stl").value) || 0),
+                blk: role === 'DNP' ? 0 : (parseInt(document.getElementById("stat-blk").value) || 0),
+                oreb: role === 'DNP' ? 0 : (parseInt(document.getElementById("stat-oreb").value) || 0),
+                dreb: role === 'DNP' ? 0 : (parseInt(document.getElementById("stat-dreb").value) || 0),
+                pf: role === 'DNP' ? 0 : (parseInt(document.getElementById("stat-pf").value) || 0),
+                plusMinus: role === 'DNP' ? "+0" : (document.getElementById("stat-pm").value || "+0")
+            };
 
-                    p.min = min;
-                    p.pts = pts;
-                    p.fgM = fgM;
-                    p.fgA = fgA;
-                    p.tpM = tpM;
-                    p.tpA = tpA;
-                    p.ftM = ftM;
-                    p.ftA = ftA;
-                    p.reb = reb;
-                    p.ast = ast;
-                    p.to = to;
-                    p.stl = stl;
-                    p.blk = blk;
-                    p.oreb = oreb;
-                    p.dreb = dreb;
-                    p.pf = pf;
-                    p.plusMinus = plusMinus;
+            game.boxscoreSnapshots[p.id] = statEntry;
 
-                    p.gamesPlayed = (p.gamesPlayed || 0) + 1;
-                    p.totalPts = (p.totalPts || 0) + pts;
-                    p.totalReb = (p.totalReb || 0) + reb;
-                    p.totalAst = (p.totalAst || 0) + ast;
-                    p.totalBlk = (p.totalBlk || 0) + blk;
-                    p.totalStl = (p.totalStl || 0) + stl;
+            // Update player career averages
+            if(role !== 'DNP') {
+                p.gamesPlayed = (p.gamesPlayed || 0) + 1;
+                p.totalPts = (p.totalPts || 0) + statEntry.pts;
+                p.totalReb = (p.totalReb || 0) + statEntry.reb;
+                p.totalAst = (p.totalAst || 0) + statEntry.ast;
+                p.totalBlk = (p.totalBlk || 0) + statEntry.blk;
+                p.totalStl = (p.totalStl || 0) + statEntry.stl;
 
-                    p.ppg = parseFloat((p.totalPts / p.gamesPlayed).toFixed(1));
-                    p.rpg = parseFloat((p.totalReb / p.gamesPlayed).toFixed(1));
-                    p.apg = parseFloat((p.totalAst / p.gamesPlayed).toFixed(1));
-                    p.bpg = parseFloat((p.totalBlk / p.gamesPlayed).toFixed(1));
-                    p.spg = parseFloat((p.totalStl / p.gamesPlayed).toFixed(1));
-                }
-
-                localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
-                alert("Stat line updated successfully!");
-                renderBoxScoreContent();
-                renderPlayerTable();
+                p.ppg = parseFloat((p.totalPts / p.gamesPlayed).toFixed(1));
+                p.rpg = parseFloat((p.totalReb / p.gamesPlayed).toFixed(1));
+                p.apg = parseFloat((p.totalAst / p.gamesPlayed).toFixed(1));
+                p.bpg = parseFloat((p.totalBlk / p.gamesPlayed).toFixed(1));
+                p.spg = parseFloat((p.totalStl / p.gamesPlayed).toFixed(1));
             }
+
+            localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
+            localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
+            alert("Stat line permanently snapshotted to this game date!");
+            renderBoxScoreContent();
+            renderPlayerTable();
         }
 
-        function adminRemovePlayerStatLine(playerId) {
-            let p = playersDatabase.find(x => x.id === playerId);
-            if(p) {
-                p.min = 0; p.pts = 0; p.fgM = 0; p.fgA = 0; p.tpM = 0; p.tpA = 0; p.ftM = 0; p.ftA = 0; p.reb = 0; p.ast = 0; p.to = 0; p.stl = 0; p.blk = 0; p.oreb = 0; p.dreb = 0; p.pf = 0; p.plusMinus = "+0";
-                localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
-                alert("Stat line removed.");
+        function adminRemovePlayerStatLine(gameId, playerId) {
+            let game = null;
+            Object.values(scheduleDatabase).forEach(dayGames => {
+                const found = dayGames.find(g => g.id === gameId);
+                if(found) game = found;
+            });
+            if(game && game.boxscoreSnapshots && game.boxscoreSnapshots[playerId]) {
+                delete game.boxscoreSnapshots[playerId];
+                localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
+                alert("Stat line removed from this game.");
                 renderBoxScoreContent();
-                renderPlayerTable();
             }
         }
 
@@ -919,7 +976,6 @@
             const tbody = document.getElementById("standings-tbody");
             let teamRecords = {};
 
-            // Initialize all default teams so standings always show complete conference rosters
             Object.values(teamsData).forEach(t => {
                 teamRecords[t.code] = { code: t.code, name: t.name, conf: t.conf, logo: t.logo, w: 0, l: 0 };
             });
@@ -974,7 +1030,9 @@
 
         function populateDropdowns() {
             const teamSel = document.getElementById("team-filter-select");
-            teamSel.innerHTML = nbaTeamsAlphabetical.map(t => `<option value="${t.code}">${t.name} (${t.code})</option>`).join('');
+            let optionsHTML = nbaTeamsAlphabetical.map(t => `<option value="${t.code}">${t.name} (${t.code})</option>`).join('');
+            optionsHTML += `<option value="FA">Free Agency (FA)</option>`;
+            teamSel.innerHTML = optionsHTML;
         }
 
         function renderPlayerTable() {
@@ -983,7 +1041,7 @@
             const filtered = playersDatabase.filter(p => p.team === filterTeam);
 
             if(filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="py-6 text-center text-slate-500">No players found for this team. Use Admin Panel to add players.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-slate-500">No players found in this section.</td></tr>`;
                 return;
             }
 
@@ -993,7 +1051,6 @@
                         <div class="w-9 h-9 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center text-slate-400 text-xs font-bold"><i class="fa-solid fa-user"></i></div>
                         <span class="font-bold text-white hover:text-orange-400">#${p.no} ${p.name}</span>
                     </td>
-                    <td class="py-3 px-4 text-slate-300 font-semibold">${p.team}</td>
                     <td class="py-3 px-4 text-slate-400">${p.pos}</td>
                     <td class="py-3 px-4 text-center font-bold text-orange-400">${p.ppg || 0.0}</td>
                     <td class="py-3 px-4 text-center text-slate-300">${p.rpg || 0.0}</td>
@@ -1003,6 +1060,8 @@
                     <td class="py-3 px-4 text-center space-x-1">
                         <button onclick="openPlayerModal('${p.id}')" class="px-2 py-1 text-xs font-semibold rounded bg-slate-800 text-slate-300 hover:bg-orange-600 hover:text-white transition-all">Profile</button>
                         ${isAdmin ? `<button onclick="openEditPlayerModal('${p.id}')" class="px-2 py-1 text-xs font-semibold rounded bg-slate-700 text-slate-200 hover:bg-slate-600 transition-all">Edit</button>` : ''}
+                        ${isAdmin && filterTeam !== 'FA' ? `<button onclick="releasePlayer('${p.id}')" class="px-2 py-1 text-xs font-semibold rounded bg-amber-950 text-amber-400 hover:bg-amber-900 transition-all">Release</button>` : ''}
+                        ${isAdmin && filterTeam === 'FA' ? `<button onclick="openMovePlayerModal('${p.id}')" class="px-2 py-1 text-xs font-semibold rounded bg-emerald-950 text-emerald-400 hover:bg-emerald-900 transition-all">Move</button>` : ''}
                         ${isAdmin ? `<button onclick="adminDeletePlayer('${p.id}')" class="px-2 py-1 text-xs font-semibold rounded bg-red-950 text-red-400 hover:bg-red-900 transition-all">Delete</button>` : ''}
                     </td>
                 </tr>
@@ -1050,9 +1109,12 @@
             document.getElementById("modal-tab-summary").className = `py-3 text-xs font-bold uppercase tracking-wider border-b-2 ${currentModalTab === 'summary' ? 'border-orange-500 text-orange-400' : 'border-transparent text-slate-400'} transition-all`;
             document.getElementById("modal-tab-players").className = `py-3 text-xs font-bold uppercase tracking-wider border-b-2 ${currentModalTab === 'players' ? 'border-orange-500 text-orange-400' : 'border-transparent text-slate-400'} transition-all`;
 
+            let snapshots = game.boxscoreSnapshots || {};
+            let snapList = Object.values(snapshots);
+
             if(currentModalTab === 'summary') {
-                let awayPlayers = playersDatabase.filter(p => p.team === game.away && p.role !== 'DNP');
-                let homePlayers = playersDatabase.filter(p => p.team === game.home && p.role !== 'DNP');
+                let awayPlayers = snapList.filter(p => p.team === game.away && p.role !== 'DNP');
+                let homePlayers = snapList.filter(p => p.team === game.home && p.role !== 'DNP');
 
                 let calcTotals = (list) => {
                     let fgM = 0, fgA = 0, tpM = 0, tpA = 0, ftM = 0, ftA = 0, to = 0, reb = 0;
@@ -1169,8 +1231,8 @@
                     </div>
                 `;
             } else {
-                let awayPlayers = playersDatabase.filter(p => p.team === game.away);
-                let homePlayers = playersDatabase.filter(p => p.team === game.home);
+                let awayPlayers = snapList.filter(p => p.team === game.away);
+                let homePlayers = snapList.filter(p => p.team === game.home);
 
                 const renderTeamProBoxScore = (teamInfo, players, teamTotalScore) => {
                     const starters = players.filter(p => p.role === 'STARTER');
@@ -1211,7 +1273,7 @@
                                     <tr class="hover:bg-slate-900/80 text-xs">
                                         <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap flex items-center space-x-2">
                                             <span class="cursor-pointer hover:underline" onclick="openPlayerModal('${p.id}')">${p.name} #${p.no}</span>
-                                            ${isAdmin ? `<button onclick="adminRemovePlayerStatLine('${p.id}')" class="text-red-400 hover:text-red-300 text-[10px]"><i class="fa-solid fa-trash"></i></button>` : ''}
+                                            ${isAdmin ? `<button onclick="adminRemovePlayerStatLine('${game.id}', '${p.id}')" class="text-red-400 hover:text-red-300 text-[10px]"><i class="fa-solid fa-trash"></i></button>` : ''}
                                         </td>
                                         <td colspan="14" class="py-2.5 px-2 text-center text-slate-400 italic font-semibold tracking-wider">DNP-COACH'S DECISION</td>
                                     </tr>
@@ -1227,7 +1289,7 @@
                                 <tr class="hover:bg-slate-900/80 text-xs">
                                     <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap flex items-center space-x-2">
                                         <span class="cursor-pointer hover:underline" onclick="openPlayerModal('${p.id}')">${p.name} #${p.no}</span>
-                                        ${isAdmin ? `<button onclick="adminRemovePlayerStatLine('${p.id}')" class="text-red-400 hover:text-red-300 text-[10px]"><i class="fa-solid fa-trash"></i></button>` : ''}
+                                        ${isAdmin ? `<button onclick="adminRemovePlayerStatLine('${game.id}', '${p.id}')" class="text-red-400 hover:text-red-300 text-[10px]"><i class="fa-solid fa-trash"></i></button>` : ''}
                                     </td>
                                     <td class="py-2.5 px-2 text-center text-slate-300">${p.min || 0}</td>
                                     <td class="py-2.5 px-2 text-center font-bold text-orange-400">${p.pts || 0}</td>
@@ -1321,7 +1383,7 @@
 
                 let adminStatEntryForm = "";
                 if(isAdmin) {
-                    const eligiblePlayers = playersDatabase.filter(p => p.team === game.away || p.team === game.home);
+                    const eligiblePlayers = playersDatabase;
                     const rosterOptions = eligiblePlayers.map(p => `<option value="${p.id}">${p.name} (${p.team})</option>`).join('');
 
                     adminStatEntryForm = `
@@ -1330,7 +1392,7 @@
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                                 <div>
                                     <label class="text-[10px] text-slate-400 block mb-1">Select Player</label>
-                                    <select id="stat-player-select" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white">${rosterOptions || '<option value="">No players in roster for these teams</option>'}</select>
+                                    <select id="stat-player-select" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white">${rosterOptions || '<option value="">No players in roster</option>'}</select>
                                 </div>
                                 <div>
                                     <label class="text-[10px] text-slate-400 block mb-1">Role / Status</label>
