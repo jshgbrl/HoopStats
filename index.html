@@ -256,7 +256,7 @@
         </div>
     </footer>
 
-    <!-- ================= MODAL: PRO BOX SCORE & AUTO UPLOADER ================= -->
+    <!-- ================= MODAL: PRO BOX SCORE & QUICK PASTE IMPORTER ================= -->
     <div id="boxscore-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-2 sm:p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-7xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div class="flex items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800 shrink-0">
@@ -662,10 +662,16 @@
             }
         }
 
-        // ================= DYNAMIC SCREENSHOT UPLOADER & STATS EDITOR =================
-        function handleAutoVisionUpload(event, gameId) {
-            const file = event.target.files[0];
-            if (!file) return;
+        // ================= OPTION 1: QUICK TEXT / CSV PASTE IMPORTER =================
+        function processTextPasteImport(gameId) {
+            const rawText = document.getElementById(`quick-paste-input-${gameId}`).value.trim();
+            const targetTeam = document.getElementById(`quick-paste-team-${gameId}`).value;
+            const playerRole = document.getElementById(`quick-paste-role-${gameId}`).value;
+
+            if (!rawText) {
+                alert("Please paste player stat lines first.");
+                return;
+            }
 
             let targetGame = null;
             Object.values(scheduleDatabase).forEach(dayGames => {
@@ -678,148 +684,74 @@
                 return;
             }
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                // Open a prompt or interactive modal to let you input or adjust player rows dynamically for this specific game
-                openBoxScoreEntryModal(targetGame, e.target.result);
-            };
-            reader.readAsDataURL(file);
-        }
+            if (!targetGame.boxscoreSnapshots) targetGame.boxscoreSnapshots = {};
 
-        function openBoxScoreEntryModal(game, imageSrc) {
-            let awayT = teamsData[game.away] || { name: game.away };
-            let homeT = teamsData[game.home] || { name: game.home };
+            let lines = rawText.split('\n');
+            let importedCount = 0;
 
-            // Create a dynamic input modal overlay if it doesn't exist
-            let existingModal = document.getElementById("dynamic-boxscore-modal");
-            if(existingModal) existingModal.remove();
+            lines.forEach(line => {
+                if(!line.trim()) return;
+                // Expected format per line: Name, #no, min, pts, fgM, fgA, 3pM, 3pA, ftM, ftA, reb, ast, to, stl, blk, pf, +/-
+                let parts = line.split(',').map(s => s.trim());
+                if (parts.length >= 4) {
+                    let name = parts[0];
+                    let no = parts[1] || "23";
+                    let min = parseInt(parts[2]) || 30;
+                    let pts = parseInt(parts[3]) || 0;
+                    let reb = parseInt(parts[4]) || 0;
+                    let ast = parseInt(parts[5]) || 0;
+                    let stl = parseInt(parts[6]) || 0;
+                    let blk = parseInt(parts[7]) || 0;
+                    let to = parseInt(parts[8]) || 1;
+                    let pf = parseInt(parts[9]) || 2;
+                    let plusMinus = parts[10] || "+0";
 
-            let modalHTML = `
-                <div id="dynamic-boxscore-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4">
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                        <div class="flex items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800">
-                            <h3 class="text-base font-bold text-white uppercase tracking-wider">Add Box Score Data for ${awayT.name} @ ${homeT.name}</h3>
-                            <button onclick="document.getElementById('dynamic-boxscore-modal').remove()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-all">
-                                <i class="fa-solid fa-xmark text-lg"></i>
-                            </button>
-                        </div>
-                        <div class="p-6 overflow-y-auto space-y-4 text-xs">
-                            <div class="flex items-center space-x-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
-                                <img src="${imageSrc}" class="w-24 h-24 object-cover rounded-lg border border-slate-700 shrink-0">
-                                <div class="space-y-1">
-                                    <h4 class="font-bold text-white text-sm">Screenshot Loaded Successfully</h4>
-                                    <p class="text-slate-400 text-xs">Since screenshots contain unique custom player rosters, enter or paste the key player lines below (Name, Jersey #, Points, Rebounds, Assists) to instantly generate the box score and update season stats.</p>
-                                </div>
-                            </div>
+                    let playerId = targetTeam.toLowerCase() + "_" + name.toLowerCase().replace(/\s+/g, '_') + "_" + no;
+                    
+                    let pData = {
+                        id: playerId, name: name, team: targetTeam, role: playerRole, pos: "G", no: no,
+                        min: min, pts: pts, fgM: Math.floor(pts/2), fgA: pts, tpM: 2, tpA: 5, ftM: 2, ftA: 2,
+                        reb: reb, ast: ast, to: to, stl: stl, blk: blk, oreb: 1, dreb: reb > 1 ? reb - 1 : 0, pf: pf, plusMinus: plusMinus
+                    };
 
-                            <div class="space-y-3">
-                                <label class="font-bold text-orange-400 uppercase tracking-wide block">Quick Player Entry (${awayT.code} or ${homeT.code})</label>
-                                <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
-                                    <input type="text" id="entry-p-name" placeholder="Player Name" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                                    <select id="entry-p-team" class="bg-slate-950 border border-slate-700 rounded-lg px-2 py-2 text-white">
-                                        <option value="${game.away}">${awayT.name} (Away)</option>
-                                        <option value="${game.home}">${homeT.name} (Home)</option>
-                                    </select>
-                                    <input type="text" id="entry-p-no" placeholder="Jersey #" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                                    <input type="number" id="entry-p-pts" placeholder="Points" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                                </div>
-                                <div class="grid grid-cols-4 gap-2">
-                                    <input type="number" id="entry-p-reb" placeholder="Rebounds" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                                    <input type="number" id="entry-p-ast" placeholder="Assists" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                                    <input type="number" id="entry-p-stl" placeholder="Steals" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                                    <input type="number" id="entry-p-blk" placeholder="Blocks" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                                </div>
-                                <button onclick="addPlayerFromScreenshotEntry('${game.id}')" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-orange-400 font-bold rounded-lg transition-all border border-orange-500/30">+ Add Player Stat Line</button>
-                            </div>
+                    targetGame.boxscoreSnapshots[playerId] = pData;
+                    importedCount++;
 
-                            <div class="pt-4 border-t border-slate-800 space-y-2">
-                                <h4 class="font-bold text-slate-300 uppercase tracking-wide">Added Players for this Game:</h4>
-                                <div id="temp-added-players-list" class="space-y-1 max-h-40 overflow-y-auto bg-slate-950 p-3 rounded-xl border border-slate-800">
-                                    <p class="text-slate-500 italic">No players added yet for this upload session.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="px-6 py-4 bg-slate-950 border-t border-slate-800 flex justify-end space-x-3">
-                            <button onclick="document.getElementById('dynamic-boxscore-modal').remove()" class="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl transition-all">Done & Sync Game</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
-        }
+                    // Update global players database & running season averages
+                    let existingPlayer = playersDatabase.find(p => p.id === playerId);
+                    if(!existingPlayer) {
+                        playersDatabase.push({
+                            id: playerId, name: name, team: targetTeam, pos: "G", no: no,
+                            gamesPlayed: 1, totalPts: pts, totalReb: reb, totalAst: ast, totalBlk: blk, totalStl: stl,
+                            ppg: pts, rpg: reb, apg: ast, bpg: blk, spg: stl
+                        });
+                    } else {
+                        existingPlayer.gamesPlayed = (existingPlayer.gamesPlayed || 0) + 1;
+                        existingPlayer.totalPts = (existingPlayer.totalPts || 0) + pts;
+                        existingPlayer.totalReb = (existingPlayer.totalReb || 0) + reb;
+                        existingPlayer.totalAst = (existingPlayer.totalAst || 0) + ast;
+                        existingPlayer.totalBlk = (existingPlayer.totalBlk || 0) + blk;
+                        existingPlayer.totalStl = (existingPlayer.totalStl || 0) + stl;
 
-        function addPlayerFromScreenshotEntry(gameId) {
-            let name = document.getElementById("entry-p-name").value.trim();
-            let team = document.getElementById("entry-p-team").value;
-            let no = document.getElementById("entry-p-no").value.trim() || "23";
-            let pts = parseInt(document.getElementById("entry-p-pts").value) || 0;
-            let reb = parseInt(document.getElementById("entry-p-reb").value) || 0;
-            let ast = parseInt(document.getElementById("entry-p-ast").value) || 0;
-            let stl = parseInt(document.getElementById("entry-p-stl").value) || 0;
-            let blk = parseInt(document.getElementById("entry-p-blk").value) || 0;
-
-            if(!name) {
-                alert("Please enter a player name.");
-                return;
-            }
-
-            let targetGame = null;
-            Object.values(scheduleDatabase).forEach(dayGames => {
-                const found = dayGames.find(g => g.id === gameId);
-                if (found) targetGame = found;
+                        existingPlayer.ppg = parseFloat((existingPlayer.totalPts / existingPlayer.gamesPlayed).toFixed(1));
+                        existingPlayer.rpg = parseFloat((existingPlayer.totalReb / existingPlayer.gamesPlayed).toFixed(1));
+                        existingPlayer.apg = parseFloat((existingPlayer.totalAst / existingPlayer.gamesPlayed).toFixed(1));
+                        existingPlayer.bpg = parseFloat((existingPlayer.totalBlk / existingPlayer.gamesPlayed).toFixed(1));
+                        existingPlayer.spg = parseFloat((existingPlayer.totalStl / existingPlayer.gamesPlayed).toFixed(1));
+                    }
+                }
             });
-            if(!targetGame) return;
 
-            let playerId = team.toLowerCase() + "_" + name.toLowerCase().replace(/\s+/g, '_') + "_" + no;
-            let pData = {
-                id: playerId, name: name, team: team, role: "STARTER", pos: "G", no: no,
-                min: 30, pts: pts, fgM: Math.floor(pts/2), fgA: pts, tpM: 2, tpA: 5, ftM: 2, ftA: 2,
-                reb: reb, ast: ast, to: 1, stl: stl, blk: blk, oreb: 1, dreb: reb-1 > 0 ? reb-1 : 0, pf: 2, plusMinus: "+4"
-            };
-
-            if(!targetGame.boxscoreSnapshots) targetGame.boxscoreSnapshots = {};
-            targetGame.boxscoreSnapshots[playerId] = pData;
-
-            // Update global players database & averages
-            let existingPlayer = playersDatabase.find(p => p.id === playerId);
-            if(!existingPlayer) {
-                playersDatabase.push({
-                    id: playerId, name: name, team: team, pos: "G", no: no,
-                    gamesPlayed: 1, totalPts: pts, totalReb: reb, totalAst: ast, totalBlk: blk, totalStl: stl,
-                    ppg: pts, rpg: reb, apg: ast, bpg: blk, spg: stl
-                });
-            } else {
-                existingPlayer.gamesPlayed = (existingPlayer.gamesPlayed || 0) + 1;
-                existingPlayer.totalPts = (existingPlayer.totalPts || 0) + pts;
-                existingPlayer.totalReb = (existingPlayer.totalReb || 0) + reb;
-                existingPlayer.totalAst = (existingPlayer.totalAst || 0) + ast;
-                existingPlayer.totalBlk = (existingPlayer.totalBlk || 0) + blk;
-                existingPlayer.totalStl = (existingPlayer.totalStl || 0) + stl;
-
-                existingPlayer.ppg = parseFloat((existingPlayer.totalPts / existingPlayer.gamesPlayed).toFixed(1));
-                existingPlayer.rpg = parseFloat((existingPlayer.totalReb / existingPlayer.gamesPlayed).toFixed(1));
-                existingPlayer.apg = parseFloat((existingPlayer.totalAst / existingPlayer.gamesPlayed).toFixed(1));
-                existingPlayer.bpg = parseFloat((existingPlayer.totalBlk / existingPlayer.gamesPlayed).toFixed(1));
-                existingPlayer.spg = parseFloat((existingPlayer.totalStl / existingPlayer.gamesPlayed).toFixed(1));
-            }
+            // Automatically calculate team scores based on imported player points
+            let awaySum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.away).reduce((acc, curr) => acc + curr.pts, 0);
+            let homeSum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.home).reduce((acc, curr) => acc + curr.pts, 0);
+            if(awaySum > 0) targetGame.awayScore = awaySum;
+            if(homeSum > 0) targetGame.homeScore = homeSum;
 
             localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
             localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
 
-            // Update UI list inside modal
-            let listContainer = document.getElementById("temp-added-players-list");
-            if(listContainer.innerHTML.includes("No players added")) listContainer.innerHTML = "";
-            listContainer.insertAdjacentHTML('beforeend', `<div class="text-emerald-400 font-semibold">• Added: ${name} (${team}) - ${pts} PTS, ${reb} REB, ${ast} AST</div>`);
-
-            // Clear inputs for next player
-            document.getElementById("entry-p-name").value = "";
-            document.getElementById("entry-p-no").value = "";
-            document.getElementById("entry-p-pts").value = "";
-            document.getElementById("entry-p-reb").value = "";
-            document.getElementById("entry-p-ast").value = "";
-            document.getElementById("entry-p-stl").value = "";
-            document.getElementById("entry-p-blk").value = "";
-
+            alert(`Successfully parsed and synced ${importedCount} player stat lines!`);
             renderBoxScoreContent();
             renderPlayerTable();
             renderGames();
@@ -1059,7 +991,7 @@
             renderTeamLeaders(filtered);
 
             if(filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-slate-500">No players found. Upload box score screenshots or add players in Admin Panel.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-slate-500">No players found. Use Quick Paste below or add players in Admin Panel.</td></tr>`;
                 return;
             }
 
@@ -1150,42 +1082,28 @@
                 let awayPlayers = snapList.filter(p => p.team === game.away);
                 let homePlayers = snapList.filter(p => p.team === game.home);
 
-                const renderTeamProBoxScore = (teamInfo, players, teamTotalScore) => {
-                    const starters = players.filter(p => p.role === 'STARTER');
-                    const bench = players.filter(p => p.role === 'BENCH');
-                    const dnp = players.filter(p => p.role === 'DNP');
-
+                const renderTeamProBoxScore = (teamInfo, players) => {
                     const renderRows = (list) => {
-                        if(list.length === 0) return `<tr><td colspan="15" class="py-2 px-3 text-xs text-slate-500 italic">No players loaded yet. Click 'Upload Box Score Screenshot' below!</td></tr>`;
-                        return list.map(p => {
-                            if (p.role === 'DNP') {
-                                return `
-                                    <tr class="hover:bg-slate-900/80 text-xs">
-                                        <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap">${p.name} #${p.no}</td>
-                                        <td colspan="14" class="py-2.5 px-2 text-center text-slate-400 italic font-semibold tracking-wider">DNP-COACH'S DECISION</td>
-                                    </tr>
-                                `;
-                            }
-                            return `
-                                <tr class="hover:bg-slate-900/80 text-xs">
-                                    <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap">${p.name} #${p.no}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.min || 0}</td>
-                                    <td class="py-2.5 px-2 text-center font-bold text-orange-400">${p.pts || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.fgM || 0}-${p.fgA || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.tpM || 0}-${p.tpA || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.ftM || 0}-${p.ftA || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.reb || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.ast || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.to || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.stl || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.blk || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.oreb || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.dreb || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.pf || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.plusMinus || '+0'}</td>
-                                </tr>
-                            `;
-                        }).join('');
+                        if(list.length === 0) return `<tr><td colspan="15" class="py-2 px-3 text-xs text-slate-500 italic">No players loaded yet. Use the Quick Paste Importer below!</td></tr>`;
+                        return list.map(p => `
+                            <tr class="hover:bg-slate-900/80 text-xs">
+                                <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap">${p.name} #${p.no}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.min || 0}</td>
+                                <td class="py-2.5 px-2 text-center font-bold text-orange-400">${p.pts || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.fgM || 0}-${p.fgA || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.tpM || 0}-${p.tpA || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.ftM || 0}-${p.ftA || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.reb || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.ast || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.to || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.stl || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.blk || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.oreb || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.dreb || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.pf || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.plusMinus || '+0'}</td>
+                            </tr>
+                        `).join('');
                     };
 
                     return `
@@ -1216,11 +1134,7 @@
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-900">
-                                        <tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-orange-400 tracking-widest">Starters</td></tr>
-                                        ${renderRows(starters)}
-                                        <tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-orange-400 tracking-widest">Bench</td></tr>
-                                        ${renderRows(bench)}
-                                        ${dnp.length > 0 ? `<tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-orange-400 tracking-widest">DNP</td></tr>${renderRows(dnp)}` : ''}
+                                        ${renderRows(players)}
                                     </tbody>
                                 </table>
                             </div>
@@ -1230,20 +1144,30 @@
 
                 content.innerHTML = `
                     <div class="space-y-6">
-                        <div class="bg-orange-950/40 border-2 border-orange-600/60 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <div>
-                                <h4 class="text-xs font-black font-teko uppercase text-orange-400 tracking-wider">📸 Automated Box Score Importer (${awayT.name} @ ${homeT.name})</h4>
-                                <p class="text-[11px] text-slate-300 mt-0.5">Upload your screenshot to instantly extract exact player stat lines from your match.</p>
+                        <!-- QUICK PASTE IMPORTER BOX -->
+                        <div class="bg-orange-950/30 border-2 border-orange-600/50 p-4 rounded-2xl space-y-3">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-xs font-black font-teko uppercase text-orange-400 tracking-wider">⚡ Quick Text/CSV Box Score Importer</h4>
+                                <span class="text-[10px] text-slate-400">Format: Name, #no, Min, Pts, Reb, Ast, Stl, Blk, TO, PF, +/-</span>
                             </div>
-                            <div>
-                                <input type="file" id="auto-vision-file-${game.id}" class="hidden" accept="image/*" onchange="handleAutoVisionUpload(event, '${game.id}')">
-                                <button onclick="document.getElementById('auto-vision-file-${game.id}').click()" class="px-4 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl text-xs transition-all flex items-center shadow-lg shadow-orange-600/30 whitespace-nowrap">
-                                    <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Upload Box Score Screenshot
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                <select id="quick-paste-team-${game.id}" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold">
+                                    <option value="${game.away}">${awayT.name} (Away)</option>
+                                    <option value="${game.home}">${homeT.name} (Home)</option>
+                                </select>
+                                <select id="quick-paste-role-${game.id}" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold">
+                                    <option value="STARTER">Starter</option>
+                                    <option value="BENCH">Bench</option>
+                                </select>
+                                <button onclick="processTextPasteImport('${game.id}')" class="py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-xl text-xs transition-all shadow-md shadow-orange-600/20">
+                                    <i class="fa-solid fa-bolt mr-1"></i>Parse & Sync Box Score
                                 </button>
                             </div>
+                            <textarea id="quick-paste-input-${game.id}" rows="3" placeholder="Example lines:\nPaul George, #13, 31, 38, 5, 3, 5, 0, 3, 5, +9\nJayson Tatum, #0, 38, 13, 4, 11, 0, 0, 2, 3, -5" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white font-mono focus:outline-none focus:border-orange-500"></textarea>
                         </div>
-                        ${renderTeamProBoxScore(awayT, awayPlayers, game.awayScore)}
-                        ${renderTeamProBoxScore(homeT, homePlayers, game.homeScore)}
+
+                        ${renderTeamProBoxScore(awayT, awayPlayers)}
+                        ${renderTeamProBoxScore(homeT, homePlayers)}
                     </div>
                 `;
             }
