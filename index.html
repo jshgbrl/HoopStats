@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HoopStats Central | Pro Box Score & Team Leaders Edition</title>
+    <title>HoopStats Central | Pro Box Score & Bulk Importer Edition</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome Icons -->
@@ -80,7 +80,7 @@
                 <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-orange-600 text-white tracking-widest">Master Access</span>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 text-xs">
                 <!-- 1. ADD GAME SCORE -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                     <h3 class="font-bold text-orange-400 uppercase">1. Add Game Score</h3>
@@ -147,6 +147,16 @@
                         <p class="text-[11px] text-slate-400 mt-1">Restore factory default schedules, box scores, rosters, and standings.</p>
                     </div>
                     <button onclick="adminResetStorage()" class="w-full py-2 bg-red-950 hover:bg-red-900 text-red-300 font-bold rounded-lg transition-all">Reset All Data</button>
+                </div>
+
+                <!-- 5. BULK JSON BOX SCORE IMPORTER -->
+                <div class="bg-slate-950 p-4 rounded-xl border border-orange-500/50 space-y-2 col-span-1 md:col-span-2 lg:col-span-1 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-orange-400 uppercase flex items-center"><i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i>5. Bulk JSON Importer</h3>
+                        <p class="text-[10px] text-slate-400 mt-1">Paste box score JSON data here to instantly populate games, players & stats.</p>
+                    </div>
+                    <textarea id="bulk-json-input" placeholder="Paste game JSON here..." class="w-full h-24 bg-slate-900 border border-slate-700 rounded-lg p-2 text-[10px] text-slate-200 font-mono"></textarea>
+                    <button onclick="adminImportBulkJSON()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 font-bold text-white rounded-lg transition-all text-xs">Import & Sync Game</button>
                 </div>
             </div>
         </section>
@@ -251,7 +261,7 @@
     <!-- FOOTER -->
     <footer class="bg-slate-900 border-t border-slate-800 mt-12 py-8 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4 space-y-2">
-            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Box Score & Team Leaders Edition</p>
+            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Box Score & Bulk Importer Edition</p>
             <p>Automatic team totals, shooting percentages, and synced player profile averages.</p>
         </div>
     </footer>
@@ -421,19 +431,8 @@
 
         const nbaTeamsAlphabetical = Object.values(teamsData).sort((a, b) => a.name.localeCompare(b.name));
 
-        const defaultPlayersDatabase = [
-            { id: "bos_0", name: "Jayson Tatum", team: "BOS", role: "STARTER", pos: "F", no: "0", min: 38, pts: 27, fgM: 9, fgA: 20, tpM: 4, tpA: 9, ftM: 5, ftA: 6, reb: 8, ast: 5, blk: 1, stl: 1, to: 2, oreb: 1, dreb: 7, pf: 2, plusMinus: "+8", ppg: 27.0, rpg: 8.0, apg: 5.0, bpg: 1.0, spg: 1.0, gamesPlayed: 1 },
-            { id: "det_2", name: "Cade Cunningham", team: "DET", role: "STARTER", pos: "G", no: "2", min: 36, pts: 28, fgM: 10, fgA: 21, tpM: 3, tpA: 7, ftM: 5, ftA: 6, reb: 5, ast: 9, blk: 1, stl: 1, to: 4, oreb: 0, dreb: 5, pf: 1, plusMinus: "-1", ppg: 28.0, rpg: 5.0, apg: 9.0, bpg: 1.0, spg: 1.0, gamesPlayed: 1 }
-        ];
-
-        const defaultScheduleDatabase = {
-            "2026-10-25": [
-                { id: "g_1025_1", status: "FINAL", time: "5:00 PM", gameDate: "2026-10-25", home: "DET", away: "BOS", homeScore: 108, awayScore: 116, arena: "Little Caesars Arena, Detroit", boxscoreData: null }
-            ]
-        };
-
-        let playersDatabase = JSON.parse(localStorage.getItem("hoopStatsPlayers")) || defaultPlayersDatabase;
-        let scheduleDatabase = JSON.parse(localStorage.getItem("hoopStatsSchedule")) || defaultScheduleDatabase;
+        let playersDatabase = JSON.parse(localStorage.getItem("hoopStatsPlayers")) || [];
+        let scheduleDatabase = JSON.parse(localStorage.getItem("hoopStatsSchedule")) || {};
 
         let currentDate = "2026-10-25";
         let currentConf = "EAST";
@@ -467,8 +466,8 @@
             editHomeSel.innerHTML = teamOptionsHTML;
             moveTeamSel.innerHTML = teamOptionsHTML;
 
-            awaySel.value = "BOS";
-            homeSel.value = "DET";
+            awaySel.value = "UTA";
+            homeSel.value = "MEM";
         }
 
         function toggleAdminSession() {
@@ -511,6 +510,113 @@
             }
         }
 
+        // ================= BULK JSON BOX SCORE IMPORTER LOGIC =================
+        function adminImportBulkJSON() {
+            const rawText = document.getElementById("bulk-json-input").value.trim();
+            if(!rawText) {
+                alert("Please paste valid JSON box score data into the box.");
+                return;
+            }
+
+            try {
+                const gameData = JSON.parse(rawText);
+                // expected format: { gameDate, away, home, awayScore, homeScore, arena, players: [ { id, name, team, role, pos, no, min, pts, fgM, fgA, tpM, tpA, ftM, ftA, reb, ast, to, stl, blk, oreb, dreb, pf, plusMinus } ] }
+                
+                const dateStr = gameData.gameDate || currentDate;
+                const gameId = "g_" + Date.now();
+
+                const newGame = {
+                    id: gameId,
+                    status: "FINAL",
+                    time: "7:00 PM",
+                    gameDate: dateStr,
+                    home: gameData.home,
+                    away: gameData.away,
+                    homeScore: gameData.homeScore,
+                    awayScore: gameData.awayScore,
+                    arena: gameData.arena || "NBA Arena",
+                    boxscoreSnapshots: {}
+                };
+
+                // Process players and sync averages
+                gameData.players.forEach(pData => {
+                    let playerId = pData.id || (pData.team.toLowerCase() + "_" + pData.no);
+                    let existingPlayer = playersDatabase.find(p => p.id === playerId);
+
+                    let statEntry = {
+                        id: playerId,
+                        name: pData.name,
+                        no: pData.no || "23",
+                        pos: pData.pos || "G",
+                        team: pData.team,
+                        role: pData.role || "BENCH",
+                        min: pData.min || 0,
+                        pts: pData.pts || 0,
+                        fgM: pData.fgM || 0,
+                        fgA: pData.fgA || 0,
+                        tpM: pData.tpM || 0,
+                        tpA: pData.tpA || 0,
+                        ftM: pData.ftM || 0,
+                        ftA: pData.ftA || 0,
+                        reb: pData.reb || 0,
+                        ast: pData.ast || 0,
+                        to: pData.to || 0,
+                        stl: pData.stl || 0,
+                        blk: pData.blk || 0,
+                        oreb: pData.oreb || 0,
+                        dreb: pData.dreb || 0,
+                        pf: pData.pf || 0,
+                        plusMinus: pData.plusMinus || "+0"
+                    };
+
+                    newGame.boxscoreSnapshots[playerId] = statEntry;
+
+                    if(!existingPlayer) {
+                        existingPlayer = {
+                            id: playerId,
+                            name: pData.name,
+                            team: pData.team,
+                            pos: pData.pos || "G",
+                            no: pData.no || "23",
+                            gamesPlayed: 0,
+                            totalPts: 0, totalReb: 0, totalAst: 0, totalBlk: 0, totalStl: 0,
+                            ppg: 0, rpg: 0, apg: 0, bpg: 0, spg: 0
+                        };
+                        playersDatabase.push(existingPlayer);
+                    }
+
+                    if(statEntry.role !== 'DNP') {
+                        existingPlayer.gamesPlayed = (existingPlayer.gamesPlayed || 0) + 1;
+                        existingPlayer.totalPts = (existingPlayer.totalPts || 0) + statEntry.pts;
+                        existingPlayer.totalReb = (existingPlayer.totalReb || 0) + statEntry.reb;
+                        existingPlayer.totalAst = (existingPlayer.totalAst || 0) + statEntry.ast;
+                        existingPlayer.totalBlk = (existingPlayer.totalBlk || 0) + statEntry.blk;
+                        existingPlayer.totalStl = (existingPlayer.totalStl || 0) + statEntry.stl;
+
+                        existingPlayer.ppg = parseFloat((existingPlayer.totalPts / existingPlayer.gamesPlayed).toFixed(1));
+                        existingPlayer.rpg = parseFloat((existingPlayer.totalReb / existingPlayer.gamesPlayed).toFixed(1));
+                        existingPlayer.apg = parseFloat((existingPlayer.totalAst / existingPlayer.gamesPlayed).toFixed(1));
+                        existingPlayer.bpg = parseFloat((existingPlayer.totalBlk / existingPlayer.gamesPlayed).toFixed(1));
+                        existingPlayer.spg = parseFloat((existingPlayer.totalStl / existingPlayer.gamesPlayed).toFixed(1));
+                    }
+                });
+
+                if(!scheduleDatabase[dateStr]) scheduleDatabase[dateStr] = [];
+                scheduleDatabase[dateStr].push(newGame);
+
+                localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
+                localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
+
+                alert("Box score imported and synchronized successfully!");
+                document.getElementById("bulk-json-input").value = "";
+                renderGames();
+                renderStandings();
+                renderPlayerTable();
+            } catch(err) {
+                alert("Invalid JSON format. Please verify your box score JSON structure. Error: " + err.message);
+            }
+        }
+
         function adminAddGame() {
             const dateStr = document.getElementById("adm-game-date").value;
             const awayCode = document.getElementById("adm-away-team").value;
@@ -533,7 +639,7 @@
                 homeScore: homeScore,
                 awayScore: awayScore,
                 arena: "Custom NBA Arena",
-                boxscoreData: null
+                boxscoreSnapshots: {}
             };
 
             if (!scheduleDatabase[dateStr]) scheduleDatabase[dateStr] = [];
@@ -602,7 +708,7 @@
             }
 
             if(!targetGame) {
-                targetGame = { id: gameId };
+                targetGame = { id: gameId, boxscoreSnapshots: {} };
             }
 
             targetGame.gameDate = newDate;
@@ -613,6 +719,7 @@
             targetGame.status = "FINAL";
             targetGame.time = "7:00 PM";
             targetGame.arena = "Custom NBA Arena";
+            if(!targetGame.boxscoreSnapshots) targetGame.boxscoreSnapshots = {};
 
             if(!scheduleDatabase[newDate]) scheduleDatabase[newDate] = [];
             scheduleDatabase[newDate].push(targetGame);
@@ -844,7 +951,6 @@
             localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
             alert("Stat line permanently snapshotted to this game date!");
             
-            // Switch tab to players so the user immediately sees the added stats
             currentModalTab = 'players';
             renderBoxScoreContent();
             renderPlayerTable();
@@ -1089,7 +1195,7 @@
 
         function renderPlayerTable() {
             const tbody = document.getElementById("player-table-tbody");
-            const filterTeam = document.getElementById("team-filter-select").value || "BOS";
+            const filterTeam = document.getElementById("team-filter-select").value || "UTA";
             const filtered = playersDatabase.filter(p => p.team === filterTeam);
 
             filtered.sort((a, b) => {
@@ -1156,7 +1262,7 @@
                 const found = dayGames.find(g => g.id === activeGameId);
                 if (found) game = found;
             });
-            if (!game) game = getGamesForDate(currentDate)[0] || { home: "DET", away: "BOS", homeScore: 108, awayScore: 116, gameDate: "2026-10-25", status: "FINAL" };
+            if (!game) game = getGamesForDate(currentDate)[0] || { home: "MEM", away: "UTA", homeScore: 123, awayScore: 103, gameDate: "2026-10-25", status: "FINAL" };
 
             const homeT = teamsData[game.home] || { name: game.home, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
             const awayT = teamsData[game.away] || { name: game.away, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
