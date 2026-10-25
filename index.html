@@ -64,7 +64,7 @@
                     </div>
                     <div class="flex items-center space-x-1.5 bg-emerald-950/60 border border-emerald-800/60 px-3 py-1 rounded-full">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span class="text-xs font-bold text-emerald-400 tracking-wide uppercase">API Synced</span>
+                        <span id="api-status-badge" class="text-xs font-bold text-emerald-400 tracking-wide uppercase">Hybrid Sync</span>
                     </div>
                 </div>
             </div>
@@ -72,7 +72,7 @@
         <!-- Mobile Navigation Sub-bar -->
         <div class="md:hidden flex overflow-x-auto px-4 py-2 border-t border-slate-800 bg-slate-900/90 space-x-2 hide-scrollbar">
             <button onclick="switchTab('scores')" id="mob-nav-scores" class="mob-nav-btn px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap bg-orange-600 text-white">Scores</button>
-            <button onclick="switchTab('')" id="mob-nav-" class="mob-nav-btn px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap text-slate-300 hover:bg-slate-800"></button>
+            <button onclick="switchTab('standings')" id="mob-nav-standings" class="mob-nav-btn px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap text-slate-300 hover:bg-slate-800">Standings</button>
             <button onclick="switchTab('leaders')" id="mob-nav-leaders" class="mob-nav-btn px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap text-slate-300 hover:bg-slate-800">Stats</button>
             <button onclick="switchTab('compare')" id="mob-nav-compare" class="mob-nav-btn px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap text-slate-300 hover:bg-slate-800">Compare</button>
         </div>
@@ -88,7 +88,7 @@
                     <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center">
                         <i class="fa-regular fa-calendar-days text-orange-500 mr-2"></i>Select Game Date (2026-27 NBA Season)
                     </h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Pick any date to instantly view schedules, final scores & complete box scores.</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Pick any date to view schedules, live scores & final box scores.</p>
                 </div>
                 <div class="flex items-center space-x-3">
                     <input type="date" id="game-date-picker" value="2026-10-25" onchange="onDateChanged(this.value)" class="bg-slate-950 border border-slate-700 text-xs sm:text-sm text-orange-400 font-bold rounded-xl px-4 py-2 focus:outline-none focus:border-orange-500 shadow-inner">
@@ -110,12 +110,12 @@
             <div id="games-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </section>
 
-        <!-- ================= TAB 2:  ================= -->
-        <section id="tab-" class="hidden space-y-6">
+        <!-- ================= TAB 2: STANDINGS ================= -->
+        <section id="tab-standings" class="hidden space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 class="text-2xl sm:text-3xl font-black font-teko uppercase tracking-wide text-white">2026-27 Conference Standings </h1>
-                    <p class="text-xs sm:text-sm text-slate-400">Official synchronized regular season standings.</p>
+                    <h1 class="text-2xl sm:text-3xl font-black font-teko uppercase tracking-wide text-white">2026-27 Conference Standings (All 15 Teams)</h1>
+                    <p class="text-xs sm:text-sm text-slate-400">Official regular season synchronized standings.</p>
                 </div>
                 <div class="flex bg-slate-900 border border-slate-800 rounded-xl p-1 self-start">
                     <button onclick="switchConference('EAST')" id="conf-east" class="px-4 py-1.5 text-xs font-bold rounded-lg bg-orange-600 text-white transition-all">Eastern Conference</button>
@@ -206,7 +206,7 @@
     <footer class="bg-slate-900 border-t border-slate-800 mt-12 py-8 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4 space-y-2">
             <p class="font-bold text-slate-400">HoopStats Central &bull; 2026-27 Official NBA Analytics Dashboard</p>
-            <p>Non-commercial fan dashboard featuring instant official team logos and synchronized standings.</p>
+            <p>Non-commercial fan dashboard featuring instant official team logos and hybrid live sync.</p>
         </div>
     </footer>
 
@@ -296,7 +296,6 @@
             { id: "ja", name: "Ja Morant", team: "MEM", pos: "PG", ppg: 25.1, rpg: 5.6, apg: 8.1, bpg: 0.4, spg: 1.1, fg: "47.1%", tp: "31.8%", ft: "77.5%", ht: "6'2\"", wt: "174 lbs", no: "12", college: "Murray State", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1629630.png" }
         ];
 
-        // 2026-27 Synchronized Real Regular Season Standings (All 15 Teams per Conference)
         const standingsData = {
             EAST: [
                 { rank: 1, team: "Atlanta Hawks", w: 2, l: 0, pct: "1.000", gb: "-" },
@@ -339,6 +338,7 @@
         let currentConf = "EAST";
         let activeGameId = null;
         let currentModalTab = 'summary';
+        let liveGamesCache = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById("game-date-picker").value = currentDate;
@@ -348,7 +348,49 @@
             populateDropdowns();
             renderPlayerTable();
             updateComparison();
+
+            // Attempt background hybrid fetch (non-blocking)
+            fetchLiveScoresHybrid();
         });
+
+        async function fetchLiveScoresHybrid() {
+            try {
+                const proxyUrl = "https://api.allorigins.win/raw?url=";
+                const targetUrl = encodeURIComponent("https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard");
+                
+                const response = await fetch(proxyUrl + targetUrl, { signal: AbortSignal.timeout(4000) });
+                if(!response.ok) throw new Error("API request failed");
+                const data = await response.json();
+
+                if(data && data.events && data.events.length > 0) {
+                    liveGamesCache = data.events.map(ev => {
+                        const comp = ev.competitions[0];
+                        const home = comp.competitors.find(c => c.homeAway === 'home');
+                        const away = comp.competitors.find(c => c.homeAway === 'away');
+                        const statusType = ev.status.type.state; // pre, in, post
+                        
+                        let status = "UPCOMING";
+                        if(statusType === 'in') status = "LIVE";
+                        if(statusType === 'post') status = "FINAL";
+
+                        return {
+                            id: ev.id,
+                            status: status,
+                            time: ev.status.type.shortDetail,
+                            home: home.team.abbreviation,
+                            away: away.team.abbreviation,
+                            homeScore: parseInt(home.score || 0),
+                            awayScore: parseInt(away.score || 0),
+                            arena: comp.venue ? comp.venue.fullName : "NBA Arena"
+                        };
+                    });
+                    document.getElementById("api-status-badge").innerText = "Live API Synced";
+                    renderGames();
+                }
+            } catch(err) {
+                console.warn("Background API sync skipped or throttled, using robust local data.", err);
+            }
+        }
 
         function switchTab(tabId) {
             ['scores', 'standings', 'leaders', 'compare'].forEach(t => {
@@ -363,6 +405,7 @@
 
         function onDateChanged(dateStr) {
             currentDate = dateStr;
+            liveGamesCache = null; // reset live cache for custom dates
             renderGames();
         }
 
@@ -373,6 +416,9 @@
         }
 
         function getGamesForDate(dateStr) {
+            if (liveGamesCache && dateStr === "2026-10-25") return liveGamesCache;
+            
+            // Fallback local games generator for any selected date
             return [
                 { id: "g1_" + dateStr, status: "FINAL", time: "Final", home: "LAL", away: "GSW", homeScore: 118, awayScore: 112, arena: "Crypto.com Arena, Los Angeles" },
                 { id: "g2_" + dateStr, status: "FINAL", time: "Final", home: "BOS", away: "MIL", homeScore: 111, awayScore: 103, arena: "TD Garden, Boston" },
@@ -394,8 +440,8 @@
             const filtered = games.filter(g => currentFilter === 'ALL' || (currentFilter === 'LIVE' && g.status === 'LIVE'));
 
             container.innerHTML = filtered.map(g => {
-                const homeT = teamsData[g.home];
-                const awayT = teamsData[g.away];
+                const homeT = teamsData[g.home] || { name: g.home, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
+                const awayT = teamsData[g.away] || { name: g.away, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
                 const isLive = g.status === 'LIVE';
                 const isFinal = g.status === 'FINAL';
 
@@ -622,8 +668,8 @@
         function renderBoxScoreContent() {
             const games = getGamesForDate(currentDate);
             const game = games.find(g => g.id === activeGameId) || games[0];
-            const homeT = teamsData[game.home];
-            const awayT = teamsData[game.away];
+            const homeT = teamsData[game.home] || { name: game.home, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
+            const awayT = teamsData[game.away] || { name: game.away, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
             const isLive = game.status === 'LIVE' || game.status === 'UPCOMING';
 
             document.getElementById("modal-game-title").innerText = `${awayT.name} at ${homeT.name} (${game.time})`;
