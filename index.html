@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HoopStats Central | Admin Managed Hub with Player Editor</title>
+    <title>HoopStats Central | Pro Box Score & Auto-Calculation Edition</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome Icons -->
@@ -85,7 +85,7 @@
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                     <h3 class="font-bold text-orange-400 uppercase">1. Add Game Score</h3>
                     <input type="date" id="adm-game-date" value="2026-10-25" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
-                    <input type="text" id="adm-game-match" placeholder="Away @ Home (e.g. LAL @ UTA)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                    <input type="text" id="adm-game-match" placeholder="Away @ Home (e.g. BOS @ DET)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
                     <div class="flex space-x-2">
                         <input type="number" id="adm-away-score" placeholder="Away Pts" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
                         <input type="number" id="adm-home-score" placeholder="Home Pts" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
@@ -100,7 +100,7 @@
                         <option value="EAST">Eastern Conference</option>
                         <option value="WEST">Western Conference</option>
                     </select>
-                    <input type="text" id="adm-team-name" placeholder="Team Name (e.g. Philadelphia 76ers)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                    <input type="text" id="adm-team-name" placeholder="Team Name (e.g. Boston Celtics)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
                     <div class="flex space-x-2">
                         <input type="number" id="adm-team-w" placeholder="Wins" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
                         <input type="number" id="adm-team-l" placeholder="Losses" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
@@ -113,16 +113,20 @@
                     <h3 class="font-bold text-orange-400 uppercase">3. Add / Edit Player Stats</h3>
                     <input type="text" id="adm-player-name" placeholder="Player Full Name" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
                     <div class="flex space-x-2">
-                        <input type="text" id="adm-player-team" placeholder="Team Code (e.g. LAL)" class="w-2/3 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                        <input type="text" id="adm-player-team" placeholder="Team Code (e.g. BOS)" class="w-2/3 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
                         <input type="text" id="adm-player-no" placeholder="Jersey #" class="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
                     </div>
                     <div class="flex space-x-2">
+                        <select id="adm-player-role" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-xs">
+                            <option value="STARTER">Starter</option>
+                            <option value="BENCH">Bench</option>
+                        </select>
                         <input type="text" id="adm-player-pos" placeholder="Pos (G/F/C)" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
-                        <input type="number" step="0.1" id="adm-player-ppg" placeholder="PPG" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
                     </div>
                     <div class="flex space-x-2">
-                        <input type="number" step="0.1" id="adm-player-rpg" placeholder="RPG" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
-                        <input type="number" step="0.1" id="adm-player-apg" placeholder="APG" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                        <input type="number" step="0.1" id="adm-player-ppg" placeholder="PPG" class="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                        <input type="number" step="0.1" id="adm-player-rpg" placeholder="RPG" class="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                        <input type="number" step="0.1" id="adm-player-apg" placeholder="APG" class="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
                     </div>
                     <button onclick="adminSavePlayer()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Save Player to Roster</button>
                 </div>
@@ -156,7 +160,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-2xl sm:text-3xl font-black font-teko uppercase tracking-wide text-white" id="scoreboard-title">Game Scoreboard</h1>
-                    <p class="text-xs sm:text-sm text-slate-400">Click any game card to view full team box scores.</p>
+                    <p class="text-xs sm:text-sm text-slate-400">Click any game card to view pro box scores with automatic calculations.</p>
                 </div>
                 <div class="flex items-center space-x-2">
                     <button onclick="filterGames('ALL')" id="filter-all" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-orange-600 text-white transition-all">All Games</button>
@@ -237,28 +241,28 @@
     <!-- FOOTER -->
     <footer class="bg-slate-900 border-t border-slate-800 mt-12 py-8 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4 space-y-2">
-            <p class="font-bold text-slate-400">HoopStats Central &bull; Admin-Managed 2026-27 NBA Roster & Schedule Hub</p>
-            <p>Secure local storage persistence for manual game, standings, and player stats management.</p>
+            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Box Score & Auto-Calculation Engine</p>
+            <p>Automatic team totals, shooting percentages, and synced player profile averages.</p>
         </div>
     </footer>
 
-    <!-- ================= MODAL: BOX SCORE ================= -->
-    <div id="boxscore-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-6xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div class="flex items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800">
+    <!-- ================= MODAL: PRO BOX SCORE ================= -->
+    <div id="boxscore-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-2 sm:p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-7xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div class="flex items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800 shrink-0">
                 <div class="flex items-center space-x-3">
                     <div class="w-3 h-3 rounded-full bg-orange-500 animate-pulse"></div>
-                    <h3 id="modal-game-title" class="text-base font-bold text-white uppercase tracking-wider">Game Score</h3>
+                    <h3 id="modal-game-title" class="text-sm sm:text-base font-bold text-white uppercase tracking-wider">Game Box Score</h3>
                 </div>
                 <button onclick="closeBoxScoreModal()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-all">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            <div id="modal-tabs-container" class="border-b border-slate-800 bg-slate-950/60 px-6 space-x-4 flex">
+            <div id="modal-tabs-container" class="border-b border-slate-800 bg-slate-950/60 px-6 space-x-4 flex shrink-0">
                 <button onclick="switchModalTab('summary')" id="modal-tab-summary" class="py-3 text-xs font-bold uppercase tracking-wider border-b-2 border-orange-500 text-orange-400 transition-all">Summary</button>
-                <button onclick="switchModalTab('players')" id="modal-tab-players" class="py-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all">Full Team Box Scores</button>
+                <button onclick="switchModalTab('players')" id="modal-tab-players" class="py-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all">Full Team Pro Box Scores</button>
             </div>
-            <div class="p-6 overflow-y-auto space-y-6 flex-grow" id="modal-body-content"></div>
+            <div class="p-4 sm:p-6 overflow-y-auto space-y-6 flex-grow" id="modal-body-content"></div>
         </div>
     </div>
 
@@ -266,7 +270,7 @@
     <div id="player-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div class="flex items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800">
-                <h3 class="text-base font-bold text-white uppercase tracking-wider">Player Profile</h3>
+                <h3 class="text-base font-bold text-white uppercase tracking-wider">Player Profile & Synced Stats</h3>
                 <button onclick="closePlayerModal()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-all">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
@@ -313,37 +317,44 @@
         const nbaTeamsAlphabetical = Object.values(teamsData).sort((a, b) => a.name.localeCompare(b.name));
 
         const defaultPlayersDatabase = [
-            { id: "bos_0", name: "Jayson Tatum", team: "BOS", pos: "G/F", ppg: 26.9, rpg: 8.1, apg: 4.9, fg: "47.1%", tp: "37.6%", ft: "83.3%", no: "0", college: "Duke", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1628369.png" },
-            { id: "bos_9", name: "Derrick White", team: "BOS", pos: "G", ppg: 15.2, rpg: 4.2, apg: 5.1, fg: "46.1%", tp: "39.5%", ft: "90.1%", no: "9", college: "Colorado", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1628401.png" },
-            { id: "phi_21", name: "Joel Embiid", team: "PHI", pos: "C", ppg: 34.7, rpg: 11.0, apg: 5.6, fg: "52.9%", tp: "38.8%", ft: "88.3%", no: "21", college: "Kansas", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/203954.png" },
-            { id: "phi_0", name: "Tyrese Maxey", team: "PHI", pos: "G", ppg: 25.9, rpg: 3.7, apg: 6.2, fg: "45.0%", tp: "37.3%", ft: "86.8%", no: "0", college: "Kentucky", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1630178.png" },
-            { id: "lal_77", name: "Luka Dončić", team: "LAL", pos: "G", ppg: 33.9, rpg: 9.2, apg: 9.8, fg: "48.7%", tp: "38.2%", ft: "78.6%", no: "77", college: "Slovenia", img: "" },
-            { id: "lal_15", name: "Austin Reaves", team: "LAL", pos: "G", ppg: 15.9, rpg: 4.3, apg: 5.5, fg: "43.0%", tp: "36.7%", ft: "85.3%", no: "15", college: "Oklahoma", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1630559.png" }
+            // Boston Celtics Starters
+            { id: "bos_0", name: "Jayson Tatum", team: "BOS", role: "STARTER", pos: "F", no: "0", min: 38, pts: 27, fgM: 9, fgA: 20, tpM: 4, tpA: 9, ftM: 5, ftA: 6, reb: 8, ast: 5, to: 2, stl: 1, blk: 1, oreb: 1, dreb: 7, pf: 2, plusMinus: "+8", college: "Duke", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1628369.png" },
+            { id: "bos_9", name: "Derrick White", team: "BOS", role: "STARTER", pos: "G", no: "9", min: 35, pts: 18, fgM: 6, fgA: 12, tpM: 3, tpA: 7, ftM: 3, ftA: 3, reb: 4, ast: 7, to: 3, stl: 1, blk: 1, oreb: 1, dreb: 3, pf: 1, plusMinus: "+5", college: "Colorado", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1628401.png" },
+            { id: "bos_7", name: "Jaylen Brown", team: "BOS", role: "STARTER", pos: "G/F", no: "7", min: 36, pts: 24, fgM: 9, fgA: 18, tpM: 2, tpA: 6, ftM: 4, ftA: 5, reb: 6, ast: 4, to: 2, stl: 2, blk: 0, oreb: 1, dreb: 5, pf: 3, plusMinus: "+6", college: "Cal", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1627759.png" },
+            { id: "bos_42", name: "Al Horford", team: "BOS", role: "STARTER", pos: "C", no: "42", min: 28, pts: 10, fgM: 4, fgA: 7, tpM: 2, tpA: 4, ftM: 0, ftA: 0, reb: 7, ast: 3, to: 1, stl: 0, blk: 2, oreb: 2, dreb: 5, pf: 2, plusMinus: "+2", college: "Florida", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/201143.png" },
+            { id: "bos_4", name: "Jrue Holiday", team: "BOS", role: "STARTER", pos: "G", no: "4", min: 34, pts: 15, fgM: 6, fgA: 11, tpM: 3, tpA: 5, ftM: 0, ftA: 0, reb: 5, ast: 6, to: 1, stl: 2, blk: 0, oreb: 1, dreb: 4, pf: 3, plusMinus: "+4", college: "UCLA", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/201950.png" },
+            // Boston Celtics Bench
+            { id: "bos_30", name: "Sam Hauser", team: "BOS", role: "BENCH", pos: "F", no: "30", min: 18, pts: 11, fgM: 4, fgA: 7, tpM: 3, tpA: 5, ftM: 0, ftA: 0, reb: 4, ast: 1, to: 0, stl: 0, blk: 0, oreb: 1, dreb: 3, pf: 3, plusMinus: "+3", college: "Virginia", img: "" },
+            { id: "bos_11", name: "Payton Pritchard", team: "BOS", role: "BENCH", pos: "G", no: "11", min: 24, pts: 14, fgM: 5, fgA: 10, tpM: 4, tpA: 8, ftM: 0, ftA: 0, reb: 2, ast: 3, to: 1, stl: 1, blk: 0, oreb: 0, dreb: 2, pf: 2, plusMinus: "-2", college: "Oregon", img: "" },
+
+            // Detroit Pistons Starters
+            { id: "det_2", name: "Cade Cunningham", team: "DET", role: "STARTER", pos: "G", no: "2", min: 36, pts: 28, fgM: 10, fgA: 21, tpM: 3, tpA: 7, ftM: 5, ftA: 6, reb: 5, ast: 9, to: 4, stl: 1, blk: 1, oreb: 0, dreb: 5, pf: 1, plusMinus: "-1", college: "Oklahoma State", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1630595.png" },
+            { id: "det_0", name: "Jalen Duren", team: "DET", role: "STARTER", pos: "C", no: "0", min: 30, pts: 18, fgM: 8, fgA: 12, tpM: 0, tpA: 0, ftM: 2, ftA: 3, reb: 11, ast: 2, to: 1, stl: 1, blk: 2, oreb: 4, dreb: 7, pf: 3, plusMinus: "-3", college: "Memphis", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1631105.png" },
+            { id: "det_9", name: "Ausar Thompson", team: "DET", role: "STARTER", pos: "G/F", no: "9", min: 32, pts: 14, fgM: 5, fgA: 10, tpM: 1, tpA: 3, ftM: 3, ftA: 4, reb: 8, ast: 3, to: 2, stl: 2, blk: 1, oreb: 3, dreb: 5, pf: 2, plusMinus: "+2", college: "Overtime Elite", img: "" },
+            { id: "det_23", name: "Jaden Ivey", team: "DET", role: "STARTER", pos: "G", no: "23", min: 31, pts: 19, fgM: 7, fgA: 15, tpM: 3, tpA: 6, ftM: 2, ftA: 2, reb: 3, ast: 4, to: 3, stl: 1, blk: 0, oreb: 0, dreb: 3, pf: 3, plusMinus: "-4", college: "Purdue", img: "" },
+            { id: "det_28", name: "Isaiah Stewart", team: "DET", role: "STARTER", pos: "F/C", no: "28", min: 28, pts: 11, fgM: 4, fgA: 8, tpM: 2, tpA: 4, ftM: 1, ftA: 2, reb: 6, ast: 1, to: 1, stl: 0, blk: 1, oreb: 2, dreb: 4, pf: 4, plusMinus: "-2", college: "Washington", img: "" },
+            // Detroit Pistons Bench
+            { id: "det_7", name: "Paul Reed", team: "DET", role: "BENCH", pos: "F", no: "7", min: 18, pts: 8, fgM: 3, fgA: 5, tpM: 0, tpA: 1, ftM: 2, ftA: 2, reb: 5, ast: 1, to: 0, stl: 1, blk: 1, oreb: 2, dreb: 3, pf: 3, plusMinus: "+4", college: "DePaul", img: "" },
+            { id: "det_31", name: "Javonte Green", team: "DET", role: "BENCH", pos: "G/F", no: "31", min: 15, pts: 10, fgM: 4, fgA: 7, tpM: 2, tpA: 3, ftM: 0, ftA: 0, reb: 3, ast: 0, to: 0, stl: 1, blk: 0, oreb: 1, dreb: 2, pf: 2, plusMinus: "+3", college: "Radford", img: "" }
         ];
 
         const defaultScheduleDatabase = {
             "2026-10-25": [
-                { id: "g_1025_1", status: "FINAL", time: "5:00 PM", home: "UTA", away: "LAL", homeScore: 108, awayScore: 116, arena: "Delta Center, Salt Lake City" },
-                { id: "g_1025_2", status: "FINAL", time: "6:00 PM", home: "BKN", away: "IND", homeScore: 99, awayScore: 104, arena: "Barclays Center, New York" },
-                { id: "g_1025_3", status: "UPCOMING", time: "7:00 PM", home: "MIN", away: "TOR", homeScore: 0, awayScore: 0, arena: "Target Center, Minneapolis" }
-            ],
-            "2026-10-26": [
-                { id: "g_1026_1", status: "UPCOMING", time: "7:00 PM", home: "CLE", away: "MIN", homeScore: 0, awayScore: 0, arena: "Rocket Arena, Cleveland" }
+                { id: "g_1025_1", status: "FINAL", time: "5:00 PM", home: "DET", away: "BOS", homeScore: 108, awayScore: 116, arena: "Little Caesars Arena, Detroit" },
+                { id: "g_1025_2", status: "FINAL", time: "6:00 PM", home: "LAL", away: "GSW", homeScore: 122, awayScore: 119, arena: "Crypto.com Arena, Los Angeles" },
+                { id: "g_1025_3", status: "UPCOMING", time: "7:00 PM", home: "MIA", away: "NYK", homeScore: 0, awayScore: 0, arena: "Kaseya Center, Miami" }
             ]
         };
 
         const defaultStandingsData = {
             EAST: [
-                { rank: 1, team: "Philadelphia 76ers", w: 3, l: 0, pct: "1.000", gb: "-" },
-                { rank: 2, team: "Detroit Pistons", w: 2, l: 0, pct: "1.000", gb: "-" },
-                { rank: 3, team: "Toronto Raptors", w: 2, l: 0, pct: "1.000", gb: "-" },
-                { rank: 4, team: "Atlanta Hawks", w: 2, l: 1, pct: ".667", gb: "0.5" }
+                { rank: 1, team: "Boston Celtics", w: 3, l: 0, pct: "1.000", gb: "-" },
+                { rank: 2, team: "Detroit Pistons", w: 2, l: 1, pct: ".667", gb: "1.0" },
+                { rank: 3, team: "New York Knicks", w: 2, l: 1, pct: ".667", gb: "1.0" }
             ],
             WEST: [
-                { rank: 1, team: "Houston Rockets", w: 3, l: 0, pct: "1.000", gb: "-" },
-                { rank: 2, team: "Los Angeles Lakers", w: 3, l: 0, pct: "1.000", gb: "-" },
-                { rank: 3, team: "Oklahoma City Thunder", w: 2, l: 0, pct: "1.000", gb: "-" },
-                { rank: 4, team: "Portland Trail Blazers", w: 2, l: 0, pct: "1.000", gb: "-" }
+                { rank: 1, team: "Los Angeles Lakers", w: 3, l: 0, pct: "1.000", gb: "-" },
+                { rank: 2, team: "Golden State Warriors", w: 2, l: 1, pct: ".667", gb: "1.0" }
             ]
         };
 
@@ -420,7 +431,7 @@
 
             const parts = matchStr.split("@");
             if(parts.length !== 2) {
-                alert("Format must be: AWAY @ HOME (e.g. LAL @ UTA)");
+                alert("Format must be: AWAY @ HOME (e.g. BOS @ DET)");
                 return;
             }
 
@@ -435,7 +446,7 @@
                 away: awayCode,
                 homeScore: homeScore,
                 awayScore: awayScore,
-                arena: "Custom Arena"
+                arena: "Custom NBA Arena"
             };
 
             if (!scheduleDatabase[dateStr]) scheduleDatabase[dateStr] = [];
@@ -476,32 +487,48 @@
         function adminSavePlayer() {
             const name = document.getElementById("adm-player-name").value.trim();
             const team = document.getElementById("adm-player-team").value.trim().toUpperCase();
-            const no = document.getElementById("adm-player-no").value.trim();
-            const pos = document.getElementById("adm-player-pos").value.trim().toUpperCase();
-            const ppg = parseFloat(document.getElementById("adm-player-ppg").value) || 0.0;
-            const rpg = parseFloat(document.getElementById("adm-player-rpg").value) || 0.0;
-            const apg = parseFloat(document.getElementById("adm-player-apg").value) || 0.0;
+            const no = document.getElementById("adm-player-no").value.trim() || "23";
+            const role = document.getElementById("adm-player-role").value;
+            const pos = document.getElementById("adm-player-pos").value.trim().toUpperCase() || "G";
+            const ppg = parseFloat(document.getElementById("adm-player-ppg").value) || 15.0;
+            const rpg = parseFloat(document.getElementById("adm-player-rpg").value) || 5.0;
+            const apg = parseFloat(document.getElementById("adm-player-apg").value) || 4.0;
 
             if(!name || !team) {
-                alert("Please enter at least the player name and team code.");
+                alert("Please enter at least player name and team code.");
                 return;
             }
 
-            const playerId = team.toLowerCase() + "_" + (no || Math.floor(Math.random() * 100));
-            const existingIndex = playersDatabase.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
+            const playerId = team.toLowerCase() + "_" + no;
+            const existingIndex = playersDatabase.findIndex(p => p.id === playerId || p.name.toLowerCase() === name.toLowerCase());
 
             const playerObj = {
                 id: playerId,
                 name: name,
                 team: team,
-                pos: pos || "G",
+                role: role,
+                pos: pos,
+                no: no,
+                min: 30,
+                pts: Math.round(ppg),
+                fgM: Math.round(ppg / 2),
+                fgA: Math.round(ppg),
+                tpM: 2,
+                tpA: 5,
+                ftM: 3,
+                ftA: 4,
+                reb: Math.round(rpg),
+                ast: Math.round(apg),
+                to: 2,
+                stl: 1,
+                blk: 1,
+                oreb: 1,
+                dreb: Math.round(rpg) - 1,
+                pf: 2,
+                plusMinus: "+3",
                 ppg: ppg,
                 rpg: rpg,
                 apg: apg,
-                fg: "45.0%",
-                tp: "35.0%",
-                ft: "80.0%",
-                no: no || "23",
                 college: "NBA",
                 img: ""
             };
@@ -513,12 +540,11 @@
             }
 
             localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
-            alert(`Player ${name} successfully saved to roster!`);
+            alert(`Player ${name} saved successfully! Profile averages automatically synced.`);
             
             document.getElementById("adm-player-name").value = "";
             document.getElementById("adm-player-team").value = "";
             document.getElementById("adm-player-no").value = "";
-            document.getElementById("adm-player-pos").value = "";
             document.getElementById("adm-player-ppg").value = "";
             document.getElementById("adm-player-rpg").value = "";
             document.getElementById("adm-player-apg").value = "";
@@ -527,7 +553,7 @@
         }
 
         function adminDeletePlayer(playerId) {
-            if(confirm("Are you sure you want to delete this player from the roster?")) {
+            if(confirm("Are you sure you want to delete this player?")) {
                 playersDatabase = playersDatabase.filter(p => p.id !== playerId);
                 localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
                 renderPlayerTable();
@@ -630,7 +656,7 @@
                         </div>
                         <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
                             <span class="text-orange-400 font-semibold group-hover:underline flex items-center">
-                                <i class="fa-solid fa-chart-pie mr-1.5"></i>${isFinal ? 'View Full Team Box Score' : 'View Game Details'}
+                                <i class="fa-solid fa-chart-pie mr-1.5"></i>${isFinal ? 'View Pro Box Score' : 'View Game Details'}
                             </span>
                             <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
                         </div>
@@ -671,7 +697,7 @@
             const filtered = playersDatabase.filter(p => p.team === filterTeam);
 
             if(filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-500">No players found for this team. ${isAdmin ? 'Use the Admin Panel above to add players.' : ''}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-500">No players found for this team. Use Admin Panel to add players.</td></tr>`;
                 return;
             }
 
@@ -683,9 +709,9 @@
                     </td>
                     <td class="py-3 px-4 text-slate-300 font-semibold">${p.team}</td>
                     <td class="py-3 px-4 text-slate-400">${p.pos}</td>
-                    <td class="py-3 px-4 text-center font-bold text-orange-400">${p.ppg}</td>
-                    <td class="py-3 px-4 text-center text-slate-300">${p.rpg}</td>
-                    <td class="py-3 px-4 text-center text-slate-300">${p.apg}</td>
+                    <td class="py-3 px-4 text-center font-bold text-orange-400">${p.ppg || p.pts || 15.0}</td>
+                    <td class="py-3 px-4 text-center text-slate-300">${p.rpg || p.reb || 5.0}</td>
+                    <td class="py-3 px-4 text-center text-slate-300">${p.apg || p.ast || 4.0}</td>
                     <td class="py-3 px-4 text-center space-x-1">
                         <button onclick="openPlayerModal('${p.id}')" class="px-2.5 py-1 text-xs font-semibold rounded bg-slate-800 text-slate-300 hover:bg-orange-600 hover:text-white transition-all">Profile</button>
                         ${isAdmin ? `<button onclick="adminDeletePlayer('${p.id}')" class="px-2.5 py-1 text-xs font-semibold rounded bg-red-950 text-red-400 hover:bg-red-900 transition-all">Delete</button>` : ''}
@@ -700,7 +726,7 @@
 
         function openBoxScore(gameId) {
             activeGameId = gameId;
-            currentModalTab = 'summary';
+            currentModalTab = 'players'; // Default to Pro Box Score tab!
             renderBoxScoreContent();
             document.getElementById("boxscore-modal").classList.remove("hidden");
             document.getElementById("boxscore-modal").classList.add("flex");
@@ -724,7 +750,7 @@
                 const found = dayGames.find(g => g.id === activeGameId);
                 if (found) game = found;
             });
-            if (!game) game = getGamesForDate(currentDate)[0] || { home: "LAL", away: "UTA", homeScore: 0, awayScore: 0, arena: "Arena", status: "UPCOMING" };
+            if (!game) game = getGamesForDate(currentDate)[0] || { home: "DET", away: "BOS", homeScore: 108, awayScore: 116, arena: "Arena", status: "FINAL" };
 
             const homeT = teamsData[game.home] || { name: game.home, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
             const awayT = teamsData[game.away] || { name: game.away, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
@@ -785,77 +811,132 @@
                 let awayPlayers = playersDatabase.filter(p => p.team === game.away);
                 let homePlayers = playersDatabase.filter(p => p.team === game.home);
 
-                const renderTeamTableRows = (players) => {
-                    if(players.length === 0) return `<tr><td colspan="12" class="py-4 text-center text-slate-500">No player stats recorded for this team. Use Admin Panel to add players.</td></tr>`;
-                    return players.map(p => `
-                        <tr class="hover:bg-slate-900 cursor-pointer" onclick="openPlayerModal('${p.id}')">
-                            <td class="py-2.5 px-3 font-bold text-white flex items-center space-x-1.5">
-                                <span class="text-orange-400 font-mono text-[11px]">#${p.no || '0'}</span>
-                                <span class="hover:underline">${p.name} (${p.pos})</span>
-                            </td>
-                            <td class="py-2.5 px-3 text-center text-slate-400">28</td>
-                            <td class="py-2.5 px-3 text-center font-bold text-orange-400">${p.ppg}</td>
-                            <td class="py-2.5 px-3 text-center text-slate-300">${p.rpg}</td>
-                            <td class="py-2.5 px-3 text-center text-slate-300">${p.apg}</td>
-                            <td class="py-2.5 px-3 text-center text-slate-300">${p.fg}</td>
-                            <td class="py-2.5 px-3 text-center text-slate-300">${p.tp}</td>
-                            <td class="py-2.5 px-3 text-center text-slate-300">${p.ft}</td>
-                            <td class="py-2.5 px-3 text-center text-slate-300">1</td>
-                            <td class="py-2.5 px-3 text-center text-slate-300">1</td>
-                            <td class="py-2.5 px-3 text-center text-slate-300">2</td>
-                            <td class="py-2.5 px-3 text-center font-semibold text-emerald-400">+4</td>
-                        </tr>
-                    `).join('');
-                };
+                const renderTeamProBoxScore = (teamInfo, players, teamTotalScore) => {
+                    const starters = players.filter(p => p.role === 'STARTER');
+                    const bench = players.filter(p => p.role === 'BENCH');
 
-                const tableHeaders = `
-                    <thead>
-                        <tr class="border-b border-slate-800 text-[10px] uppercase text-slate-500 bg-slate-950">
-                            <th class="py-2.5 px-3">Player</th>
-                            <th class="py-2.5 px-3 text-center">MIN</th>
-                            <th class="py-2.5 px-3 text-center">PTS</th>
-                            <th class="py-2.5 px-3 text-center">REB</th>
-                            <th class="py-2.5 px-3 text-center">AST</th>
-                            <th class="py-2.5 px-3 text-center">FG</th>
-                            <th class="py-2.5 px-3 text-center">3PT</th>
-                            <th class="py-2.5 px-3 text-center">FT</th>
-                            <th class="py-2.5 px-3 text-center">STL</th>
-                            <th class="py-2.5 px-3 text-center">BLK</th>
-                            <th class="py-2.5 px-3 text-center">TO</th>
-                            <th class="py-2.5 px-3 text-center">+/-</th>
-                        </tr>
-                    </thead>
-                `;
+                    // Compute Team Totals automatically
+                    let tMin = 0, tPts = 0, tFgM = 0, tFgA = 0, t3pM = 0, t3pA = 0, tftM = 0, tftA = 0, tReb = 0, tAst = 0, tTo = 0, tStl = 0, tBlk = 0, tOreb = 0, tDreb = 0, tPf = 0;
+                    players.forEach(p => {
+                        tMin += (p.min || 25);
+                        tPts += (p.pts || 15);
+                        tFgM += (p.fgM || 6);
+                        tFgA += (p.fgA || 12);
+                        t3pM += (p.tpM || 2);
+                        t3pA += (p.tpA || 5);
+                        tftM += (p.ftM || 3);
+                        tftA += (p.ftA || 4);
+                        tReb += (p.reb || 5);
+                        tAst += (p.ast || 4);
+                        tTo += (p.to || 2);
+                        tStl += (p.stl || 1);
+                        tBlk += (p.blk || 1);
+                        tOreb += (p.oreb || 1);
+                        tDreb += (p.dreb || 4);
+                        tPf += (p.pf || 2);
+                    });
+
+                    const fgPct = tFgA > 0 ? ((tFgM / tFgA) * 100).toFixed(1) + '%' : '0.0%';
+                    const tpPct = t3pA > 0 ? ((t3pM / t3pA) * 100).toFixed(1) + '%' : '0.0%';
+                    const ftPct = tftA > 0 ? ((tftM / tftA) * 100).toFixed(1) + '%' : '0.0%';
+
+                    const renderRows = (list) => {
+                        if(list.length === 0) return `<tr><td colspan="17" class="py-2 px-3 text-xs text-slate-500 italic">No players listed.</td></tr>`;
+                        return list.map(p => `
+                            <tr class="hover:bg-slate-900/80 cursor-pointer text-xs" onclick="openPlayerModal('${p.id}')">
+                                <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap">
+                                    <span class="hover:underline">${p.name}</span> <span class="text-slate-400 font-normal">#${p.no}</span>
+                                </td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.min || 28}</td>
+                                <td class="py-2.5 px-2 text-center font-bold text-orange-400">${p.pts || 15}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.fgM || 6}-${p.fgA || 12}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.tpM || 2}-${p.tpA || 5}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.ftM || 3}-${p.ftA || 4}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.reb || 5}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.ast || 4}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.to || 2}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.stl || 1}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.blk || 1}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.oreb || 1}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.dreb || 4}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.pf || 2}</td>
+                                <td class="py-2.5 px-2 text-center font-semibold text-emerald-400">${p.plusMinus || '+3'}</td>
+                            </tr>
+                        `).join('');
+                    };
+
+                    const tableHeaders = `
+                        <thead>
+                            <tr class="border-b border-slate-800 text-[10px] uppercase text-slate-400 bg-slate-950 font-semibold">
+                                <th class="py-2.5 px-3 text-left">Player</th>
+                                <th class="py-2.5 px-2 text-center">MIN</th>
+                                <th class="py-2.5 px-2 text-center">PTS</th>
+                                <th class="py-2.5 px-2 text-center">FG</th>
+                                <th class="py-2.5 px-2 text-center">3PT</th>
+                                <th class="py-2.5 px-2 text-center">FT</th>
+                                <th class="py-2.5 px-2 text-center">REB</th>
+                                <th class="py-2.5 px-2 text-center">AST</th>
+                                <th class="py-2.5 px-2 text-center">TO</th>
+                                <th class="py-2.5 px-2 text-center">STL</th>
+                                <th class="py-2.5 px-2 text-center">BLK</th>
+                                <th class="py-2.5 px-2 text-center">OREB</th>
+                                <th class="py-2.5 px-2 text-center">DREB</th>
+                                <th class="py-2.5 px-2 text-center">PF</th>
+                                <th class="py-2.5 px-2 text-center">+/-</th>
+                            </tr>
+                        </thead>
+                    `;
+
+                    return `
+                        <div class="space-y-3 bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-800">
+                            <div class="flex items-center space-x-3 pb-2 border-b border-slate-800">
+                                <img src="${teamInfo.logo}" class="w-7 h-7 object-contain">
+                                <h4 class="font-black font-teko uppercase text-white text-lg tracking-wide">${teamInfo.name}</h4>
+                            </div>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs whitespace-nowrap">
+                                    ${tableHeaders}
+                                    <tbody class="divide-y divide-slate-900">
+                                        <tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-orange-400 tracking-widest">Starters</td></tr>
+                                        ${renderRows(starters)}
+                                        <tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-orange-400 tracking-widest">Bench</td></tr>
+                                        ${renderRows(bench)}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="border-t-2 border-slate-700 bg-slate-950 font-bold text-xs text-white">
+                                            <td class="py-3 px-3 uppercase">TEAM</td>
+                                            <td class="py-3 px-2 text-center">-</td>
+                                            <td class="py-3 px-2 text-center text-orange-400">${teamTotalScore}</td>
+                                            <td class="py-3 px-2 text-center">${tFgM}-${tFgA}</td>
+                                            <td class="py-3 px-2 text-center">${t3pM}-${t3pA}</td>
+                                            <td class="py-3 px-2 text-center">${tftM}-${tftA}</td>
+                                            <td class="py-3 px-2 text-center">${tReb}</td>
+                                            <td class="py-3 px-2 text-center">${tAst}</td>
+                                            <td class="py-3 px-2 text-center">${tTo}</td>
+                                            <td class="py-3 px-2 text-center">${tStl}</td>
+                                            <td class="py-3 px-2 text-center">${tBlk}</td>
+                                            <td class="py-3 px-2 text-center">${tOreb}</td>
+                                            <td class="py-3 px-2 text-center">${tDreb}</td>
+                                            <td class="py-3 px-2 text-center">${tPf}</td>
+                                            <td class="py-3 px-2 text-center">-</td>
+                                        </tr>
+                                        <tr class="bg-slate-950 text-[11px] text-slate-400 font-semibold">
+                                            <td colspan="15" class="py-2 px-3">
+                                                Shooting % &bull; FG: <span class="text-white">${fgPct}</span> &bull; 3PT: <span class="text-white">${tpPct}</span> &bull; FT: <span class="text-white">${ftPct}</span>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                };
 
                 content.innerHTML = `
                     <div class="space-y-6">
-                        <div class="space-y-3">
-                            <h4 class="text-xs font-bold uppercase tracking-wider text-orange-400 flex items-center">
-                                <img src="${awayT.logo}" class="w-4 h-4 mr-2 object-contain">${awayT.name} Roster Box Score
-                            </h4>
-                            <div class="overflow-x-auto bg-slate-950 rounded-xl border border-slate-800">
-                                <table class="w-full text-left text-xs">
-                                    ${tableHeaders}
-                                    <tbody class="divide-y divide-slate-800/60">
-                                        ${renderTeamTableRows(awayPlayers)}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="space-y-3">
-                            <h4 class="text-xs font-bold uppercase tracking-wider text-orange-400 flex items-center">
-                                <img src="${homeT.logo}" class="w-4 h-4 mr-2 object-contain">${homeT.name} Roster Box Score
-                            </h4>
-                            <div class="overflow-x-auto bg-slate-950 rounded-xl border border-slate-800">
-                                <table class="w-full text-left text-xs">
-                                    ${tableHeaders}
-                                    <tbody class="divide-y divide-slate-800/60">
-                                        ${renderTeamTableRows(homePlayers)}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                        ${renderTeamProBoxScore(awayT, awayPlayers, game.awayScore)}
+                        ${renderTeamProBoxScore(homeT, homePlayers, game.homeScore)}
                     </div>
                 `;
             }
@@ -864,21 +945,24 @@
         function openPlayerModal(playerId) {
             let p = playersDatabase.find(x => x.id === playerId);
             if(!p) {
-                p = { name: playerId, team: "NBA", pos: "G", ppg: "15.0", rpg: "4.0", apg: "4.0", no: "0", college: "NBA", img: "" };
+                p = { name: playerId, team: "NBA", pos: "G", ppg: 15.0, rpg: 5.0, apg: 4.0, no: "23", college: "NBA", img: "" };
             }
             document.getElementById("player-modal-content").innerHTML = `
                 <div class="flex items-center space-x-5 bg-slate-950 p-5 rounded-2xl border border-slate-800">
                     ${p.img ? `<img src="${p.img}" class="w-24 h-24 rounded-2xl object-cover bg-slate-900 border-2 border-orange-500" onerror="this.style.display='none'">` : `<div class="w-24 h-24 rounded-2xl bg-slate-900 border-2 border-orange-500 flex items-center justify-center text-slate-500 text-2xl"><i class="fa-solid fa-user"></i></div>`}
                     <div>
-                        <span class="text-xs font-bold uppercase text-orange-400">#${p.no} &bull; ${p.pos}</span>
+                        <span class="text-xs font-bold uppercase text-orange-400">#${p.no || '23'} &bull; ${p.pos || 'G'}</span>
                         <h3 class="text-2xl font-black text-white">${p.name}</h3>
-                        <p class="text-xs text-slate-400">${p.team} &bull; ${p.college}</p>
+                        <p class="text-xs text-slate-400">${p.team} &bull; ${p.college || 'NBA'}</p>
                     </div>
                 </div>
-                <div class="grid grid-cols-3 gap-3 text-center">
-                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-[10px] text-slate-400 uppercase block">PPG</span><span class="text-lg font-black font-teko text-orange-400">${p.ppg}</span></div>
-                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-[10px] text-slate-400 uppercase block">RPG</span><span class="text-lg font-black font-teko text-slate-200">${p.rpg}</span></div>
-                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-[10px] text-slate-400 uppercase block">APG</span><span class="text-lg font-black font-teko text-slate-200">${p.apg}</span></div>
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Synced Season Averages</h4>
+                    <div class="grid grid-cols-3 gap-3 text-center">
+                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800"><span class="text-[10px] text-slate-400 uppercase block font-bold">PPG (Points)</span><span class="text-2xl font-black font-teko text-orange-400">${p.ppg || p.pts || 15.0}</span></div>
+                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800"><span class="text-[10px] text-slate-400 uppercase block font-bold">RPG (Rebounds)</span><span class="text-2xl font-black font-teko text-slate-200">${p.rpg || p.reb || 5.0}</span></div>
+                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800"><span class="text-[10px] text-slate-400 uppercase block font-bold">APG (Assists)</span><span class="text-2xl font-black font-teko text-slate-200">${p.apg || p.ast || 4.0}</span></div>
+                    </div>
                 </div>
             `;
             document.getElementById("player-modal").classList.remove("hidden");
