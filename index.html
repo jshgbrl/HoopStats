@@ -219,7 +219,7 @@
                 </div>
             </div>
 
-            <!-- TEAM LEADERS SECTION (Reference Style) -->
+            <!-- TEAM LEADERS SECTION -->
             <div id="team-leaders-wrapper" class="space-y-3">
                 <h2 class="text-xs font-black uppercase tracking-widest text-slate-400 font-teko text-lg">Team Leaders</h2>
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" id="team-leaders-cards"></div>
@@ -465,7 +465,7 @@
             }
         }
 
-        // ================= ADMIN GAME ACTIONS (EDIT & DELETE) =================
+        // ================= ADMIN GAME ACTIONS =================
         function adminAddGame() {
             const dateStr = document.getElementById("adm-game-date").value;
             const awayCode = document.getElementById("adm-away-team").value;
@@ -591,11 +591,11 @@
             }
         }
 
-        // ================= ADMIN PLAYER ACTIONS (EDIT & DELETE) =================
+        // ================= ADMIN PLAYER ACTIONS =================
         function adminSavePlayer() {
             const name = document.getElementById("adm-player-name").value.trim();
             const team = document.getElementById("adm-player-team").value;
-            const no = document.getElementById("adm-player-no").value.trim() || "23";
+            const no = document.getElementById("adm-player-no").value.trim().replace(/^#+/, '') || "23";
             const pos = document.getElementById("adm-player-pos").value;
 
             if(!name) {
@@ -610,6 +610,7 @@
                 existing.name = name;
                 existing.team = team;
                 existing.pos = pos;
+                existing.no = no;
             } else {
                 playersDatabase.push({
                     id: playerId, name: name, team: team, pos: pos, no: no, ppg: 0.0, rpg: 0.0, apg: 0.0, bpg: 0.0, spg: 0.0, gamesPlayed: 0
@@ -645,7 +646,7 @@
             let p = playersDatabase.find(x => x.id === id);
             if(p) {
                 p.name = document.getElementById("edit-player-name-input").value.trim();
-                p.no = document.getElementById("edit-player-no-input").value.trim();
+                p.no = document.getElementById("edit-player-no-input").value.trim().replace(/^#+/, '');
                 p.pos = document.getElementById("edit-player-pos-input").value;
                 localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
                 alert("Player information updated successfully!");
@@ -662,7 +663,7 @@
             }
         }
 
-        // ================= OPTION 1: QUICK TEXT / CSV PASTE IMPORTER =================
+        // ================= QUICK TEXT / CSV PASTE IMPORTER (WITH DNP SUPPORT) =================
         function processTextPasteImport(gameId) {
             const rawText = document.getElementById(`quick-paste-input-${gameId}`).value.trim();
             const targetTeam = document.getElementById(`quick-paste-team-${gameId}`).value;
@@ -691,11 +692,11 @@
 
             lines.forEach(line => {
                 if(!line.trim()) return;
-                // Expected format per line: Name, #no, min, pts, fgM, fgA, 3pM, 3pA, ftM, ftA, reb, ast, to, stl, blk, pf, +/-
                 let parts = line.split(',').map(s => s.trim());
-                if (parts.length >= 4) {
+                if (parts.length >= 2) {
                     let name = parts[0];
-                    let no = parts[1] || "23";
+                    let rawNo = parts[1] || "#23";
+                    let no = rawNo.replace(/^#+/, ''); // Cleans up ## to single #
                     let min = parseInt(parts[2]) || 30;
                     let pts = parseInt(parts[3]) || 0;
                     let reb = parseInt(parts[4]) || 0;
@@ -717,41 +718,43 @@
                     targetGame.boxscoreSnapshots[playerId] = pData;
                     importedCount++;
 
-                    // Update global players database & running season averages
-                    let existingPlayer = playersDatabase.find(p => p.id === playerId);
-                    if(!existingPlayer) {
-                        playersDatabase.push({
-                            id: playerId, name: name, team: targetTeam, pos: "G", no: no,
-                            gamesPlayed: 1, totalPts: pts, totalReb: reb, totalAst: ast, totalBlk: blk, totalStl: stl,
-                            ppg: pts, rpg: reb, apg: ast, bpg: blk, spg: stl
-                        });
-                    } else {
-                        existingPlayer.gamesPlayed = (existingPlayer.gamesPlayed || 0) + 1;
-                        existingPlayer.totalPts = (existingPlayer.totalPts || 0) + pts;
-                        existingPlayer.totalReb = (existingPlayer.totalReb || 0) + reb;
-                        existingPlayer.totalAst = (existingPlayer.totalAst || 0) + ast;
-                        existingPlayer.totalBlk = (existingPlayer.totalBlk || 0) + blk;
-                        existingPlayer.totalStl = (existingPlayer.totalStl || 0) + stl;
+                    // Only count stats for season averages if player actually played (not DNP)
+                    if (playerRole !== 'DNP') {
+                        let existingPlayer = playersDatabase.find(p => p.id === playerId);
+                        if(!existingPlayer) {
+                            playersDatabase.push({
+                                id: playerId, name: name, team: targetTeam, pos: "G", no: no,
+                                gamesPlayed: 1, totalPts: pts, totalReb: reb, totalAst: ast, totalBlk: blk, totalStl: stl,
+                                ppg: pts, rpg: reb, apg: ast, bpg: blk, spg: stl
+                            });
+                        } else {
+                            existingPlayer.gamesPlayed = (existingPlayer.gamesPlayed || 0) + 1;
+                            existingPlayer.totalPts = (existingPlayer.totalPts || 0) + pts;
+                            existingPlayer.totalReb = (existingPlayer.totalReb || 0) + reb;
+                            existingPlayer.totalAst = (existingPlayer.totalAst || 0) + ast;
+                            existingPlayer.totalBlk = (existingPlayer.totalBlk || 0) + blk;
+                            existingPlayer.totalStl = (existingPlayer.totalStl || 0) + stl;
 
-                        existingPlayer.ppg = parseFloat((existingPlayer.totalPts / existingPlayer.gamesPlayed).toFixed(1));
-                        existingPlayer.rpg = parseFloat((existingPlayer.totalReb / existingPlayer.gamesPlayed).toFixed(1));
-                        existingPlayer.apg = parseFloat((existingPlayer.totalAst / existingPlayer.gamesPlayed).toFixed(1));
-                        existingPlayer.bpg = parseFloat((existingPlayer.totalBlk / existingPlayer.gamesPlayed).toFixed(1));
-                        existingPlayer.spg = parseFloat((existingPlayer.totalStl / existingPlayer.gamesPlayed).toFixed(1));
+                            existingPlayer.ppg = parseFloat((existingPlayer.totalPts / existingPlayer.gamesPlayed).toFixed(1));
+                            existingPlayer.rpg = parseFloat((existingPlayer.totalReb / existingPlayer.gamesPlayed).toFixed(1));
+                            existingPlayer.apg = parseFloat((existingPlayer.totalAst / existingPlayer.gamesPlayed).toFixed(1));
+                            existingPlayer.bpg = parseFloat((existingPlayer.totalBlk / existingPlayer.gamesPlayed).toFixed(1));
+                            existingPlayer.spg = parseFloat((existingPlayer.totalStl / existingPlayer.gamesPlayed).toFixed(1));
+                        }
                     }
                 }
             });
 
-            // Automatically calculate team scores based on imported player points
-            let awaySum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.away).reduce((acc, curr) => acc + curr.pts, 0);
-            let homeSum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.home).reduce((acc, curr) => acc + curr.pts, 0);
+            // Automatically calculate team scores based on active player points
+            let awaySum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.away && p.role !== 'DNP').reduce((acc, curr) => acc + curr.pts, 0);
+            let homeSum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.home && p.role !== 'DNP').reduce((acc, curr) => acc + curr.pts, 0);
             if(awaySum > 0) targetGame.awayScore = awaySum;
             if(homeSum > 0) targetGame.homeScore = homeSum;
 
             localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
             localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
 
-            alert(`Successfully parsed and synced ${importedCount} player stat lines!`);
+            alert(`Successfully parsed and synced ${importedCount} player entries!`);
             renderBoxScoreContent();
             renderPlayerTable();
             renderGames();
@@ -827,7 +830,6 @@
             return scheduleDatabase[dateStr] || [];
         }
 
-        // ================= RENDER GAMES WITH ADMIN EDIT & DELETE BUTTONS =================
         function renderGames() {
             const container = document.getElementById("games-container");
             const games = getGamesForDate(currentDate);
@@ -939,7 +941,14 @@
             teamSel.value = "BOS";
         }
 
-        // ================= RENDER TEAM LEADERS GRID & ROSTERS =================
+        // ================= SMART SURNAME SORTING HELPER (IGNORING "JR.", "SR.", ETC.) =================
+        function getPlayerSurname(fullName) {
+            if (!fullName) return "";
+            let cleaned = fullName.replace(/\b(Jr\.?|Sr\.?|II|III|IV|V)\b/gi, "").trim();
+            let parts = cleaned.split(/\s+/);
+            return parts[parts.length - 1].toLowerCase();
+        }
+
         function renderTeamLeaders(filteredPlayers) {
             const container = document.getElementById("team-leaders-cards");
             const wrapper = document.getElementById("team-leaders-wrapper");
@@ -954,7 +963,7 @@
             let rebLeader = [...filteredPlayers].sort((a,b) => (b.rpg || 0) - (a.rpg || 0))[0] || { name: 'None', rpg: 0, pos: 'F' };
             let astLeader = [...filteredPlayers].sort((a,b) => (b.apg || 0) - (a.apg || 0))[0] || { name: 'None', apg: 0, pos: 'G' };
             let stlLeader = [...filteredPlayers].sort((a,b) => (b.spg || 0) - (a.spg || 0))[0] || { name: 'None', spg: 0, pos: 'G' };
-            let blkLeader = [...filteredPlayers].sort((a,b) => (b.bpg || 0) - (a.bpg || 0))[0] || { name: 'None', bpg: 0, pos: 'C' };
+            let blkLeader = [...filteredPlayers].sort((a,b) => (b.bpg || 0) - (b.bpg || 0))[0] || { name: 'None', bpg: 0, pos: 'C' };
 
             const makeCard = (title, player, valKey, valColor) => `
                 <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col justify-between space-y-3">
@@ -984,6 +993,13 @@
             const tbody = document.getElementById("player-table-tbody");
             const filterTeamCode = document.getElementById("team-filter-select").value || "BOS";
             const filtered = playersDatabase.filter(p => p.team === filterTeamCode);
+
+            // Sort players alphabetically by their surname (ignoring Jr./Sr.)
+            filtered.sort((a, b) => {
+                let surnameA = getPlayerSurname(a.name);
+                let surnameB = getPlayerSurname(b.name);
+                return surnameA.localeCompare(surnameB);
+            });
 
             const teamObj = teamsData[filterTeamCode] || { name: filterTeamCode };
             document.getElementById("roster-section-title").innerText = `${teamObj.name} Stats 2026-27`;
@@ -1083,8 +1099,11 @@
                 let homePlayers = snapList.filter(p => p.team === game.home);
 
                 const renderTeamProBoxScore = (teamInfo, players) => {
+                    const starters = players.filter(p => p.role === 'STARTER');
+                    const bench = players.filter(p => p.role === 'BENCH');
+                    const dnps = players.filter(p => p.role === 'DNP');
+
                     const renderRows = (list) => {
-                        if(list.length === 0) return `<tr><td colspan="15" class="py-2 px-3 text-xs text-slate-500 italic">No players loaded yet. Use the Quick Paste Importer below!</td></tr>`;
                         return list.map(p => `
                             <tr class="hover:bg-slate-900/80 text-xs">
                                 <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap">${p.name} #${p.no}</td>
@@ -1102,6 +1121,15 @@
                                 <td class="py-2.5 px-2 text-center text-slate-300">${p.dreb || 0}</td>
                                 <td class="py-2.5 px-2 text-center text-slate-300">${p.pf || 0}</td>
                                 <td class="py-2.5 px-2 text-center text-slate-300">${p.plusMinus || '+0'}</td>
+                            </tr>
+                        `).join('');
+                    };
+
+                    const renderDNPRows = (list) => {
+                        return list.map(p => `
+                            <tr class="hover:bg-slate-900/80 text-xs text-slate-400 italic">
+                                <td class="py-2.5 px-3 font-bold text-slate-300 whitespace-nowrap">${p.name} #${p.no}</td>
+                                <td colspan="14" class="py-2.5 px-3 text-left text-slate-500 font-semibold tracking-wide">DNP-COACH'S DECISION</td>
                             </tr>
                         `).join('');
                     };
@@ -1134,7 +1162,19 @@
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-900">
-                                        ${renderRows(players)}
+                                        <!-- STARTERS HEADER -->
+                                        <tr class="bg-slate-900/40 text-[10px] font-bold text-orange-400 uppercase tracking-wider"><td colspan="15" class="py-1.5 px-3">Starters</td></tr>
+                                        ${starters.length > 0 ? renderRows(starters) : '<tr><td colspan="15" class="py-2 px-3 text-slate-500 italic">No starters listed.</td></tr>'}
+
+                                        <!-- BENCH HEADER -->
+                                        <tr class="bg-slate-900/40 text-[10px] font-bold text-orange-400 uppercase tracking-wider"><td colspan="15" class="py-1.5 px-3">Bench</td></tr>
+                                        ${bench.length > 0 ? renderRows(bench) : '<tr><td colspan="15" class="py-2 px-3 text-slate-500 italic">No bench players listed.</td></tr>'}
+
+                                        <!-- DNP HEADER (If any) -->
+                                        ${dnps.length > 0 ? `
+                                            <tr class="bg-slate-900/40 text-[10px] font-bold text-slate-400 uppercase tracking-wider"><td colspan="15" class="py-1.5 px-3">Did Not Play</td></tr>
+                                            ${renderDNPRows(dnps)}
+                                        ` : ''}
                                     </tbody>
                                 </table>
                             </div>
@@ -1158,12 +1198,13 @@
                                 <select id="quick-paste-role-${game.id}" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold">
                                     <option value="STARTER">Starter</option>
                                     <option value="BENCH">Bench</option>
+                                    <option value="DNP">DNP (Did Not Play)</option>
                                 </select>
                                 <button onclick="processTextPasteImport('${game.id}')" class="py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-xl text-xs transition-all shadow-md shadow-orange-600/20">
                                     <i class="fa-solid fa-bolt mr-1"></i>Parse & Sync Box Score
                                 </button>
                             </div>
-                            <textarea id="quick-paste-input-${game.id}" rows="3" placeholder="Example lines:\nPaul George, #13, 31, 38, 5, 3, 5, 0, 3, 5, +9\nJayson Tatum, #0, 38, 13, 4, 11, 0, 0, 2, 3, -5" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white font-mono focus:outline-none focus:border-orange-500"></textarea>
+                            <textarea id="quick-paste-input-${game.id}" rows="3" placeholder="Example lines:\nLeBron James, #23, 34, 14, 9, 7, 1, 1, 1, 4, -2\nJustin Edwards, #11 (For DNP, you can just paste Name and Jersey #)" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white font-mono focus:outline-none focus:border-orange-500"></textarea>
                         </div>
 
                         ${renderTeamProBoxScore(awayT, awayPlayers)}
