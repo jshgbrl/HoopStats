@@ -353,6 +353,9 @@
         });
 
         async function fetchLiveScoresHybrid() {
+            const todayStr = "2026-10-25";
+            if (currentDate !== todayStr) return;
+
             try {
                 const proxyUrl = "https://api.allorigins.win/raw?url=";
                 const targetUrl = encodeURIComponent("https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard");
@@ -404,21 +407,18 @@
 
         function onDateChanged(dateStr) {
             currentDate = dateStr;
-            liveGamesCache = null; 
             renderGames();
         }
 
         function resetToToday() {
             currentDate = "2026-10-25";
             document.getElementById("game-date-picker").value = currentDate;
-            liveGamesCache = null;
             renderGames();
         }
 
         function getGamesForDate(dateStr) {
             if (liveGamesCache && dateStr === "2026-10-25") return liveGamesCache;
             
-            // Comprehensive Schedule Map for 2026-27 Opening Week
             const scheduleMap = {
                 "2026-10-23": [
                     { id: "g1_26", status: "FINAL", time: "Final", home: "BOS", away: "NYK", homeScore: 107, awayScore: 103, arena: "TD Garden, Boston" },
@@ -442,7 +442,6 @@
                 ]
             };
 
-            // If the date is found in the map, return those games. Otherwise, show a clean generic game for that date.
             return scheduleMap[dateStr] || [
                 { id: "gen_" + dateStr, status: "UPCOMING", time: "7:00 PM ET", home: "LAL", away: "BOS", homeScore: 0, awayScore: 0, arena: "Crypto.com Arena, Los Angeles" },
                 { id: "gen2_" + dateStr, status: "UPCOMING", time: "9:30 PM ET", home: "GSW", away: "DEN", homeScore: 0, awayScore: 0, arena: "Chase Center, San Francisco" }
@@ -744,55 +743,78 @@
                     </div>
                 `;
             } else {
-                const samplePlayers = [
-                    { name: "Stephen Curry", no: "30", pos: "PG", min: "35", pts: "32", reb: "5", ast: "7", fg: "11-20", tp: "6-11", ft: "4-4", stl: "2", blk: "0", to: "3", pm: "+8" },
-                    { name: "Jimmy Butler", no: "10", pos: "SF", min: "34", pts: "24", reb: "6", ast: "5", fg: "9-16", tp: "2-4", ft: "4-5", stl: "1", blk: "1", to: "1", pm: "+5" }
-                ];
+                const awayPlayers = playersDatabase.filter(p => p.team === game.away);
+                const homePlayers = playersDatabase.filter(p => p.team === game.home);
+
+                const renderTeamTableRows = (players) => {
+                    if (players.length === 0) {
+                        return `<tr><td colspan="12" class="py-4 text-center text-slate-500">Box score stats logging in progress.</td></tr>`;
+                    }
+                    return players.map(p => `
+                        <tr class="hover:bg-slate-900 cursor-pointer" onclick="openPlayerModal('${p.id}')">
+                            <td class="py-2.5 px-3 font-bold text-white flex items-center space-x-1.5">
+                                <span class="text-orange-400 font-mono text-[11px]">#${p.no}</span>
+                                <span class="hover:underline">${p.name} (${p.pos})</span>
+                            </td>
+                            <td class="py-2.5 px-3 text-center text-slate-400">32</td>
+                            <td class="py-2.5 px-3 text-center font-bold text-orange-400">${p.ppg}</td>
+                            <td class="py-2.5 px-3 text-center text-slate-300">${p.rpg}</td>
+                            <td class="py-2.5 px-3 text-center text-slate-300">${p.apg}</td>
+                            <td class="py-2.5 px-3 text-center text-slate-300">${p.fg}</td>
+                            <td class="py-2.5 px-3 text-center text-slate-300">${p.tp}</td>
+                            <td class="py-2.5 px-3 text-center text-slate-300">${p.ft}</td>
+                            <td class="py-2.5 px-3 text-center text-slate-300">1</td>
+                            <td class="py-2.5 px-3 text-center text-slate-300">1</td>
+                            <td class="py-2.5 px-3 text-center text-slate-300">2</td>
+                            <td class="py-2.5 px-3 text-center font-semibold text-emerald-400">+4</td>
+                        </tr>
+                    `).join('');
+                };
+
+                const tableHeaders = `
+                    <thead>
+                        <tr class="border-b border-slate-800 text-[10px] uppercase text-slate-500 bg-slate-950">
+                            <th class="py-2.5 px-3">Player</th>
+                            <th class="py-2.5 px-3 text-center">MIN</th>
+                            <th class="py-2.5 px-3 text-center">PTS</th>
+                            <th class="py-2.5 px-3 text-center">REB</th>
+                            <th class="py-2.5 px-3 text-center">AST</th>
+                            <th class="py-2.5 px-3 text-center">FG</th>
+                            <th class="py-2.5 px-3 text-center">3PT</th>
+                            <th class="py-2.5 px-3 text-center">FT</th>
+                            <th class="py-2.5 px-3 text-center">STL</th>
+                            <th class="py-2.5 px-3 text-center">BLK</th>
+                            <th class="py-2.5 px-3 text-center">TO</th>
+                            <th class="py-2.5 px-3 text-center">+/-</th>
+                        </tr>
+                    </thead>
+                `;
 
                 content.innerHTML = `
                     <div class="space-y-6">
                         <div class="space-y-3">
                             <h4 class="text-xs font-bold uppercase tracking-wider text-orange-400 flex items-center">
-                                <img src="${awayT.logo}" class="w-4 h-4 mr-2 object-contain">${awayT.name} Box Score (Final)
+                                <img src="${awayT.logo}" class="w-4 h-4 mr-2 object-contain">${awayT.name} Roster Box Score (Final)
                             </h4>
                             <div class="overflow-x-auto bg-slate-950 rounded-xl border border-slate-800">
                                 <table class="w-full text-left text-xs">
-                                    <thead>
-                                        <tr class="border-b border-slate-800 text-[10px] uppercase text-slate-500">
-                                            <th class="py-2 px-3">Player</th>
-                                            <th class="py-2 px-3 text-center">MIN</th>
-                                            <th class="py-2 px-3 text-center">PTS</th>
-                                            <th class="py-2 px-3 text-center">REB</th>
-                                            <th class="py-2 px-3 text-center">AST</th>
-                                            <th class="py-2 px-3 text-center">FG</th>
-                                            <th class="py-2 px-3 text-center">3PT</th>
-                                            <th class="py-2 px-3 text-center">FT</th>
-                                            <th class="py-2 px-3 text-center">STL</th>
-                                            <th class="py-2 px-3 text-center">BLK</th>
-                                            <th class="py-2 px-3 text-center">TO</th>
-                                            <th class="py-2 px-3 text-center">+/-</th>
-                                        </tr>
-                                    </thead>
+                                    ${tableHeaders}
                                     <tbody class="divide-y divide-slate-800/60">
-                                        ${samplePlayers.map(p => `
-                                            <tr class="hover:bg-slate-900">
-                                                <td class="py-2 px-3 font-bold text-white flex items-center space-x-1.5">
-                                                    <span class="text-orange-400 font-mono text-[11px]">#${p.no}</span>
-                                                    <span>${p.name} (${p.pos})</span>
-                                                </td>
-                                                <td class="py-2 px-3 text-center text-slate-400">${p.min}</td>
-                                                <td class="py-2 px-3 text-center font-bold text-orange-400">${p.pts}</td>
-                                                <td class="py-2 px-3 text-center text-slate-300">${p.reb}</td>
-                                                <td class="py-2 px-3 text-center text-slate-300">${p.ast}</td>
-                                                <td class="py-2 px-3 text-center text-slate-300">${p.fg}</td>
-                                                <td class="py-2 px-3 text-center text-slate-300">${p.tp}</td>
-                                                <td class="py-2 px-3 text-center text-slate-300">${p.ft}</td>
-                                                <td class="py-2 px-3 text-center text-slate-300">${p.stl}</td>
-                                                <td class="py-2 px-3 text-center text-slate-300">${p.blk}</td>
-                                                <td class="py-2 px-3 text-center text-slate-300">${p.to}</td>
-                                                <td class="py-2 px-3 text-center font-semibold text-emerald-400">${p.pm}</td>
-                                            </tr>
-                                        `).join('')}
+                                        ${renderTeamTableRows(awayPlayers)}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-orange-400 flex items-center">
+                                <img src="${homeT.logo}" class="w-4 h-4 mr-2 object-contain">${homeT.name} Roster Box Score (Final)
+                            </h4>
+                            <div class="overflow-x-auto bg-slate-950 rounded-xl border border-slate-800">
+                                <table class="w-full text-left text-xs">
+                                    ${tableHeaders}
+                                    <tbody class="divide-y divide-slate-800/60">
+                                        ${renderTeamTableRows(homePlayers)}
                                     </tbody>
                                 </table>
                             </div>
