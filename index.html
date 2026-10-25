@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HoopStats Central | Pro Box Score & Free Agency Edition</title>
+    <title>HoopStats Central | Pro Box Score & Team Leaders Edition</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome Icons -->
@@ -209,18 +209,23 @@
 
         <!-- ================= TAB 3: TEAM STATS & PLAYERS ================= -->
         <section id="tab-leaders" class="hidden space-y-6">
-            <div>
-                <h1 class="text-2xl sm:text-3xl font-black font-teko uppercase tracking-wide text-white">Official 2026-27 NBA Team Rosters & Full 15-Man Stats</h1>
-                <p class="text-xs sm:text-sm text-slate-400">Select any team or Free Agency from the dropdown to view active rosters and player stats.</p>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-black font-teko uppercase tracking-wide text-white">Official 2026-27 NBA Team Rosters & Full Stats</h1>
+                    <p class="text-xs sm:text-sm text-slate-400">Select any team or Free Agency from the dropdown to view active rosters and team leaders.</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <select id="team-filter-select" onchange="filterPlayerTable()" class="bg-slate-950 border border-slate-700 text-xs text-orange-400 font-bold rounded-xl px-4 py-2.5 focus:outline-none focus:border-orange-500 shadow-inner"></select>
+                </div>
+            </div>
+
+            <!-- TEAM LEADERS SECTION -->
+            <div id="team-leaders-wrapper" class="space-y-3">
+                <h2 class="text-xs font-black uppercase tracking-widest text-slate-400 font-teko text-lg">Team Leaders</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" id="team-leaders-cards"></div>
             </div>
 
             <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <h2 class="text-lg font-bold uppercase tracking-wider font-teko text-slate-200">Select Team / Free Agency</h2>
-                    <div class="flex items-center space-x-2">
-                        <select id="team-filter-select" onchange="filterPlayerTable()" class="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:border-orange-500 font-semibold"></select>
-                    </div>
-                </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -246,7 +251,7 @@
     <!-- FOOTER -->
     <footer class="bg-slate-900 border-t border-slate-800 mt-12 py-8 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4 space-y-2">
-            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Box Score & Free Agency Edition</p>
+            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Box Score & Team Leaders Edition</p>
             <p>Automatic team totals, shooting percentages, and synced player profile averages.</p>
         </div>
     </footer>
@@ -673,7 +678,7 @@
                 if(confirm(`Are you sure you want to release ${p.name} to Free Agency?`)) {
                     p.team = "FA";
                     localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
-                    alert(`${p.name} has been released to Free Agency. Their historical game stats remain safely preserved.`);
+                    alert(`${p.name} has been released to Free Agency.`);
                     document.getElementById("team-filter-select").value = "FA";
                     renderPlayerTable();
                 }
@@ -790,7 +795,6 @@
             let p = playersDatabase.find(x => x.id === playerSelId);
             if(!p) return;
 
-            // Initialize game boxscore snapshot storage if not present
             if(!game.boxscoreSnapshots) game.boxscoreSnapshots = {};
 
             let statEntry = {
@@ -821,7 +825,6 @@
 
             game.boxscoreSnapshots[p.id] = statEntry;
 
-            // Update player career averages
             if(role !== 'DNP') {
                 p.gamesPlayed = (p.gamesPlayed || 0) + 1;
                 p.totalPts = (p.totalPts || 0) + statEntry.pts;
@@ -1035,10 +1038,64 @@
             teamSel.innerHTML = optionsHTML;
         }
 
+        function getSurname(fullName) {
+            if(!fullName) return "";
+            const parts = fullName.trim().split(" ");
+            return parts[parts.length - 1];
+        }
+
+        function renderTeamLeaders(filteredPlayers) {
+            const container = document.getElementById("team-leaders-cards");
+            const wrapper = document.getElementById("team-leaders-wrapper");
+
+            if(filteredPlayers.length === 0) {
+                wrapper.classList.add("hidden");
+                return;
+            }
+            wrapper.classList.remove("hidden");
+
+            let ptsLeader = [...filteredPlayers].sort((a,b) => (b.ppg || 0) - (a.ppg || 0))[0] || { name: 'None', ppg: 0, pos: 'G' };
+            let rebLeader = [...filteredPlayers].sort((a,b) => (b.rpg || 0) - (a.rpg || 0))[0] || { name: 'None', rpg: 0, pos: 'F' };
+            let astLeader = [...filteredPlayers].sort((a,b) => (b.apg || 0) - (a.apg || 0))[0] || { name: 'None', apg: 0, pos: 'G' };
+            let stlLeader = [...filteredPlayers].sort((a,b) => (b.spg || 0) - (a.spg || 0))[0] || { name: 'None', spg: 0, pos: 'G' };
+            let blkLeader = [...filteredPlayers].sort((a,b) => (b.bpg || 0) - (a.bpg || 0))[0] || { name: 'None', bpg: 0, pos: 'C' };
+
+            const makeCard = (title, player, valKey, valColor) => `
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col justify-between space-y-3">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">${title}</span>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center text-slate-400 text-sm font-bold shrink-0">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <h4 class="font-bold text-white text-xs truncate">${player.name || 'N/A'} <span class="text-[10px] text-slate-400 font-semibold">${player.pos || ''}</span></h4>
+                            <span class="text-2xl font-black font-teko ${valColor}">${player[valKey] !== undefined ? player[valKey] : 0.0}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = `
+                ${makeCard("Points", ptsLeader, "ppg", "text-orange-400")}
+                ${makeCard("Rebounds", rebLeader, "rpg", "text-slate-200")}
+                ${makeCard("Assists", astLeader, "apg", "text-slate-200")}
+                ${makeCard("Steals", stlLeader, "spg", "text-slate-200")}
+                ${makeCard("Blocks", blkLeader, "bpg", "text-slate-200")}
+            `;
+        }
+
         function renderPlayerTable() {
             const tbody = document.getElementById("player-table-tbody");
             const filterTeam = document.getElementById("team-filter-select").value || "BOS";
             const filtered = playersDatabase.filter(p => p.team === filterTeam);
+
+            filtered.sort((a, b) => {
+                let surA = getSurname(a.name).toLowerCase();
+                let surB = getSurname(b.name).toLowerCase();
+                return surA.localeCompare(surB);
+            });
+
+            renderTeamLeaders(filtered);
 
             if(filtered.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-slate-500">No players found in this section.</td></tr>`;
@@ -1383,7 +1440,8 @@
 
                 let adminStatEntryForm = "";
                 if(isAdmin) {
-                    const eligiblePlayers = playersDatabase;
+                    // Strictly filter dropdown players to ONLY include players from the away or home team of this game
+                    const eligiblePlayers = playersDatabase.filter(p => p.team === game.away || p.team === game.home);
                     const rosterOptions = eligiblePlayers.map(p => `<option value="${p.id}">${p.name} (${p.team})</option>`).join('');
 
                     adminStatEntryForm = `
@@ -1391,8 +1449,8 @@
                             <h4 class="text-xs font-black font-teko uppercase text-orange-400 tracking-wider">🔒 Admin Stat-Sheet Entry (Add Player Stats or DNP for this Game)</h4>
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                                 <div>
-                                    <label class="text-[10px] text-slate-400 block mb-1">Select Player</label>
-                                    <select id="stat-player-select" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white">${rosterOptions || '<option value="">No players in roster</option>'}</select>
+                                    <label class="text-[10px] text-slate-400 block mb-1">Select Player (${game.away} vs ${game.home})</label>
+                                    <select id="stat-player-select" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white">${rosterOptions || '<option value="">No players found for these teams</option>'}</select>
                                 </div>
                                 <div>
                                     <label class="text-[10px] text-slate-400 block mb-1">Role / Status</label>
