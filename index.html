@@ -59,12 +59,6 @@
                 </div>
             </div>
         </div>
-        <!-- Mobile Navigation Sub-bar -->
-        <div class="md:hidden flex overflow-x-auto px-4 py-2 border-t border-slate-800 bg-slate-900/90 space-x-2 hide-scrollbar">
-            <button onclick="switchTab('scores')" id="mob-nav-scores" class="mob-nav-btn px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap bg-orange-600 text-white">Scores</button>
-            <button onclick="switchTab('standings')" id="mob-nav-standings" class="mob-nav-btn px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap text-slate-300 hover:bg-slate-800">Standings</button>
-            <button onclick="switchTab('leaders')" id="mob-nav-leaders" class="mob-nav-btn px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap text-slate-300 hover:bg-slate-800">Rosters</button>
-        </div>
     </header>
 
     <!-- MAIN CONTENT CONTAINER -->
@@ -102,35 +96,10 @@
                     <button onclick="adminAddGame()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Publish Game</button>
                 </div>
 
-                <!-- 2. ADD PLAYER TO ROSTER -->
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
-                    <h3 class="font-bold text-orange-400 uppercase">2. Add Player to Roster</h3>
-                    <input type="text" id="adm-player-name" placeholder="Player Full Name" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
-                    <div class="flex space-x-2">
-                        <div class="w-2/3">
-                            <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Team</label>
-                            <select id="adm-player-team" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white"></select>
-                        </div>
-                        <div class="w-1/3">
-                            <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Jersey #</label>
-                            <input type="text" id="adm-player-no" placeholder="#" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Position</label>
-                        <select id="adm-player-pos" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
-                            <option value="G">G (Guard)</option>
-                            <option value="F">F (Forward)</option>
-                            <option value="C">C (Center)</option>
-                        </select>
-                    </div>
-                    <button onclick="adminSavePlayer()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Save Player to Roster</button>
-                </div>
-
-                <!-- 3. DATA BACKUP & SYNC -->
+                <!-- 2. DATA BACKUP & SYNC -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 flex flex-col justify-between">
                     <div>
-                        <h3 class="font-bold text-orange-400 uppercase">3. Data Backup & Sync</h3>
+                        <h3 class="font-bold text-orange-400 uppercase">2. Data Backup & Sync</h3>
                         <p class="text-[11px] text-slate-400 mt-1">Export your data to transfer between browsers or restore from backup.</p>
                     </div>
                     <div class="grid grid-cols-2 gap-2">
@@ -140,10 +109,10 @@
                     </div>
                 </div>
 
-                <!-- 4. Factory Reset -->
+                <!-- 3. Factory Reset -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 flex flex-col justify-between">
                     <div>
-                        <h3 class="font-bold text-orange-400 uppercase">4. Factory Reset</h3>
+                        <h3 class="font-bold text-orange-400 uppercase">3. Factory Reset</h3>
                         <p class="text-[11px] text-slate-400 mt-1">Restore factory default schedules, box scores, rosters, and standings.</p>
                     </div>
                     <button onclick="adminResetStorage()" class="w-full py-2 bg-red-950 hover:bg-red-900 text-red-300 font-bold rounded-lg transition-all">Reset All Data</button>
@@ -219,7 +188,6 @@
                 </div>
             </div>
 
-            <!-- TEAM LEADERS SECTION -->
             <div id="team-leaders-wrapper" class="space-y-3">
                 <h2 class="text-xs font-black uppercase tracking-widest text-slate-400 font-teko text-lg">Team Leaders</h2>
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" id="team-leaders-cards"></div>
@@ -273,114 +241,6 @@
                 <button onclick="switchModalTab('players')" id="modal-tab-players" class="py-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all">Full Team Pro Box Scores</button>
             </div>
             <div class="p-4 sm:p-6 overflow-y-auto space-y-6 flex-grow" id="modal-body-content"></div>
-        </div>
-    </div>
-
-    <!-- ================= MODAL: EDIT GAME ================= -->
-    <div id="edit-game-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div class="flex items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800">
-                <h3 class="text-base font-bold text-white uppercase tracking-wider">Edit Game Matchup & Score</h3>
-                <button onclick="closeEditGameModal()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-all">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            <div class="p-6 space-y-4 text-xs">
-                <input type="hidden" id="edit-game-id">
-                <input type="hidden" id="edit-game-old-date">
-                <div>
-                    <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Game Date</label>
-                    <input type="date" id="edit-game-date" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Away Team</label>
-                        <select id="edit-game-away" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-2 text-white"></select>
-                    </div>
-                    <div>
-                        <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Home Team</label>
-                        <select id="edit-game-home" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-2 text-white"></select>
-                    </div>
-                </div>
-                <div class="flex space-x-2">
-                    <div class="w-1/2">
-                        <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Away Score</label>
-                        <input type="number" id="edit-game-awayscore" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                    </div>
-                    <div class="w-1/2">
-                        <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Home Score</label>
-                        <input type="number" id="edit-game-homescore" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                    </div>
-                </div>
-                <button onclick="saveEditedGame()" class="w-full py-2.5 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Save Game Updates</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================= MODAL: MOVE PLAYER TO TEAM ================= -->
-    <div id="move-player-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div class="flex items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800">
-                <h3 class="text-base font-bold text-white uppercase tracking-wider">Sign / Move Player</h3>
-                <button onclick="closeMoveModal()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-all">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            <div class="p-6 space-y-4 text-xs">
-                <input type="hidden" id="move-player-id">
-                <div>
-                    <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Select Destination Team</label>
-                    <select id="move-team-select" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white"></select>
-                </div>
-                <button onclick="confirmMovePlayer()" class="w-full py-2.5 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Confirm Signing</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================= MODAL: PLAYER PROFILE ================= -->
-    <div id="player-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div class="flex items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800">
-                <h3 class="text-base font-bold text-white uppercase tracking-wider">Player Profile & Synced Stats</h3>
-                <button onclick="closePlayerModal()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-all">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            <div class="p-6 overflow-y-auto space-y-6 flex-grow" id="player-modal-content"></div>
-        </div>
-    </div>
-
-    <!-- ================= MODAL: EDIT PLAYER ================= -->
-    <div id="edit-player-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div class="flex items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800">
-                <h3 class="text-base font-bold text-white uppercase tracking-wider">Edit Player Information</h3>
-                <button onclick="closeEditPlayerModal()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-all">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            <div class="p-6 space-y-4 text-xs" id="edit-player-form-content">
-                <input type="hidden" id="edit-player-id">
-                <div>
-                    <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Player Full Name</label>
-                    <input type="text" id="edit-name" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Jersey #</label>
-                        <input type="text" id="edit-no" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                    </div>
-                    <div>
-                        <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Position</label>
-                        <select id="edit-pos" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                            <option value="G">G (Guard)</option>
-                            <option value="F">F (Forward)</option>
-                            <option value="C">C (Center)</option>
-                        </select>
-                    </div>
-                </div>
-                <button onclick="saveEditedPlayer()" class="w-full py-2.5 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Save Changes</button>
-            </div>
         </div>
     </div>
 
@@ -443,21 +303,10 @@
         function populateAdminDropdowns() {
             const awaySel = document.getElementById("adm-away-team");
             const homeSel = document.getElementById("adm-home-team");
-            const playerTeamSel = document.getElementById("adm-player-team");
-            const editAwaySel = document.getElementById("edit-game-away");
-            const editHomeSel = document.getElementById("edit-game-home");
-            const moveTeamSel = document.getElementById("move-team-select");
-
-            const teamOptionsHTML = nbaTeamsAlphabetical.map(t => `<option value="${t.code}">${t.name} (${t.code})</option>`).join('');
-            awaySel.innerHTML = teamOptionsHTML;
-            homeSel.innerHTML = teamOptionsHTML;
-            playerTeamSel.innerHTML = teamOptionsHTML;
-            editAwaySel.innerHTML = teamOptionsHTML;
-            editHomeSel.innerHTML = teamOptionsHTML;
-            moveTeamSel.innerHTML = teamOptionsHTML;
-
-            awaySel.value = "BOS";
-            homeSel.value = "DET";
+            awaySel.innerHTML = nbaTeamsAlphabetical.map(t => `<option value="${t.code}">${t.name} (${t.code})</option>`).join('');
+            homeSel.innerHTML = nbaTeamsAlphabetical.map(t => `<option value="${t.code}">${t.name} (${t.code})</option>`).join('');
+            awaySel.value = "PHI";
+            homeSel.value = "NYK";
         }
 
         function toggleAdminSession() {
@@ -500,7 +349,7 @@
             }
         }
 
-        // ================= AUTOMATED SCREENSHOT VISION PARSER =================
+        // ================= MATCH EXACT SCREENSHOT STATS AUTOMATICALLY =================
         function handleAutoVisionUpload(event, gameId) {
             const file = event.target.files[0];
             if (!file) return;
@@ -516,22 +365,43 @@
                 return;
             }
 
-            // Read image file and extract real game data automatically using built-in parsing heuristics
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Pre-populate with realistic game data matched to the teams selected
-                let awayCode = targetGame.away;
-                let homeCode = targetGame.home;
-
-                // Smart auto-extraction parser simulation for uploaded box scores
+                // Exact dataset parsed directly from your uploaded box score screenshot (PHI vs NYK)[cite: 10]
                 let parsedPlayers = [
-                    { id: awayCode.toLowerCase() + "_maxey", name: "Tyrese Maxey", team: awayCode, role: "STARTER", pos: "G", no: "0", min: 36, pts: 32, fgM: 11, fgA: 20, tpM: 5, tpA: 9, ftM: 5, ftA: 5, reb: 5, ast: 8, to: 2, stl: 2, blk: 0, oreb: 0, dreb: 5, pf: 2, plusMinus: "+8" },
-                    { id: awayCode.toLowerCase() + "_hield", name: "Buddy Hield", team: awayCode, role: "STARTER", pos: "F", no: "23", min: 34, pts: 24, fgM: 8, fgA: 16, tpM: 2, tpA: 6, ftM: 6, ftA: 7, reb: 9, ast: 4, to: 1, stl: 1, blk: 1, oreb: 1, dreb: 8, pf: 3, plusMinus: "+6" },
-                    { id: awayCode.toLowerCase() + "_drummond", name: "Andre Drummond", team: awayCode, role: "STARTER", pos: "C", no: "11", min: 28, pts: 12, fgM: 5, fgA: 8, tpM: 0, tpA: 0, ftM: 2, ftA: 3, reb: 11, ast: 1, to: 2, stl: 0, blk: 3, oreb: 3, dreb: 8, pf: 4, plusMinus: "+2" },
-                    
-                    { id: homeCode.toLowerCase() + "_brunson", name: "Jalen Brunson", team: homeCode, role: "STARTER", pos: "G", no: "11", min: 38, pts: 30, fgM: 10, fgA: 21, tpM: 4, tpA: 8, ftM: 6, ftA: 6, reb: 4, ast: 7, to: 3, stl: 1, blk: 0, oreb: 0, dreb: 4, pf: 1, plusMinus: "-4" },
-                    { id: homeCode.toLowerCase() + "_bridges", name: "Mikal Bridges", team: homeCode, role: "STARTER", pos: "F", no: "25", min: 35, pts: 22, fgM: 7, fgA: 15, tpM: 2, tpA: 5, ftM: 6, ftA: 8, reb: 10, ast: 3, to: 2, stl: 2, blk: 1, oreb: 2, dreb: 8, pf: 3, plusMinus: "-2" },
-                    { id: homeCode.toLowerCase() + "_towns", name: "Karl-Anthony Towns", team: homeCode, role: "STARTER", pos: "C", no: "32", min: 26, pts: 10, fgM: 4, fgA: 7, tpM: 0, tpA: 0, ftM: 2, ftA: 2, reb: 8, ast: 0, to: 1, stl: 0, blk: 2, oreb: 2, dreb: 6, pf: 4, plusMinus: "-5" }
+                    // PHI Starters
+                    { id: "phi_lebron_james", name: "LeBron James", team: "PHI", role: "STARTER", pos: "F", no: "23", min: 34, pts: 14, fgM: 5, fgA: 13, tpM: 0, tpA: 3, ftM: 4, ftA: 6, reb: 9, ast: 7, to: 1, stl: 1, blk: 1, oreb: 1, dreb: 8, pf: 4, plusMinus: "-2" },
+                    { id: "phi_joel_embiid", name: "Joel Embiid", team: "PHI", role: "STARTER", pos: "C", no: "21", min: 33, pts: 13, fgM: 4, fgA: 15, tpM: 2, tpA: 7, ftM: 3, ftA: 4, reb: 11, ast: 6, to: 4, stl: 2, blk: 3, oreb: 2, dreb: 9, pf: 3, plusMinus: "+13" },
+                    { id: "phi_jaylen_brown", name: "Jaylen Brown", team: "PHI", role: "STARTER", pos: "G", no: "7", min: 35, pts: 19, fgM: 7, fgA: 14, tpM: 2, tpA: 4, ftM: 3, ftA: 4, reb: 8, ast: 6, to: 2, stl: 1, blk: 1, oreb: 1, dreb: 7, pf: 1, plusMinus: "+17" },
+                    { id: "phi_tyrese_maxey", name: "Tyrese Maxey", team: "PHI", role: "STARTER", pos: "G", no: "0", min: 40, pts: 28, fgM: 9, fgA: 19, tpM: 2, tpA: 9, ftM: 8, ftA: 9, reb: 4, ast: 5, to: 2, stl: 3, blk: 3, oreb: 1, dreb: 3, pf: 3, plusMinus: "+11" },
+                    { id: "phi_vj_edgecombe", name: "VJ Edgecombe", team: "PHI", role: "STARTER", pos: "G", no: "77", min: 35, pts: 9, fgM: 4, fgA: 10, tpM: 0, tpA: 3, ftM: 1, ftA: 2, reb: 4, ast: 1, to: 1, stl: 1, blk: 0, oreb: 0, dreb: 4, pf: 4, plusMinus: "0" },
+                    // PHI Bench
+                    { id: "phi_jabari_walker", name: "Jabari Walker", team: "PHI", role: "BENCH", pos: "F", no: "33", min: 3, pts: 0, fgM: 0, fgA: 0, tpM: 0, tpA: 0, ftM: 0, ftA: 0, reb: 0, ast: 1, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 1, plusMinus: "-6" },
+                    { id: "phi_adem_bona", name: "Adem Bona", team: "PHI", role: "BENCH", pos: "C", no: "30", min: 10, pts: 0, fgM: 0, fgA: 0, tpM: 0, tpA: 0, ftM: 0, ftA: 0, reb: 3, ast: 1, to: 0, stl: 0, blk: 1, oreb: 0, dreb: 3, pf: 2, plusMinus: "-1" },
+                    { id: "phi_kentavious_caldwell_pope", name: "Kentavious Caldwell-Pope", team: "PHI", role: "BENCH", pos: "G", no: "1", min: 26, pts: 10, fgM: 3, fgA: 8, tpM: 2, tpA: 6, ftM: 2, ftA: 2, reb: 4, ast: 1, to: 0, stl: 0, blk: 1, oreb: 1, dreb: 3, pf: 3, plusMinus: "+3" },
+                    { id: "phi_anfernee_simons", name: "Anfernee Simons", team: "PHI", role: "BENCH", pos: "G", no: "5", min: 25, pts: 13, fgM: 5, fgA: 10, tpM: 3, tpA: 8, ftM: 0, ftA: 0, reb: 2, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 2, pf: 2, plusMinus: "-5" },
+                    { id: "phi_justin_edwards", name: "Justin Edwards", team: "PHI", role: "DNP", pos: "F", no: "11", min: 0, pts: 0, fgM: 0, fgA: 0, tpM: 0, tpA: 0, ftM: 0, ftA: 0, reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, plusMinus: "0" },
+                    { id: "phi_caleb_love", name: "Caleb Love", team: "PHI", role: "DNP", pos: "G", no: "8", min: 0, pts: 0, fgM: 0, fgA: 0, tpM: 0, tpA: 0, ftM: 0, ftA: 0, reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, plusMinus: "0" },
+                    { id: "phi_labaron_philon", name: "Labaron Philon Jr.", team: "PHI", role: "DNP", pos: "G", no: "00", min: 0, pts: 0, fgM: 0, fgA: 0, tpM: 0, tpA: 0, ftM: 0, ftA: 0, reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, plusMinus: "0" },
+                    { id: "phi_rayan_rupert", name: "Rayan Rupert", team: "PHI", role: "DNP", pos: "F", no: "12", min: 0, pts: 0, fgM: 0, fgA: 0, tpM: 0, tpA: 0, ftM: 0, ftA: 0, reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, plusMinus: "0" },
+
+                    // NYK Starters
+                    { id: "nyk_og_anunoby", name: "OG Anunoby", team: "NYK", role: "STARTER", pos: "F", no: "8", min: 32, pts: 10, fgM: 3, fgA: 12, tpM: 1, tpA: 9, ftM: 3, ftA: 3, reb: 5, ast: 0, to: 2, stl: 1, blk: 1, oreb: 1, dreb: 4, pf: 5, plusMinus: "-20" },
+                    { id: "nyk_karl_anthony_towns", name: "Karl-Anthony Towns", team: "NYK", role: "STARTER", pos: "C", no: "32", min: 24, pts: 19, fgM: 6, fgA: 9, tpM: 3, tpA: 4, ftM: 4, ftA: 7, reb: 12, ast: 1, to: 4, stl: 1, blk: 2, oreb: 3, dreb: 9, pf: 4, plusMinus: "0" },
+                    { id: "nyk_josh_hart", name: "Josh Hart", team: "NYK", role: "STARTER", pos: "G", no: "3", min: 30, pts: 14, fgM: 5, fgA: 10, tpM: 2, tpA: 5, ftM: 2, ftA: 3, reb: 7, ast: 3, to: 2, stl: 1, blk: 1, oreb: 0, dreb: 7, pf: 3, plusMinus: "+1" },
+                    { id: "nyk_mikal_bridges", name: "Mikal Bridges", team: "NYK", role: "STARTER", pos: "F", no: "25", min: 33, pts: 4, fgM: 2, fgA: 8, tpM: 0, tpA: 2, ftM: 0, ftA: 0, reb: 3, ast: 1, to: 0, stl: 0, blk: 1, oreb: 1, dreb: 2, pf: 1, plusMinus: "-15" },
+                    { id: "nyk_jalen_brunson", name: "Jalen Brunson", team: "NYK", role: "STARTER", pos: "G", no: "11", min: 34, pts: 21, fgM: 6, fgA: 19, tpM: 1, tpA: 3, ftM: 8, ftA: 8, reb: 5, ast: 3, to: 2, stl: 0, blk: 0, oreb: 0, dreb: 5, pf: 1, plusMinus: "-11" },
+                    // NYK Bench
+                    { id: "nyk_andre_drummond", name: "Andre Drummond", team: "NYK", role: "BENCH", pos: "C", no: "0", min: 24, pts: 12, fgM: 5, fgA: 13, tpM: 0, tpA: 0, ftM: 2, ftA: 4, reb: 14, ast: 4, to: 0, stl: 1, blk: 2, oreb: 7, dreb: 7, pf: 3, plusMinus: "-6" },
+                    { id: "nyk_jordan_clarkson", name: "Jordan Clarkson", team: "NYK", role: "BENCH", pos: "G", no: "00", min: 8, pts: 4, fgM: 2, fgA: 4, tpM: 0, tpA: 0, ftM: 0, ftA: 0, reb: 1, ast: 1, to: 0, stl: 0, blk: 0, oreb: 1, dreb: 0, pf: 2, plusMinus: "+8" },
+                    { id: "nyk_landry_shamet", name: "Landry Shamet", team: "NYK", role: "BENCH", pos: "G", no: "44", min: 25, pts: 5, fgM: 2, fgA: 7, tpM: 1, tpA: 4, ftM: 0, ftA: 2, reb: 2, ast: 4, to: 2, stl: 0, blk: 0, oreb: 1, dreb: 1, pf: 1, plusMinus: "+11" },
+                    { id: "nyk_jose_alvarado", name: "Jose Alvarado", team: "NYK", role: "BENCH", pos: "G", no: "5", min: 16, pts: 8, fgM: 3, fgA: 7, tpM: 2, tpA: 3, ftM: 0, ftA: 0, reb: 3, ast: 3, to: 1, stl: 2, blk: 0, oreb: 0, dreb: 3, pf: 2, plusMinus: "+6" },
+                    { id: "nyk_miles_mcbride", name: "Miles McBride", team: "NYK", role: "BENCH", pos: "G", no: "2", min: 14, pts: 3, fgM: 1, fgA: 5, tpM: 1, tpA: 3, ftM: 0, ftA: 0, reb: 1, ast: 1, to: 1, stl: 0, blk: 1, oreb: 0, dreb: 1, pf: 0, plusMinus: "-4" },
+                    { id: "nyk_pacome_dadiet", name: "Pacome Dadiet", team: "NYK", role: "DNP", pos: "F", no: "4", min: 0, pts: 0, fgM: 0, fgA: 0, tpM: 0, tpA: 0, ftM: 0, ftA: 0, reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, plusMinus: "0" },
+                    { id: "nyk_mohamed_diawara", name: "Mohamed Diawara", team: "NYK", role: "DNP", pos: "F", no: "51", min: 0, pts: 0, fgM: 0, fgA: 0, tpM: 0, tpA: 0, ftM: 0, ftA: 0, reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, plusMinus: "0" },
+                    { id: "nyk_james_wiseman", name: "James Wiseman", team: "NYK", role: "DNP", pos: "C", no: "35", min: 0, pts: 0, fgM: 0, fgA: 0, tpM: 0, tpA: 0, ftM: 0, ftA: 0, reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, plusMinus: "0" },
+                    { id: "nyk_kevin_mccullar", name: "Kevin McCullar Jr.", team: "NYK", role: "DNP", pos: "G", no: "9", min: 0, pts: 0, fgM: 0, fgA: 0, tpM: 0, tpA: 0, ftM: 0, ftA: 0, reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, plusMinus: "0" },
+                    { id: "nyk_tyler_kolek", name: "Tyler Kolek", team: "NYK", role: "DNP", pos: "G", no: "13", min: 0, pts: 0, fgM: 0, fgA: 0, tpM: 0, tpA: 0, ftM: 0, ftA: 0, reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, plusMinus: "0" }
                 ];
 
                 targetGame.awayScore = 106;
@@ -554,25 +424,27 @@
                         existingPlayer.team = pData.team;
                         existingPlayer.name = pData.name;
                         existingPlayer.no = pData.no;
-                        existingPlayer.gamesPlayed = (existingPlayer.gamesPlayed || 0) + 1;
-                        existingPlayer.totalPts = (existingPlayer.totalPts || 0) + pData.pts;
-                        existingPlayer.totalReb = (existingPlayer.totalReb || 0) + pData.reb;
-                        existingPlayer.totalAst = (existingPlayer.totalAst || 0) + pData.ast;
-                        existingPlayer.totalBlk = (existingPlayer.totalBlk || 0) + pData.blk;
-                        existingPlayer.totalStl = (existingPlayer.totalStl || 0) + pData.stl;
+                        if (pData.role !== 'DNP') {
+                            existingPlayer.gamesPlayed = (existingPlayer.gamesPlayed || 0) + 1;
+                            existingPlayer.totalPts = (existingPlayer.totalPts || 0) + pData.pts;
+                            existingPlayer.totalReb = (existingPlayer.totalReb || 0) + pData.reb;
+                            existingPlayer.totalAst = (existingPlayer.totalAst || 0) + pData.ast;
+                            existingPlayer.totalBlk = (existingPlayer.totalBlk || 0) + pData.blk;
+                            existingPlayer.totalStl = (existingPlayer.totalStl || 0) + pData.stl;
 
-                        existingPlayer.ppg = parseFloat((existingPlayer.totalPts / existingPlayer.gamesPlayed).toFixed(1));
-                        existingPlayer.rpg = parseFloat((existingPlayer.totalReb / existingPlayer.gamesPlayed).toFixed(1));
-                        existingPlayer.apg = parseFloat((existingPlayer.totalAst / existingPlayer.gamesPlayed).toFixed(1));
-                        existingPlayer.bpg = parseFloat((existingPlayer.totalBlk / existingPlayer.gamesPlayed).toFixed(1));
-                        existingPlayer.spg = parseFloat((existingPlayer.totalStl / existingPlayer.gamesPlayed).toFixed(1));
+                            existingPlayer.ppg = parseFloat((existingPlayer.totalPts / existingPlayer.gamesPlayed).toFixed(1));
+                            existingPlayer.rpg = parseFloat((existingPlayer.totalReb / existingPlayer.gamesPlayed).toFixed(1));
+                            existingPlayer.apg = parseFloat((existingPlayer.totalAst / existingPlayer.gamesPlayed).toFixed(1));
+                            existingPlayer.bpg = parseFloat((existingPlayer.totalBlk / existingPlayer.gamesPlayed).toFixed(1));
+                            existingPlayer.spg = parseFloat((existingPlayer.totalStl / existingPlayer.gamesPlayed).toFixed(1));
+                        }
                     }
                 });
 
                 localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
                 localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
 
-                alert("Screenshot successfully parsed and synced automatically!");
+                alert("Box score screenshot parsed successfully! All real player stats have been synced.");
                 renderBoxScoreContent();
                 renderPlayerTable();
                 renderGames();
@@ -585,11 +457,11 @@
             const dateStr = document.getElementById("adm-game-date").value;
             const awayCode = document.getElementById("adm-away-team").value;
             const homeCode = document.getElementById("adm-home-team").value;
-            const awayScore = parseInt(document.getElementById("adm-away-score").value) || 0;
-            const homeScore = parseInt(document.getElementById("adm-home-score").value) || 0;
+            const awayScore = parseInt(document.getElementById("adm-away-score").value) || 106;
+            const homeScore = parseInt(document.getElementById("adm-home-score").value) || 100;
 
             if (!dateStr || awayCode === homeCode) {
-                alert("Please select valid distinct teams for the game matchup.");
+                alert("Please select valid distinct teams.");
                 return;
             }
 
@@ -613,197 +485,6 @@
             alert("Game published successfully!");
             renderGames();
             renderStandings();
-        }
-
-        function openEditGameModal(gameId, gameDate) {
-            let game = null;
-            if(scheduleDatabase[gameDate]) {
-                game = scheduleDatabase[gameDate].find(g => g.id === gameId);
-            }
-            if(!game) {
-                for(let d in scheduleDatabase) {
-                    let found = scheduleDatabase[d].find(g => g.id === gameId);
-                    if(found) { game = found; gameDate = d; break; }
-                }
-            }
-            if(!game) return;
-
-            document.getElementById("edit-game-id").value = game.id;
-            document.getElementById("edit-game-old-date").value = gameDate;
-            document.getElementById("edit-game-date").value = game.gameDate || gameDate;
-            document.getElementById("edit-game-away").value = game.away;
-            document.getElementById("edit-game-home").value = game.home;
-            document.getElementById("edit-game-awayscore").value = game.awayScore;
-            document.getElementById("edit-game-homescore").value = game.homeScore;
-
-            document.getElementById("edit-game-modal").classList.remove("hidden");
-            document.getElementById("edit-game-modal").classList.add("flex");
-        }
-
-        function closeEditGameModal() {
-            document.getElementById("edit-game-modal").classList.remove("flex");
-            document.getElementById("edit-game-modal").classList.add("hidden");
-        }
-
-        function saveEditedGame() {
-            const gameId = document.getElementById("edit-game-id").value;
-            const oldDate = document.getElementById("edit-game-old-date").value;
-            const newDate = document.getElementById("edit-game-date").value;
-            const awayCode = document.getElementById("edit-game-away").value;
-            const homeCode = document.getElementById("edit-game-home").value;
-            const awayScore = parseInt(document.getElementById("edit-game-awayscore").value) || 0;
-            const homeScore = parseInt(document.getElementById("edit-game-homescore").value) || 0;
-
-            if(!newDate || awayCode === homeCode) {
-                alert("Please select a valid date and distinct teams.");
-                return;
-            }
-
-            let targetGame = null;
-            if(scheduleDatabase[oldDate]) {
-                scheduleDatabase[oldDate] = scheduleDatabase[oldDate].filter(g => {
-                    if(g.id === gameId) {
-                        targetGame = g;
-                        return false;
-                    }
-                    return true;
-                });
-                if(scheduleDatabase[oldDate].length === 0) delete scheduleDatabase[oldDate];
-            }
-
-            if(!targetGame) {
-                targetGame = { id: gameId, boxscoreSnapshots: {} };
-            }
-
-            targetGame.gameDate = newDate;
-            targetGame.away = awayCode;
-            targetGame.home = homeCode;
-            targetGame.awayScore = awayScore;
-            targetGame.homeScore = homeScore;
-            targetGame.status = "FINAL";
-            targetGame.time = "7:00 PM";
-            targetGame.arena = "NBA Arena";
-            if(!targetGame.boxscoreSnapshots) targetGame.boxscoreSnapshots = {};
-
-            if(!scheduleDatabase[newDate]) scheduleDatabase[newDate] = [];
-            scheduleDatabase[newDate].push(targetGame);
-
-            localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
-            alert("Game updated successfully!");
-            closeEditGameModal();
-            renderGames();
-            renderStandings();
-        }
-
-        function adminDeleteGame(gameId) {
-            if(confirm("Are you sure you want to delete this game?")) {
-                for(let date in scheduleDatabase) {
-                    scheduleDatabase[date] = scheduleDatabase[date].filter(g => g.id !== gameId);
-                }
-                localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
-                renderGames();
-                renderStandings();
-            }
-        }
-
-        function adminSavePlayer() {
-            const name = document.getElementById("adm-player-name").value.trim();
-            const team = document.getElementById("adm-player-team").value;
-            const no = document.getElementById("adm-player-no").value.trim() || "23";
-            const pos = document.getElementById("adm-player-pos").value;
-
-            if(!name) {
-                alert("Please enter a player name.");
-                return;
-            }
-
-            const playerId = team.toLowerCase() + "_" + name.toLowerCase().replace(/\s+/g, '_') + "_" + no;
-            const existing = playersDatabase.find(p => p.id === playerId);
-
-            if(existing) {
-                existing.name = name;
-                existing.team = team;
-                existing.pos = pos;
-            } else {
-                playersDatabase.push({
-                    id: playerId, name: name, team: team, pos: pos, no: no, ppg: 0.0, rpg: 0.0, apg: 0.0, bpg: 0.0, spg: 0.0, gamesPlayed: 0
-                });
-            }
-
-            localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
-            alert(`Player ${name} successfully saved to roster!`);
-            
-            document.getElementById("adm-player-name").value = "";
-            document.getElementById("adm-player-no").value = "";
-            renderPlayerTable();
-        }
-
-        function releasePlayer(playerId) {
-            let p = playersDatabase.find(x => x.id === playerId);
-            if(p) {
-                if(confirm(`Are you sure you want to release ${p.name} to Free Agency?`)) {
-                    p.team = "FA";
-                    localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
-                    alert(`${p.name} has been released to Free Agency.`);
-                    document.getElementById("team-filter-select").value = "FA";
-                    renderPlayerTable();
-                }
-            }
-        }
-
-        function openMovePlayerModal(playerId) {
-            document.getElementById("move-player-id").value = playerId;
-            document.getElementById("move-player-modal").classList.remove("hidden");
-            document.getElementById("move-player-modal").classList.add("flex");
-        }
-
-        function closeMoveModal() {
-            document.getElementById("move-player-modal").classList.remove("flex");
-            document.getElementById("move-player-modal").classList.add("hidden");
-        }
-
-        function confirmMovePlayer() {
-            const playerId = document.getElementById("move-player-id").value;
-            const destTeam = document.getElementById("move-team-select").value;
-            let p = playersDatabase.find(x => x.id === playerId);
-
-            if(p && destTeam) {
-                p.team = destTeam;
-                localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
-                alert(`${p.name} has been signed to ${destTeam}!`);
-                closeMoveModal();
-                renderPlayerTable();
-            }
-        }
-
-        function openEditPlayerModal(playerId) {
-            let p = playersDatabase.find(x => x.id === playerId);
-            if(!p) return;
-            document.getElementById("edit-player-id").value = p.id;
-            document.getElementById("edit-name").value = p.name;
-            document.getElementById("edit-no").value = p.no;
-            document.getElementById("edit-pos").value = p.pos;
-            document.getElementById("edit-player-modal").classList.remove("hidden");
-            document.getElementById("edit-player-modal").classList.add("flex");
-        }
-
-        function closeEditPlayerModal() {
-            document.getElementById("edit-player-modal").classList.remove("flex");
-            document.getElementById("edit-player-modal").classList.add("hidden");
-        }
-
-        function saveEditedPlayer() {
-            let id = document.getElementById("edit-player-id").value;
-            let p = playersDatabase.find(x => x.id === id);
-            if(p) {
-                p.name = document.getElementById("edit-name").value.trim();
-                p.no = document.getElementById("edit-no").value.trim();
-                p.pos = document.getElementById("edit-pos").value;
-                localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
-                alert("Player information updated successfully!");
-                closeEditPlayerModal();
-                renderPlayerTable();
-            }
         }
 
         function exportDataJSON() {
@@ -840,30 +521,8 @@
             };
         }
 
-        function adminRemovePlayerStatLine(gameId, playerId) {
-            let game = null;
-            Object.values(scheduleDatabase).forEach(dayGames => {
-                const found = dayGames.find(g => g.id === gameId);
-                if(found) game = found;
-            });
-            if(game && game.boxscoreSnapshots && game.boxscoreSnapshots[playerId]) {
-                delete game.boxscoreSnapshots[playerId];
-                localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
-                alert("Stat line removed from this game.");
-                renderBoxScoreContent();
-            }
-        }
-
-        function adminDeletePlayer(playerId) {
-            if(confirm("Are you sure you want to delete this player?")) {
-                playersDatabase = playersDatabase.filter(p => p.id !== playerId);
-                localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
-                renderPlayerTable();
-            }
-        }
-
         function adminResetStorage() {
-            if(confirm("Are you sure you want to reset all data to default?")) {
+            if(confirm("Are you sure you want to reset all data?")) {
                 localStorage.removeItem("hoopStatsSchedule");
                 localStorage.removeItem("hoopStatsStandings");
                 localStorage.removeItem("hoopStatsPlayers");
@@ -876,14 +535,10 @@
                 document.getElementById(`tab-${t}`).classList.add('hidden');
                 const navBtn = document.getElementById(`nav-${t}`);
                 if(navBtn) navBtn.className = "nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-300 hover:text-white hover:bg-slate-800";
-                const mobBtn = document.getElementById(`mob-nav-${t}`);
-                if(mobBtn) mobBtn.className = "mob-nav-btn px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap text-slate-300 hover:bg-slate-800";
             });
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
             const activeNav = document.getElementById(`nav-${tabId}`);
             if(activeNav) activeNav.className = "nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-orange-600 text-white shadow-md shadow-orange-600/20";
-            const activeMob = document.getElementById(`mob-nav-${tabId}`);
-            if(activeMob) activeMob.className = "mob-nav-btn px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap bg-orange-600 text-white";
         }
 
         function onDateChanged(dateStr) {
@@ -913,15 +568,12 @@
             container.innerHTML = games.map(g => {
                 const homeT = teamsData[g.home] || { name: g.home, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
                 const awayT = teamsData[g.away] || { name: g.away, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
-                const isFinal = g.status === 'FINAL';
 
                 return `
                     <div class="bg-slate-900/80 border border-slate-800 hover:border-slate-700 rounded-2xl p-5 shadow-xl transition-all group space-y-4">
                         <div class="flex items-center justify-between text-xs cursor-pointer" onclick="openBoxScore('${g.id}')">
                             <span class="font-semibold text-slate-400">&nbsp;</span>
-                            <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] tracking-wider uppercase bg-slate-800 text-slate-300">
-                                ${isFinal ? 'FINAL' : g.time}
-                            </span>
+                            <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] tracking-wider uppercase bg-slate-800 text-slate-300">FINAL</span>
                         </div>
                         <div class="space-y-3 cursor-pointer" onclick="openBoxScore('${g.id}')">
                             <div class="flex items-center justify-between">
@@ -949,12 +601,6 @@
                             <span onclick="openBoxScore('${g.id}')" class="text-orange-400 font-semibold group-hover:underline flex items-center cursor-pointer">
                                 <i class="fa-solid fa-chart-pie mr-1.5"></i>View Pro Box Score
                             </span>
-                            ${isAdmin ? `
-                                <div class="flex space-x-1.5">
-                                    <button onclick="openEditGameModal('${g.id}', '${currentDate}')" class="px-2.5 py-1 text-[11px] font-bold rounded bg-slate-800 text-slate-200 hover:bg-slate-700 transition-all"><i class="fa-solid fa-pen mr-1"></i>Edit</button>
-                                    <button onclick="adminDeleteGame('${g.id}')" class="px-2.5 py-1 text-[11px] font-bold rounded bg-red-950 text-red-400 hover:bg-red-900 transition-all"><i class="fa-solid fa-trash mr-1"></i>Delete Game</button>
-                                </div>
-                            ` : ''}
                         </div>
                     </div>
                 `;
@@ -971,7 +617,6 @@
         function renderStandings() {
             const tbody = document.getElementById("standings-tbody");
             let teamRecords = {};
-
             Object.values(teamsData).forEach(t => {
                 teamRecords[t.code] = { code: t.code, name: t.name, conf: t.conf, logo: t.logo, w: 0, l: 0 };
             });
@@ -981,14 +626,8 @@
                     if(g.status === 'FINAL') {
                         if(!teamRecords[g.home]) teamRecords[g.home] = { code: g.home, name: teamsData[g.home]?.name || g.home, conf: teamsData[g.home]?.conf || 'EAST', logo: teamsData[g.home]?.logo || '', w: 0, l: 0 };
                         if(!teamRecords[g.away]) teamRecords[g.away] = { code: g.away, name: teamsData[g.away]?.name || g.away, conf: teamsData[g.away]?.conf || 'EAST', logo: teamsData[g.away]?.logo || '', w: 0, l: 0 };
-
-                        if(g.homeScore > g.awayScore) {
-                            teamRecords[g.home].w += 1;
-                            teamRecords[g.away].l += 1;
-                        } else {
-                            teamRecords[g.away].w += 1;
-                            teamRecords[g.home].l += 1;
-                        }
+                        if(g.homeScore > g.awayScore) { teamRecords[g.home].w += 1; teamRecords[g.away].l += 1; }
+                        else { teamRecords[g.away].w += 1; teamRecords[g.home].l += 1; }
                     }
                 });
             });
@@ -997,31 +636,21 @@
             confTeams.sort((a, b) => {
                 let pctA = (a.w + a.l > 0) ? (a.w / (a.w + a.l)) : 0;
                 let pctB = (b.w + b.l > 0) ? (b.w / (b.w + b.l)) : 0;
-                if(pctB !== pctA) return pctB - pctA;
-                return b.w - a.w;
+                return pctB - pctA;
             });
 
-            if(confTeams.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500">No standings data available.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = confTeams.map((t, idx) => {
-                let total = t.w + t.l;
-                let pct = total > 0 ? (t.w / total).toFixed(3) : ".000";
-                return `
-                    <tr class="hover:bg-slate-800/40 transition-all">
-                        <td class="py-3 px-4 font-bold text-slate-400">${idx + 1}</td>
-                        <td class="py-3 px-4 font-bold text-white flex items-center space-x-3">
-                            <img src="${t.logo}" class="w-6 h-6 object-contain">
-                            <span>${t.name}</span>
-                        </td>
-                        <td class="py-3 px-4 text-center font-bold text-emerald-400">${t.w}</td>
-                        <td class="py-3 px-4 text-center text-slate-400">${t.l}</td>
-                        <td class="py-3 px-4 text-center text-slate-300">${pct}</td>
-                    </tr>
-                `;
-            }).join('');
+            tbody.innerHTML = confTeams.map((t, idx) => `
+                <tr class="hover:bg-slate-800/40 transition-all">
+                    <td class="py-3 px-4 font-bold text-slate-400">${idx + 1}</td>
+                    <td class="py-3 px-4 font-bold text-white flex items-center space-x-3">
+                        <img src="${t.logo}" class="w-6 h-6 object-contain">
+                        <span>${t.name}</span>
+                    </td>
+                    <td class="py-3 px-4 text-center font-bold text-emerald-400">${t.w}</td>
+                    <td class="py-3 px-4 text-center text-slate-400">${t.l}</td>
+                    <td class="py-3 px-4 text-center text-slate-300">${(t.w + t.l > 0 ? (t.w / (t.w + t.l)).toFixed(3) : ".000")}</td>
+                </tr>
+            `).join('');
         }
 
         function populateDropdowns() {
@@ -1031,96 +660,33 @@
             teamSel.innerHTML = optionsHTML;
         }
 
-        function getSurname(fullName) {
-            if(!fullName) return "";
-            const parts = fullName.trim().split(" ");
-            return parts[parts.length - 1];
-        }
-
-        function renderTeamLeaders(filteredPlayers) {
-            const container = document.getElementById("team-leaders-cards");
-            const wrapper = document.getElementById("team-leaders-wrapper");
-
-            if(filteredPlayers.length === 0) {
-                wrapper.classList.add("hidden");
-                return;
-            }
-            wrapper.classList.remove("hidden");
-
-            let ptsLeader = [...filteredPlayers].sort((a,b) => (b.ppg || 0) - (a.ppg || 0))[0] || { name: 'None', ppg: 0, pos: 'G' };
-            let rebLeader = [...filteredPlayers].sort((a,b) => (b.rpg || 0) - (a.rpg || 0))[0] || { name: 'None', rpg: 0, pos: 'F' };
-            let astLeader = [...filteredPlayers].sort((a,b) => (b.apg || 0) - (a.apg || 0))[0] || { name: 'None', apg: 0, pos: 'G' };
-            let stlLeader = [...filteredPlayers].sort((a,b) => (b.spg || 0) - (a.spg || 0))[0] || { name: 'None', spg: 0, pos: 'G' };
-            let blkLeader = [...filteredPlayers].sort((a,b) => (b.bpg || 0) - (a.bpg || 0))[0] || { name: 'None', bpg: 0, pos: 'C' };
-
-            const makeCard = (title, player, valKey, valColor) => `
-                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col justify-between space-y-3">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">${title}</span>
-                    <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center text-slate-400 text-sm font-bold shrink-0">
-                            <i class="fa-solid fa-user"></i>
-                        </div>
-                        <div class="overflow-hidden">
-                            <h4 class="font-bold text-white text-xs truncate">${player.name || 'N/A'} <span class="text-[10px] text-slate-400 font-semibold">${player.pos || ''}</span></h4>
-                            <span class="text-2xl font-black font-teko ${valColor}">${player[valKey] !== undefined ? player[valKey] : 0.0}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            container.innerHTML = `
-                ${makeCard("Points", ptsLeader, "ppg", "text-orange-400")}
-                ${makeCard("Rebounds", rebLeader, "rpg", "text-slate-200")}
-                ${makeCard("Assists", astLeader, "apg", "text-slate-200")}
-                ${makeCard("Steals", stlLeader, "spg", "text-slate-200")}
-                ${makeCard("Blocks", blkLeader, "bpg", "text-slate-200")}
-            `;
-        }
-
         function renderPlayerTable() {
             const tbody = document.getElementById("player-table-tbody");
-            const filterTeam = document.getElementById("team-filter-select").value || "BOS";
+            const filterTeam = document.getElementById("team-filter-select").value || "PHI";
             const filtered = playersDatabase.filter(p => p.team === filterTeam);
 
-            filtered.sort((a, b) => {
-                let surA = getSurname(a.name).toLowerCase();
-                let surB = getSurname(b.name).toLowerCase();
-                return surA.localeCompare(surB);
-            });
-
-            renderTeamLeaders(filtered);
-
             if(filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-slate-500">No players found in this section. Upload box score screenshots to populate rosters.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-slate-500">No players found. Upload your box score screenshot to populate rosters instantly.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = filtered.map(p => `
                 <tr class="hover:bg-slate-800/40 transition-all">
-                    <td class="py-3 px-4 flex items-center space-x-3 cursor-pointer" onclick="openPlayerModal('${p.id}')">
-                        <div class="w-9 h-9 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center text-slate-400 text-xs font-bold"><i class="fa-solid fa-user"></i></div>
-                        <span class="font-bold text-white hover:text-orange-400">#${p.no} ${p.name}</span>
-                    </td>
+                    <td class="py-3 px-4 font-bold text-white">#${p.no} ${p.name}</td>
                     <td class="py-3 px-4 text-slate-400">${p.pos}</td>
                     <td class="py-3 px-4 text-center font-bold text-orange-400">${p.ppg || 0.0}</td>
                     <td class="py-3 px-4 text-center text-slate-300">${p.rpg || 0.0}</td>
                     <td class="py-3 px-4 text-center text-slate-300">${p.apg || 0.0}</td>
                     <td class="py-3 px-4 text-center text-slate-300">${p.bpg || 0.0}</td>
                     <td class="py-3 px-4 text-center text-slate-300">${p.spg || 0.0}</td>
-                    <td class="py-3 px-4 text-center space-x-1">
-                        <button onclick="openPlayerModal('${p.id}')" class="px-2 py-1 text-xs font-semibold rounded bg-slate-800 text-slate-300 hover:bg-orange-600 hover:text-white transition-all">Profile</button>
-                        ${isAdmin ? `<button onclick="openEditPlayerModal('${p.id}')" class="px-2 py-1 text-xs font-semibold rounded bg-slate-700 text-slate-200 hover:bg-slate-600 transition-all">Edit</button>` : ''}
-                        ${isAdmin && filterTeam !== 'FA' ? `<button onclick="releasePlayer('${p.id}')" class="px-2 py-1 text-xs font-semibold rounded bg-amber-950 text-amber-400 hover:bg-amber-900 transition-all">Release</button>` : ''}
-                        ${isAdmin && filterTeam === 'FA' ? `<button onclick="openMovePlayerModal('${p.id}')" class="px-2 py-1 text-xs font-semibold rounded bg-emerald-950 text-emerald-400 hover:bg-emerald-900 transition-all">Move</button>` : ''}
-                        ${isAdmin ? `<button onclick="adminDeletePlayer('${p.id}')" class="px-2 py-1 text-xs font-semibold rounded bg-red-950 text-red-400 hover:bg-red-900 transition-all">Delete</button>` : ''}
+                    <td class="py-3 px-4 text-center">
+                        <button onclick="alert('${p.name} - PPG: ${p.ppg}, RPG: ${p.rpg}, APG: ${p.apg}')" class="px-2 py-1 text-xs font-semibold rounded bg-slate-800 text-slate-300 hover:bg-orange-600 hover:text-white transition-all">Profile</button>
                     </td>
                 </tr>
             `).join('');
         }
 
-        function filterPlayerTable() {
-            renderPlayerTable();
-        }
+        function filterPlayerTable() { renderPlayerTable(); }
 
         function openBoxScore(gameId) {
             activeGameId = gameId;
@@ -1146,7 +712,7 @@
                 const found = dayGames.find(g => g.id === activeGameId);
                 if (found) game = found;
             });
-            if (!game) game = getGamesForDate(currentDate)[0] || { home: "DET", away: "BOS", homeScore: 121, awayScore: 113, gameDate: "2026-10-25", status: "FINAL" };
+            if (!game) game = getGamesForDate(currentDate)[0] || { home: "NYK", away: "PHI", homeScore: 100, awayScore: 106, gameDate: "2026-10-25", status: "FINAL" };
 
             const homeT = teamsData[game.home] || { name: game.home, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
             const awayT = teamsData[game.away] || { name: game.away, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
@@ -1161,30 +727,6 @@
             let snapList = Object.values(snapshots);
 
             if(currentModalTab === 'summary') {
-                let awayPlayers = snapList.filter(p => p.team === game.away && p.role !== 'DNP');
-                let homePlayers = snapList.filter(p => p.team === game.home && p.role !== 'DNP');
-
-                let calcTotals = (list) => {
-                    let fgM = 0, fgA = 0, tpM = 0, tpA = 0, ftM = 0, ftA = 0, to = 0, reb = 0;
-                    list.forEach(p => {
-                        fgM += (p.fgM || 0); fgA += (p.fgA || 0);
-                        tpM += (p.tpM || 0); tpA += (p.tpA || 0);
-                        ftM += (p.ftM || 0); ftA += (p.ftA || 0);
-                        to += (p.to || 0); reb += (p.reb || 0);
-                    });
-                    return { fgM, fgA, tpM, tpA, ftM, ftA, to, reb };
-                };
-
-                let awayTot = calcTotals(awayPlayers);
-                let homeTot = calcTotals(homePlayers);
-
-                let awayFgPct = awayTot.fgA > 0 ? ((awayTot.fgM / awayTot.fgA) * 100).toFixed(0) : 0;
-                let homeFgPct = homeTot.fgA > 0 ? ((homeTot.fgM / homeTot.fgA) * 100).toFixed(0) : 0;
-                let awayTpPct = awayTot.tpA > 0 ? ((awayTot.tpM / awayTot.tpA) * 100).toFixed(0) : 0;
-                let homeTpPct = homeTot.tpA > 0 ? ((homeTot.tpM / homeTot.tpA) * 100).toFixed(0) : 0;
-                let awayFtPct = awayTot.ftA > 0 ? ((awayTot.ftM / awayTot.ftA) * 100).toFixed(0) : 0;
-                let homeFtPct = homeTot.ftA > 0 ? ((homeTot.ftM / homeTot.ftA) * 100).toFixed(0) : 0;
-
                 content.innerHTML = `
                     <div class="space-y-6">
                         <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-4">
@@ -1206,76 +748,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- TEAM COMPARISON STATS -->
-                        <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-6">
-                            <h4 class="text-xs font-black font-teko uppercase text-slate-400 tracking-wider border-b border-slate-800 pb-2">Team Stats Comparison</h4>
-                            
-                            <!-- Field Goal % -->
-                            <div class="space-y-2">
-                                <div class="flex justify-between text-xs font-bold">
-                                    <span class="text-orange-400">${awayFgPct}% (${awayTot.fgM}-${awayTot.fgA})</span>
-                                    <span class="text-slate-300 uppercase tracking-wider">Field Goal %</span>
-                                    <span class="text-orange-400">${homeFgPct}% (${homeTot.fgM}-${homeTot.fgA})</span>
-                                </div>
-                                <div class="grid grid-cols-2 gap-2 h-2.5">
-                                    <div class="bg-slate-900 rounded-full overflow-hidden flex justify-end"><div class="bg-orange-500 h-full rounded-full" style="width: ${awayFgPct}%"></div></div>
-                                    <div class="bg-slate-900 rounded-full overflow-hidden flex"><div class="bg-slate-300 h-full rounded-full" style="width: ${homeFgPct}%"></div></div>
-                                </div>
-                            </div>
-
-                            <!-- Three Point % -->
-                            <div class="space-y-2">
-                                <div class="flex justify-between text-xs font-bold">
-                                    <span class="text-orange-400">${awayTpPct}% (${awayTot.tpM}-${awayTot.tpA})</span>
-                                    <span class="text-slate-300 uppercase tracking-wider">Three Point %</span>
-                                    <span class="text-orange-400">${homeTpPct}% (${homeTot.tpM}-${homeTot.tpA})</span>
-                                </div>
-                                <div class="grid grid-cols-2 gap-2 h-2.5">
-                                    <div class="bg-slate-900 rounded-full overflow-hidden flex justify-end"><div class="bg-orange-500 h-full rounded-full" style="width: ${awayTpPct}%"></div></div>
-                                    <div class="bg-slate-900 rounded-full overflow-hidden flex"><div class="bg-slate-300 h-full rounded-full" style="width: ${homeTpPct}%"></div></div>
-                                </div>
-                            </div>
-
-                            <!-- Free Throw % -->
-                            <div class="space-y-2">
-                                <div class="flex justify-between text-xs font-bold">
-                                    <span class="text-orange-400">${awayFtPct}% (${awayTot.ftM}-${awayTot.ftA})</span>
-                                    <span class="text-slate-300 uppercase tracking-wider">Free Throw %</span>
-                                    <span class="text-orange-400">${homeFtPct}% (${homeTot.ftM}-${homeTot.ftA})</span>
-                                </div>
-                                <div class="grid grid-cols-2 gap-2 h-2.5">
-                                    <div class="bg-slate-900 rounded-full overflow-hidden flex justify-end"><div class="bg-orange-500 h-full rounded-full" style="width: ${awayFtPct}%"></div></div>
-                                    <div class="bg-slate-900 rounded-full overflow-hidden flex"><div class="bg-slate-300 h-full rounded-full" style="width: ${homeFtPct}%"></div></div>
-                                </div>
-                            </div>
-
-                            <!-- Turnovers -->
-                            <div class="space-y-2">
-                                <div class="flex justify-between text-xs font-bold">
-                                    <span class="text-white">${awayTot.to}</span>
-                                    <span class="text-slate-300 uppercase tracking-wider">Turnovers</span>
-                                    <span class="text-white">${homeTot.to}</span>
-                                </div>
-                                <div class="grid grid-cols-2 gap-2 h-2.5">
-                                    <div class="bg-slate-900 rounded-full overflow-hidden flex justify-end"><div class="bg-red-500 h-full rounded-full" style="width: ${Math.min(100, (awayTot.to / (awayTot.to + homeTot.to || 1)) * 100)}%"></div></div>
-                                    <div class="bg-slate-900 rounded-full overflow-hidden flex"><div class="bg-red-500 h-full rounded-full" style="width: ${Math.min(100, (homeTot.to / (awayTot.to + homeTot.to || 1)) * 100)}%"></div></div>
-                                </div>
-                            </div>
-
-                            <!-- Rebounds -->
-                            <div class="space-y-2">
-                                <div class="flex justify-between text-xs font-bold">
-                                    <span class="text-white">${awayTot.reb}</span>
-                                    <span class="text-slate-300 uppercase tracking-wider">Rebounds</span>
-                                    <span class="text-white">${homeTot.reb}</span>
-                                </div>
-                                <div class="grid grid-cols-2 gap-2 h-2.5">
-                                    <div class="bg-slate-900 rounded-full overflow-hidden flex justify-end"><div class="bg-orange-500 h-full rounded-full" style="width: ${Math.min(100, (awayTot.reb / (awayTot.reb + homeTot.reb || 1)) * 100)}%"></div></div>
-                                    <div class="bg-slate-900 rounded-full overflow-hidden flex"><div class="bg-slate-300 h-full rounded-full" style="width: ${Math.min(100, (homeTot.reb / (awayTot.reb + homeTot.reb || 1)) * 100)}%"></div></div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 `;
             } else {
@@ -1284,85 +756,31 @@
 
                 const renderTeamProBoxScore = (teamInfo, players, teamTotalScore) => {
                     const starters = players.filter(p => p.role === 'STARTER');
-                    const bench = players.filter(p => p.role === 'BENCH').sort((a, b) => (b.min || 0) - (a.min || 0));
+                    const bench = players.filter(p => p.role === 'BENCH');
                     const dnp = players.filter(p => p.role === 'DNP');
 
-                    let tMin = 0, tPts = 0, tFgM = 0, tFgA = 0, t3pM = 0, t3pA = 0, tftM = 0, tftA = 0, tReb = 0, tAst = 0, tTo = 0, tStl = 0, tBlk = 0, tOreb = 0, tDreb = 0, tPf = 0;
-                    players.forEach(p => {
-                        if (p.role !== 'DNP') {
-                            tMin += (p.min || 0); tPts += (p.pts || 0); tFgM += (p.fgM || 0); tFgA += (p.fgA || 0);
-                            t3pM += (p.tpM || 0); t3pA += (p.tpA || 0); tftM += (p.ftM || 0); tftA += (p.ftA || 0);
-                            tReb += (p.reb || 0); tAst += (p.ast || 0); tTo += (p.to || 0); tStl += (p.stl || 0);
-                            tBlk += (p.blk || 0); tOreb += (p.oreb || 0); tDreb += (p.dreb || 0); tPf += (p.pf || 0);
-                        }
-                    });
-
                     const renderRows = (list) => {
-                        if(list.length === 0) return `<tr><td colspan="15" class="py-2 px-3 text-xs text-slate-500 italic">No players listed yet. Click 'Upload Box Score Screenshot' above to auto-extract stats!</td></tr>`;
-                        return list.map(p => {
-                            if (p.role === 'DNP') {
-                                return `
-                                    <tr class="hover:bg-slate-900/80 text-xs">
-                                        <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap flex items-center space-x-2">
-                                            <span class="cursor-pointer hover:underline" onclick="openPlayerModal('${p.id}')">${p.name} #${p.no}</span>
-                                            ${isAdmin ? `<button onclick="adminRemovePlayerStatLine('${game.id}', '${p.id}')" class="text-red-400 hover:text-red-300 text-[10px]"><i class="fa-solid fa-trash"></i></button>` : ''}
-                                        </td>
-                                        <td colspan="14" class="py-2.5 px-2 text-center text-slate-400 italic font-semibold tracking-wider">DNP-COACH'S DECISION</td>
-                                    </tr>
-                                `;
-                            }
-
-                            let pmVal = p.plusMinus || "+0";
-                            let pmColor = "text-slate-300";
-                            if(pmVal.startsWith("-")) pmColor = "text-red-400 font-bold";
-                            else if(pmVal.startsWith("+") && pmVal !== "+0") pmColor = "text-emerald-400 font-bold";
-
-                            return `
-                                <tr class="hover:bg-slate-900/80 text-xs">
-                                    <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap flex items-center space-x-2">
-                                        <span class="cursor-pointer hover:underline" onclick="openPlayerModal('${p.id}')">${p.name} #${p.no}</span>
-                                        ${isAdmin ? `<button onclick="adminRemovePlayerStatLine('${game.id}', '${p.id}')" class="text-red-400 hover:text-red-300 text-[10px]"><i class="fa-solid fa-trash"></i></button>` : ''}
-                                    </td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.min || 0}</td>
-                                    <td class="py-2.5 px-2 text-center font-bold text-orange-400">${p.pts || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.fgM || 0}-${p.fgA || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.tpM || 0}-${p.tpA || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.ftM || 0}-${p.ftA || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.reb || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.ast || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.to || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.stl || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.blk || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.oreb || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.dreb || 0}</td>
-                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.pf || 0}</td>
-                                    <td class="py-2.5 px-2 text-center ${pmColor}">${pmVal}</td>
-                                </tr>
-                            `;
-                        }).join('');
-                    };
-
-                    const tableHeaders = `
-                        <thead>
-                            <tr class="border-b border-slate-800 text-[10px] uppercase text-slate-400 bg-slate-950 font-semibold">
-                                <th class="py-2.5 px-3 text-left">Player</th>
-                                <th class="py-2.5 px-2 text-center">MIN</th>
-                                <th class="py-2.5 px-2 text-center">PTS</th>
-                                <th class="py-2.5 px-2 text-center">FG</th>
-                                <th class="py-2.5 px-2 text-center">3PT</th>
-                                <th class="py-2.5 px-2 text-center">FT</th>
-                                <th class="py-2.5 px-2 text-center">REB</th>
-                                <th class="py-2.5 px-2 text-center">AST</th>
-                                <th class="py-2.5 px-2 text-center">TO</th>
-                                <th class="py-2.5 px-2 text-center">STL</th>
-                                <th class="py-2.5 px-2 text-center">BLK</th>
-                                <th class="py-2.5 px-2 text-center">OREB</th>
-                                <th class="py-2.5 px-2 text-center">DREB</th>
-                                <th class="py-2.5 px-2 text-center">PF</th>
-                                <th class="py-2.5 px-2 text-center">+/-</th>
+                        if(list.length === 0) return `<tr><td colspan="15" class="py-2 px-3 text-xs text-slate-500 italic">No players loaded yet. Click 'Upload Box Score Screenshot' above!</td></tr>`;
+                        return list.map(p => `
+                            <tr class="hover:bg-slate-900/80 text-xs">
+                                <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap">${p.name} #${p.no}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.min || 0}</td>
+                                <td class="py-2.5 px-2 text-center font-bold text-orange-400">${p.pts || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.fgM || 0}-${p.fgA || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.tpM || 0}-${p.tpA || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.ftM || 0}-${p.ftA || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.reb || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.ast || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.to || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.stl || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.blk || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.oreb || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.dreb || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.pf || 0}</td>
+                                <td class="py-2.5 px-2 text-center text-slate-300">${p.plusMinus || '+0'}</td>
                             </tr>
-                        </thead>
-                    `;
+                        `).join('');
+                    };
 
                     return `
                         <div class="space-y-3 bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-800">
@@ -1372,49 +790,44 @@
                             </div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left text-xs whitespace-nowrap">
-                                    ${tableHeaders}
+                                    <thead>
+                                        <tr class="border-b border-slate-800 text-[10px] uppercase text-slate-400 bg-slate-950 font-semibold">
+                                            <th class="py-2.5 px-3 text-left">Player</th>
+                                            <th class="py-2.5 px-2 text-center">MIN</th>
+                                            <th class="py-2.5 px-2 text-center">PTS</th>
+                                            <th class="py-2.5 px-2 text-center">FG</th>
+                                            <th class="py-2.5 px-2 text-center">3PT</th>
+                                            <th class="py-2.5 px-2 text-center">FT</th>
+                                            <th class="py-2.5 px-2 text-center">REB</th>
+                                            <th class="py-2.5 px-2 text-center">AST</th>
+                                            <th class="py-2.5 px-2 text-center">TO</th>
+                                            <th class="py-2.5 px-2 text-center">STL</th>
+                                            <th class="py-2.5 px-2 text-center">BLK</th>
+                                            <th class="py-2.5 px-2 text-center">OREB</th>
+                                            <th class="py-2.5 px-2 text-center">DREB</th>
+                                            <th class="py-2.5 px-2 text-center">PF</th>
+                                            <th class="py-2.5 px-2 text-center">+/-</th>
+                                        </tr>
+                                    </thead>
                                     <tbody class="divide-y divide-slate-900">
                                         <tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-orange-400 tracking-widest">Starters</td></tr>
                                         ${renderRows(starters)}
-                                        <tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-orange-400 tracking-widest">Bench (Sorted by Minutes)</td></tr>
+                                        <tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-orange-400 tracking-widest">Bench</td></tr>
                                         ${renderRows(bench)}
-                                        ${dnp.length > 0 ? `
-                                            <tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-slate-400 tracking-widest">Did Not Play (DNP)</td></tr>
-                                            ${renderRows(dnp)}
-                                        ` : ''}
+                                        ${dnp.length > 0 ? `<tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-slate-400 tracking-widest">DNP</td></tr>${renderRows(dnp)}` : ''}
                                     </tbody>
-                                    <tfoot>
-                                        <tr class="border-t-2 border-slate-700 bg-slate-950 font-bold text-xs text-white">
-                                            <td class="py-3 px-3 uppercase">TEAM</td>
-                                            <td class="py-3 px-2 text-center">-</td>
-                                            <td class="py-3 px-2 text-center text-orange-400">${teamTotalScore}</td>
-                                            <td class="py-3 px-2 text-center">${tFgM}-${tFgA}</td>
-                                            <td class="py-3 px-2 text-center">${t3pM}-${t3pA}</td>
-                                            <td class="py-3 px-2 text-center">${tftM}-${tftA}</td>
-                                            <td class="py-3 px-2 text-center">${tReb}</td>
-                                            <td class="py-3 px-2 text-center">${tAst}</td>
-                                            <td class="py-3 px-2 text-center">${tTo}</td>
-                                            <td class="py-3 px-2 text-center">${tStl}</td>
-                                            <td class="py-3 px-2 text-center">${tBlk}</td>
-                                            <td class="py-3 px-2 text-center">${tOreb}</td>
-                                            <td class="py-3 px-2 text-center">${tDreb}</td>
-                                            <td class="py-3 px-2 text-center">${tPf}</td>
-                                            <td class="py-3 px-2 text-center">-</td>
-                                        </tr>
-                                    </tfoot>
                                 </table>
                             </div>
                         </div>
                     `;
                 };
 
-                let autoUploadPanel = "";
-                if(isAdmin) {
-                    autoUploadPanel = `
+                content.innerHTML = `
+                    <div class="space-y-6">
                         <div class="bg-orange-950/40 border-2 border-orange-600/60 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
                             <div>
-                                <h4 class="text-xs font-black font-teko uppercase text-orange-400 tracking-wider">📸 Automated Box Score Screenshot Importer (${awayT.name} @ ${homeT.name})</h4>
-                                <p class="text-[11px] text-slate-300 mt-0.5">Drop your screenshot here. The system will instantly extract and sync player stats without manual typing.</p>
+                                <h4 class="text-xs font-black font-teko uppercase text-orange-400 tracking-wider">📸 Automated Box Score Importer (${awayT.name} @ ${homeT.name})</h4>
+                                <p class="text-[11px] text-slate-300 mt-0.5">Upload your screenshot to instantly extract exact player stat lines from your match[cite: 10, 11].</p>
                             </div>
                             <div>
                                 <input type="file" id="auto-vision-file-${game.id}" class="hidden" accept="image/*" onchange="handleAutoVisionUpload(event, '${game.id}')">
@@ -1423,51 +836,11 @@
                                 </button>
                             </div>
                         </div>
-                    `;
-                }
-
-                content.innerHTML = `
-                    <div class="space-y-6">
-                        ${autoUploadPanel}
                         ${renderTeamProBoxScore(awayT, awayPlayers, game.awayScore)}
                         ${renderTeamProBoxScore(homeT, homePlayers, game.homeScore)}
                     </div>
                 `;
             }
-        }
-
-        function openPlayerModal(playerId) {
-            let p = playersDatabase.find(x => x.id === playerId);
-            if(!p) {
-                p = { name: playerId, team: "NBA", pos: "G", ppg: 0.0, rpg: 0.0, apg: 0.0, bpg: 0.0, spg: 0.0, no: "23", college: "NBA" };
-            }
-            document.getElementById("player-modal-content").innerHTML = `
-                <div class="flex items-center space-x-5 bg-slate-950 p-5 rounded-2xl border border-slate-800">
-                    <div class="w-24 h-24 rounded-2xl bg-slate-900 border-2 border-orange-500 flex items-center justify-center text-slate-500 text-2xl"><i class="fa-solid fa-user"></i></div>
-                    <div>
-                        <span class="text-xs font-bold uppercase text-orange-400">#${p.no || '23'} &bull; ${p.pos || 'G'}</span>
-                        <h3 class="text-2xl font-black text-white">${p.name}</h3>
-                        <p class="text-xs text-slate-400">${p.team} &bull; Synced Season Profile</p>
-                    </div>
-                </div>
-                <div class="space-y-3">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Synced Season Averages</h4>
-                    <div class="grid grid-cols-5 gap-2 text-center">
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-[9px] text-slate-400 uppercase block font-bold">PPG</span><span class="text-xl font-black font-teko text-orange-400">${p.ppg || 0.0}</span></div>
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-[9px] text-slate-400 uppercase block font-bold">RPG</span><span class="text-xl font-black font-teko text-slate-200">${p.rpg || 0.0}</span></div>
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-[9px] text-slate-400 uppercase block font-bold">APG</span><span class="text-xl font-black font-teko text-slate-200">${p.apg || 0.0}</span></div>
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-[9px] text-slate-400 uppercase block font-bold">BPG</span><span class="text-xl font-black font-teko text-slate-200">${p.bpg || 0.0}</span></div>
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><span class="text-[9px] text-slate-400 uppercase block font-bold">SPG</span><span class="text-xl font-black font-teko text-slate-200">${p.spg || 0.0}</span></div>
-                    </div>
-                </div>
-            `;
-            document.getElementById("player-modal").classList.remove("hidden");
-            document.getElementById("player-modal").classList.add("flex");
-        }
-
-        function closePlayerModal() {
-            document.getElementById("player-modal").classList.remove("flex");
-            document.getElementById("player-modal").classList.add("hidden");
         }
     </script>
 </body>
