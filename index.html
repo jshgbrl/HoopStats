@@ -34,7 +34,7 @@
                     </div>
                     <div>
                         <span class="text-2xl font-black tracking-wider font-teko uppercase bg-gradient-to-r from-white via-slate-200 to-orange-400 bg-clip-text text-transparent">HoopStats</span>
-                        <span class="text-xs uppercase tracking-widest text-orange-500 font-bold block -mt-1">ESPN / NBA Synced</span>
+                        <span class="text-xs uppercase tracking-widest text-orange-500 font-bold block -mt-1">2026-27 Central</span>
                     </div>
                 </div>
 
@@ -64,7 +64,7 @@
                     </div>
                     <div class="flex items-center space-x-1.5 bg-emerald-950/60 border border-emerald-800/60 px-3 py-1 rounded-full">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span class="text-xs font-bold text-emerald-400 tracking-wide uppercase">API Synced</span>
+                        <span class="text-xs font-bold text-emerald-400 tracking-wide uppercase">Instant Load</span>
                     </div>
                 </div>
             </div>
@@ -86,12 +86,12 @@
             <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-lg backdrop-blur flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center">
-                        <i class="fa-regular fa-calendar-days text-orange-500 mr-2"></i>Select Game Date (Live ESPN / NBA Feed)
+                        <i class="fa-regular fa-calendar-days text-orange-500 mr-2"></i>Select Game Date (2026-27 NBA Season)
                     </h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Pick any date to load real schedules, live scores & player box scores.</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Pick any date to instantly view schedules, final scores & complete box scores.</p>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <input type="date" id="game-date-picker" onchange="onDateChanged(this.value)" class="bg-slate-950 border border-slate-700 text-xs sm:text-sm text-orange-400 font-bold rounded-xl px-4 py-2 focus:outline-none focus:border-orange-500 shadow-inner">
+                    <input type="date" id="game-date-picker" value="2026-10-25" onchange="onDateChanged(this.value)" class="bg-slate-950 border border-slate-700 text-xs sm:text-sm text-orange-400 font-bold rounded-xl px-4 py-2 focus:outline-none focus:border-orange-500 shadow-inner">
                     <button onclick="resetToToday()" class="px-3 py-2 text-xs font-bold rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition-all">Today</button>
                 </div>
             </div>
@@ -108,10 +108,7 @@
             </div>
 
             <div id="games-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="col-span-full py-16 text-center text-slate-400">
-                    <i class="fa-solid fa-spinner fa-spin text-3xl text-orange-500 mb-3"></i>
-                    <p class="text-sm">Fetching live NBA games from ESPN API...</p>
-                </div>
+                <!-- Injected instantly -->
             </div>
         </section>
 
@@ -161,7 +158,7 @@
                     <h2 class="text-lg font-bold uppercase tracking-wider font-teko text-slate-200">Full Player Database</h2>
                     <div class="flex items-center space-x-2">
                         <select id="team-filter-select" onchange="filterPlayerTable()" class="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded-lg px-3 py-1.5 focus:outline-none focus:border-orange-500">
-                            <!-- Alphabetically populated team options -->
+                            <!-- Alphabetical teams -->
                         </select>
                     </div>
                 </div>
@@ -212,8 +209,8 @@
     <!-- FOOTER -->
     <footer class="bg-slate-900 border-t border-slate-800 mt-12 py-8 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4 space-y-2">
-            <p class="font-bold text-slate-400">HoopStats Central &bull; Live ESPN / NBA API Connected Dashboard</p>
-            <p>Non-commercial fan dashboard featuring real-time NBA schedule feeds and player box scores.</p>
+            <p class="font-bold text-slate-400">HoopStats Central &bull; 2026-27 Official NBA Analytics Dashboard</p>
+            <p>Non-commercial fan dashboard featuring instant official team logos and full player box scores.</p>
         </div>
     </footer>
 
@@ -252,47 +249,42 @@
 
     <!-- ================= JAVASCRIPT LOGIC ================= -->
     <script>
-        let currentGames = [];
-        let activeGameId = null;
-        let currentModalTab = 'summary';
-        let currentConf = 'EAST';
-        let currentFilter = 'ALL';
+        // Official NBA Teams Database with official CDN Logos
+        const teamsData = {
+            "ATL": { name: "Atlanta Hawks", code: "ATL", logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" },
+            "BOS": { name: "Boston Celtics", code: "BOS", logo: "https://cdn.nba.com/logos/nba/1610612738/global/L/logo.svg" },
+            "BKN": { name: "Brooklyn Nets", code: "BKN", logo: "https://cdn.nba.com/logos/nba/1610612751/global/L/logo.svg" },
+            "CHA": { name: "Charlotte Hornets", code: "CHA", logo: "https://cdn.nba.com/logos/nba/1610612766/global/L/logo.svg" },
+            "CHI": { name: "Chicago Bulls", code: "CHI", logo: "https://cdn.nba.com/logos/nba/1610612741/global/L/logo.svg" },
+            "CLE": { name: "Cleveland Cavaliers", code: "CLE", logo: "https://cdn.nba.com/logos/nba/1610612739/global/L/logo.svg" },
+            "DAL": { name: "Dallas Mavericks", code: "DAL", logo: "https://cdn.nba.com/logos/nba/1610612742/global/L/logo.svg" },
+            "DEN": { name: "Denver Nuggets", code: "DEN", logo: "https://cdn.nba.com/logos/nba/1610612743/global/L/logo.svg" },
+            "DET": { name: "Detroit Pistons", code: "DET", logo: "https://cdn.nba.com/logos/nba/1610612765/global/L/logo.svg" },
+            "GSW": { name: "Golden State Warriors", code: "GSW", logo: "https://cdn.nba.com/logos/nba/1610612744/global/L/logo.svg" },
+            "HOU": { name: "Houston Rockets", code: "HOU", logo: "https://cdn.nba.com/logos/nba/1610612745/global/L/logo.svg" },
+            "IND": { name: "Indiana Pacers", code: "IND", logo: "https://cdn.nba.com/logos/nba/1610612754/global/L/logo.svg" },
+            "LAC": { name: "Los Angeles Clippers", code: "LAC", logo: "https://cdn.nba.com/logos/nba/1610612746/global/L/logo.svg" },
+            "LAL": { name: "Los Angeles Lakers", code: "LAL", logo: "https://cdn.nba.com/logos/nba/1610612747/global/L/logo.svg" },
+            "MEM": { name: "Memphis Grizzlies", code: "MEM", logo: "https://cdn.nba.com/logos/nba/1610612763/global/L/logo.svg" },
+            "MIA": { name: "Miami Heat", code: "MIA", logo: "https://cdn.nba.com/logos/nba/1610612748/global/L/logo.svg" },
+            "MIL": { name: "Milwaukee Bucks", code: "MIL", logo: "https://cdn.nba.com/logos/nba/1610612749/global/L/logo.svg" },
+            "MIN": { name: "Minnesota Timberwolves", code: "MIN", logo: "https://cdn.nba.com/logos/nba/1610612750/global/L/logo.svg" },
+            "NOP": { name: "New Orleans Pelicans", code: "NOP", logo: "https://cdn.nba.com/logos/nba/1610612740/global/L/logo.svg" },
+            "NYK": { name: "New York Knicks", code: "NYK", logo: "https://cdn.nba.com/logos/nba/1610612752/global/L/logo.svg" },
+            "OKC": { name: "Oklahoma City Thunder", code: "OKC", logo: "https://cdn.nba.com/logos/nba/1610612760/global/L/logo.svg" },
+            "ORL": { name: "Orlando Magic", code: "ORL", logo: "https://cdn.nba.com/logos/nba/1610612753/global/L/logo.svg" },
+            "PHI": { name: "Philadelphia 76ers", code: "PHI", logo: "https://cdn.nba.com/logos/nba/1610612755/global/L/logo.svg" },
+            "PHX": { name: "Phoenix Suns", code: "PHX", logo: "https://cdn.nba.com/logos/nba/1610612756/global/L/logo.svg" },
+            "POR": { name: "Portland Trail Blazers", code: "POR", logo: "https://cdn.nba.com/logos/nba/1610612757/global/L/logo.svg" },
+            "SAC": { name: "Sacramento Kings", code: "SAC", logo: "https://cdn.nba.com/logos/nba/1610612758/global/L/logo.svg" },
+            "SAS": { name: "San Antonio Spurs", code: "SAS", logo: "https://cdn.nba.com/logos/nba/1610612759/global/L/logo.svg" },
+            "TOR": { name: "Toronto Raptors", code: "TOR", logo: "https://cdn.nba.com/logos/nba/1610612761/global/L/logo.svg" },
+            "UTA": { name: "Utah Jazz", code: "UTA", logo: "https://cdn.nba.com/logos/nba/1610612762/global/L/logo.svg" },
+            "WAS": { name: "Washington Wizards", code: "WAS", logo: "https://cdn.nba.com/logos/nba/1610612764/global/L/logo.svg" }
+        };
 
-        // All 30 NBA Teams in Alphabetical Order
-        const nbaTeamsAlphabetical = [
-            { code: "ATL", name: "Atlanta Hawks" },
-            { code: "BOS", name: "Boston Celtics" },
-            { code: "BKN", name: "Brooklyn Nets" },
-            { code: "CHA", name: "Charlotte Hornets" },
-            { code: "CHI", name: "Chicago Bulls" },
-            { code: "CLE", name: "Cleveland Cavaliers" },
-            { code: "DAL", name: "Dallas Mavericks" },
-            { code: "DEN", name: "Denver Nuggets" },
-            { code: "DET", name: "Detroit Pistons" },
-            { code: "GSW", name: "Golden State Warriors" },
-            { code: "HOU", name: "Houston Rockets" },
-            { code: "IND", name: "Indiana Pacers" },
-            { code: "LAC", name: "Los Angeles Clippers" },
-            { code: "LAL", name: "Los Angeles Lakers" },
-            { code: "MEM", name: "Memphis Grizzlies" },
-            { code: "MIA", name: "Miami Heat" },
-            { code: "MIL", name: "Milwaukee Bucks" },
-            { code: "MIN", name: "Minnesota Timberwolves" },
-            { code: "NOP", name: "New Orleans Pelicans" },
-            { code: "NYK", name: "New York Knicks" },
-            { code: "OKC", name: "Oklahoma City Thunder" },
-            { code: "ORL", name: "Orlando Magic" },
-            { code: "PHI", name: "Philadelphia 76ers" },
-            { code: "PHX", name: "Phoenix Suns" },
-            { code: "POR", name: "Portland Trail Blazers" },
-            { code: "SAC", name: "Sacramento Kings" },
-            { code: "SAS", name: "San Antonio Spurs" },
-            { code: "TOR", name: "Toronto Raptors" },
-            { code: "UTA", name: "Utah Jazz" },
-            { code: "WAS", name: "Washington Wizards" }
-        ];
+        const nbaTeamsAlphabetical = Object.values(teamsData).sort((a, b) => a.name.localeCompare(b.name));
 
-        // 2026-27 Current Season Player Database
         const playersDatabase = [
             { id: "jokic", name: "Nikola Jokic", team: "DEN", pos: "C", ppg: 29.2, rpg: 13.0, apg: 9.8, bpg: 0.9, spg: 1.4, fg: "58.3%", tp: "36.2%", ft: "82.1%", ht: "6'11\"", wt: "284 lbs", no: "15", college: "Serbia", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/203999.png" },
             { id: "luka", name: "Luka Doncic", team: "DAL", pos: "PG", ppg: 33.9, rpg: 9.2, apg: 9.8, bpg: 0.5, spg: 1.4, fg: "48.7%", tp: "38.2%", ft: "78.6%", ht: "6'7\"", wt: "230 lbs", no: "77", college: "Real Madrid", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1629029.png" },
@@ -308,105 +300,4 @@
             { id: "ja", name: "Ja Morant", team: "MEM", pos: "PG", ppg: 25.1, rpg: 5.6, apg: 8.1, bpg: 0.4, spg: 1.1, fg: "47.1%", tp: "31.8%", ft: "77.5%", ht: "6'2\"", wt: "174 lbs", no: "12", college: "Murray State", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1629630.png" }
         ];
 
-        // Full 15-Team Conference Standings
-        const standingsData = {
-            EAST: [
-                { rank: 1, team: "Boston Celtics", w: 64, l: 18, pct: ".780", gb: "-" },
-                { rank: 2, team: "New York Knicks", w: 52, l: 30, pct: ".634", gb: "12.0" },
-                { rank: 3, team: "Milwaukee Bucks", w: 49, l: 33, pct: ".598", gb: "15.0" },
-                { rank: 4, team: "Cleveland Cavaliers", w: 48, l: 34, pct: ".585", gb: "16.0" },
-                { rank: 5, team: "Philadelphia 76ers", w: 47, l: 35, pct: ".573", gb: "17.0" },
-                { rank: 6, team: "Indiana Pacers", w: 47, l: 35, pct: ".573", gb: "17.0" },
-                { rank: 7, team: "Miami Heat", w: 46, l: 36, pct: ".561", gb: "18.0" },
-                { rank: 8, team: "Orlando Magic", w: 45, l: 37, pct: ".549", gb: "19.0" },
-                { rank: 9, team: "Atlanta Hawks", w: 38, l: 44, pct: ".463", gb: "26.0" },
-                { rank: 10, team: "Chicago Bulls", w: 37, l: 45, pct: ".451", gb: "27.0" },
-                { rank: 11, team: "Brooklyn Nets", w: 32, l: 50, pct: ".390", gb: "32.0" },
-                { rank: 12, team: "Toronto Raptors", w: 30, l: 52, pct: ".366", gb: "34.0" },
-                { rank: 13, team: "Charlotte Hornets", w: 21, l: 61, pct: ".256", gb: "43.0" },
-                { rank: 14, team: "Washington Wizards", w: 18, l: 64, pct: ".220", gb: "46.0" },
-                { rank: 15, team: "Detroit Pistons", w: 14, l: 68, pct: ".171", gb: "50.0" }
-            ],
-            WEST: [
-                { rank: 1, team: "Oklahoma City Thunder", w: 57, l: 25, pct: ".695", gb: "-" },
-                { rank: 2, team: "Denver Nuggets", w: 57, l: 25, pct: ".695", gb: "-" },
-                { rank: 3, team: "Minnesota Timberwolves", w: 56, l: 26, pct: ".683", gb: "1.0" },
-                { rank: 4, team: "Los Angeles Clippers", w: 51, l: 31, pct: ".622", gb: "6.0" },
-                { rank: 5, team: "Dallas Mavericks", w: 50, l: 32, pct: ".610", gb: "7.0" },
-                { rank: 6, team: "Phoenix Suns", w: 49, l: 33, pct: ".598", gb: "8.0" },
-                { rank: 7, team: "Los Angeles Lakers", w: 47, l: 35, pct: ".573", gb: "10.0" },
-                { rank: 8, team: "Golden State Warriors", w: 46, l: 36, pct: ".561", gb: "11.0" },
-                { rank: 9, team: "Memphis Grizzlies", w: 45, l: 37, pct: ".549", gb: "12.0" },
-                { rank: 10, team: "Houston Rockets", w: 41, l: 41, pct: ".500", gb: "16.0" },
-                { rank: 11, team: "Sacramento Kings", w: 40, l: 42, pct: ".488", gb: "17.0" },
-                { rank: 12, team: "San Antonio Spurs", w: 34, l: 48, pct: ".415", gb: "23.0" },
-                { rank: 13, team: "New Orleans Pelicans", w: 31, l: 51, pct: ".378", gb: "26.0" },
-                { rank: 14, team: "Portland Trail Blazers", w: 23, l: 59, pct: ".280", gb: "34.0" },
-                { rank: 15, team: "Utah Jazz", w: 21, l: 61, pct: ".256", gb: "36.0" }
-            ]
-        };
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const todayStr = new Date().toISOString().split('T')[0];
-            document.getElementById("game-date-picker").value = todayStr;
-            fetchGames(todayStr);
-            renderStandings();
-            renderLeaders();
-            populateDropdowns();
-            renderPlayerTable();
-            updateComparison();
-        });
-
-        function switchTab(tabId) {
-            ['scores', 'standings', 'leaders', 'compare'].forEach(t => {
-                document.getElementById(`tab-${t}`).classList.add('hidden');
-                document.getElementById(`nav-${t}`).className = "nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-300 hover:text-white hover:bg-slate-800";
-                document.getElementById(`mob-nav-${t}`).className = "mob-nav-btn px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap text-slate-300 hover:bg-slate-800";
-            });
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            document.getElementById(`nav-${tabId}`).className = "nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-orange-600 text-white shadow-md shadow-orange-600/20";
-            document.getElementById(`mob-nav-${tabId}`).className = "mob-nav-btn px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap bg-orange-600 text-white";
-        }
-
-        function onDateChanged(dateStr) { fetchGames(dateStr); }
-        function resetToToday() {
-            const todayStr = new Date().toISOString().split('T')[0];
-            document.getElementById("game-date-picker").value = todayStr;
-            fetchGames(todayStr);
-        }
-
-        async function fetchGames(dateStr) {
-            const container = document.getElementById("games-container");
-            container.innerHTML = `<div class="col-span-full py-16 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin text-3xl text-orange-500 mb-3"></i><p class="text-sm">Fetching live NBA games from ESPN API...</p></div>`;
-            const formattedDate = dateStr.replace(/-/g, '');
-            try {
-                const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${formattedDate}`);
-                const data = await response.json();
-                currentGames = data.events || [];
-                renderGames();
-            } catch (err) {
-                container.innerHTML = `<div class="col-span-full py-12 text-center text-red-400 bg-slate-900/40 border border-slate-800 rounded-2xl"><p class="text-sm font-bold">Could not fetch games from ESPN API for this date.</p></div>`;
-            }
-        }
-
-        function filterGames(filter) {
-            currentFilter = filter;
-            document.getElementById("filter-all").className = `px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${filter === 'ALL' ? 'bg-orange-600 text-white' : 'bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800'}`;
-            document.getElementById("filter-live").className = `px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${filter === 'LIVE' ? 'bg-orange-600 text-white' : 'bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800'}`;
-            renderGames();
-        }
-
-        function renderGames() {
-            const container = document.getElementById("games-container");
-            const filtered = currentGames.filter(g => {
-                const state = g.status.type.state;
-                if(currentFilter === 'LIVE') return state === 'in';
-                return true;
-            });
-
-            if(filtered.length === 0) {
-                container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 bg-slate-900/40 border border-slate-800 rounded-2xl">No NBA games scheduled for this date.</div>`;
-                return;
-            }
-
-            container.innerHTML = filtered.map(g =>
+        const standingsData =
