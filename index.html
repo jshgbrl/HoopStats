@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HoopStats Central | Official 2026-27 NBA Rosters & Analytics</title>
+    <title>HoopStats Central | Official 2026-27 Admin Managed Hub</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome Icons -->
@@ -34,7 +34,7 @@
                     </div>
                     <div>
                         <span class="text-2xl font-black tracking-wider font-teko uppercase bg-gradient-to-r from-white via-slate-200 to-orange-400 bg-clip-text text-transparent">HoopStats</span>
-                        <span class="text-xs uppercase tracking-widest text-orange-500 font-bold block -mt-1">Official 2026-27 Roster Hub</span>
+                        <span id="header-mode-label" class="text-xs uppercase tracking-widest text-slate-400 font-bold block -mt-1">Public View Mode</span>
                     </div>
                 </div>
 
@@ -47,22 +47,15 @@
                         <i class="fa-solid fa-trophy mr-2"></i>Standings
                     </button>
                     <button onclick="switchTab('leaders')" id="nav-leaders" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-300 hover:text-white hover:bg-slate-800">
-                        <i class="fa-solid fa-chart-column mr-2"></i>Official Rosters & Stats
+                        <i class="fa-solid fa-chart-column mr-2"></i>Rosters & Stats
                     </button>
                 </nav>
 
-                <!-- Search & Status Bar -->
+                <!-- Admin Action Button -->
                 <div class="flex items-center space-x-3">
-                    <div class="relative hidden sm:block">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
-                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
-                        </span>
-                        <input type="text" id="global-search" placeholder="Search official NBA player or team..." oninput="handleSearch(this.value)" class="w-48 lg:w-64 pl-9 pr-4 py-1.5 text-xs bg-slate-950/80 border border-slate-700 rounded-lg focus:outline-none focus:border-orange-500 text-slate-200 placeholder-slate-500 transition-all">
-                    </div>
-                    <div class="flex items-center space-x-1.5 bg-emerald-950/60 border border-emerald-800/60 px-3 py-1 rounded-full">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span id="api-status-badge" class="text-xs font-bold text-emerald-400 tracking-wide uppercase">2026-27 Synced</span>
-                    </div>
+                    <button onclick="toggleAdminSession()" id="admin-auth-btn" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-all flex items-center shadow">
+                        <i class="fa-solid fa-lock mr-1.5"></i>Admin Login
+                    </button>
                 </div>
             </div>
         </div>
@@ -75,7 +68,48 @@
     </header>
 
     <!-- MAIN CONTENT CONTAINER -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- ================= SECURE ADMIN CONTROL PANEL (Hidden until logged in) ================= -->
+        <section id="admin-control-panel" class="hidden bg-orange-950/40 border-2 border-orange-600/60 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4 animate-in fade-in duration-200">
+            <div class="flex items-center justify-between border-b border-orange-800/60 pb-3">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-shield-halved text-orange-400 text-lg"></i>
+                    <h2 class="text-base font-black font-teko uppercase tracking-wider text-orange-400">Secure Admin Management Dashboard</h2>
+                </div>
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-orange-600 text-white tracking-widest">Master Access</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                    <h3 class="font-bold text-orange-400 uppercase">1. Add / Edit Game Score</h3>
+                    <input type="date" id="adm-game-date" value="2026-10-25" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                    <input type="text" id="adm-game-match" placeholder="Away (e.g. LAL) @ Home (e.g. UTA)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                    <div class="flex space-x-2">
+                        <input type="number" id="adm-away-score" placeholder="Away Pts" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                        <input type="number" id="adm-home-score" placeholder="Home Pts" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                    </div>
+                    <button onclick="adminAddGame()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Publish Game</button>
+                </div>
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                    <h3 class="font-bold text-orange-400 uppercase">2. Update Team Standings</h3>
+                    <select id="adm-standings-conf" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                        <option value="EAST">Eastern Conference</option>
+                        <option value="WEST">Western Conference</option>
+                    </select>
+                    <input type="text" id="adm-team-name" placeholder="Team Name (e.g. Philadelphia 76ers)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                    <div class="flex space-x-2">
+                        <input type="number" id="adm-team-w" placeholder="Wins" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                        <input type="number" id="adm-team-l" placeholder="Losses" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                    </div>
+                    <button onclick="adminUpdateStandings()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Update Standings</button>
+                </div>
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                    <h3 class="font-bold text-orange-400 uppercase">3. Reset to Default Data</h3>
+                    <p class="text-[11px] text-slate-400">Restore factory default schedule, box scores, and standings for the 2026-27 season.</p>
+                    <button onclick="adminResetStorage()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-lg transition-all">Factory Reset</button>
+                </div>
+            </div>
+        </section>
 
         <!-- ================= TAB 1: SCORES & GAMES ================= -->
         <section id="tab-scores" class="space-y-6">
@@ -84,10 +118,10 @@
                     <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center">
                         <i class="fa-regular fa-calendar-days text-orange-500 mr-2"></i>Select Game Date (2026-27 NBA Season)
                     </h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Pick any date to view official scheduled fixtures and box scores.</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Pick any date to view scheduled fixtures and final box scores.</p>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <input type="date" id="game-date-picker" value="2026-10-23" onchange="onDateChanged(this.value)" class="bg-slate-950 border border-slate-700 text-xs sm:text-sm text-orange-400 font-bold rounded-xl px-4 py-2 focus:outline-none focus:border-orange-500 shadow-inner">
+                    <input type="date" id="game-date-picker" value="2026-10-25" onchange="onDateChanged(this.value)" class="bg-slate-950 border border-slate-700 text-xs sm:text-sm text-orange-400 font-bold rounded-xl px-4 py-2 focus:outline-none focus:border-orange-500 shadow-inner">
                     <button onclick="resetToToday()" class="px-3 py-2 text-xs font-bold rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition-all">Today</button>
                 </div>
             </div>
@@ -176,8 +210,8 @@
     <!-- FOOTER -->
     <footer class="bg-slate-900 border-t border-slate-800 mt-12 py-8 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4 space-y-2">
-            <p class="font-bold text-slate-400">HoopStats Central &bull; Official 2026-27 NBA Roster & Schedule Hub</p>
-            <p>Complete active roster synchronization for all 30 franchises.</p>
+            <p class="font-bold text-slate-400">HoopStats Central &bull; Admin-Managed 2026-27 NBA Roster & Schedule Hub</p>
+            <p>Secure local storage persistence for manual game and standings management.</p>
         </div>
     </footer>
 
@@ -251,205 +285,174 @@
 
         const nbaTeamsAlphabetical = Object.values(teamsData).sort((a, b) => a.name.localeCompare(b.name));
 
-        const playersDatabase = [
-            // Boston Celtics
-            { id: "bos_99", name: "Devin Carter", team: "BOS", pos: "G", ppg: 6.0, rpg: 2.0, apg: 1.5, fg: "45.2%", tp: "36.5%", ft: "78.4%", no: "99", college: "Providence", img: "" },
-            { id: "bos_12", name: "Chris Cenac Jr.", team: "BOS", pos: "F", ppg: 7.2, rpg: 4.1, apg: 0.8, fg: "48.0%", tp: "30.0%", ft: "72.0%", no: "12", college: "Houston", img: "" },
-            { id: "bos_45", name: "Mike Conley", team: "BOS", pos: "G", ppg: 11.4, rpg: 2.5, apg: 4.8, fg: "43.5%", tp: "38.1%", ft: "85.2%", no: "45", college: "Ohio State", img: "" },
-            { id: "bos_52", name: "Luka Garza", team: "BOS", pos: "C", ppg: 8.5, rpg: 4.2, apg: 0.6, fg: "52.0%", tp: "35.0%", ft: "70.0%", no: "52", college: "Iowa", img: "" },
-            { id: "bos_13", name: "Paul George", team: "BOS", pos: "F", ppg: 22.6, rpg: 5.2, apg: 3.5, fg: "47.1%", tp: "41.3%", ft: "90.7%", no: "13", college: "Fresno State", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/202331.png" },
-            { id: "bos_28", name: "Hugo González", team: "BOS", pos: "G", ppg: 4.0, rpg: 1.5, apg: 0.8, fg: "42.0%", tp: "33.0%", ft: "75.0%", no: "28", college: "Spain", img: "" },
-            { id: "bos_8", name: "Ron Harper Jr.", team: "BOS", pos: "G/F", ppg: 5.1, rpg: 1.8, apg: 0.9, fg: "41.0%", tp: "34.0%", ft: "76.0%", no: "8", college: "Rutgers", img: "" },
-            { id: "bos_30", name: "Sam Hauser", team: "BOS", pos: "F", ppg: 9.0, rpg: 3.5, apg: 1.0, fg: "44.0%", tp: "42.2%", ft: "87.0%", no: "30", college: "Virginia", img: "" },
-            { id: "bos_20", name: "Dillon Mitchell", team: "BOS", pos: "F", ppg: 4.5, rpg: 2.9, apg: 0.5, fg: "50.0%", tp: "25.0%", ft: "65.0%", no: "20", college: "St. John's", img: "" },
-            { id: "bos_11", name: "Payton Pritchard", team: "BOS", pos: "G", ppg: 14.1, rpg: 3.2, apg: 4.3, fg: "46.2%", tp: "40.5%", ft: "88.1%", no: "11", college: "Oregon", img: "" },
-            { id: "bos_88", name: "Neemias Queta", team: "BOS", pos: "C", ppg: 6.8, rpg: 5.5, apg: 0.8, fg: "58.0%", tp: "0.0%", ft: "64.0%", no: "88", college: "Utah State", img: "" },
-            { id: "bos_4", name: "Mitchell Robinson", team: "BOS", pos: "F/C", ppg: 7.5, rpg: 8.2, apg: 0.5, fg: "68.0%", tp: "0.0%", ft: "55.0%", no: "4", college: "Chalmette HS", img: "" },
-            { id: "bos_55", name: "Baylor Scheierman", team: "BOS", pos: "G", ppg: 6.2, rpg: 2.4, apg: 1.1, fg: "42.0%", tp: "37.0%", ft: "80.0%", no: "55", college: "Creighton", img: "" },
+        const defaultPlayersDatabase = [
             { id: "bos_0", name: "Jayson Tatum", team: "BOS", pos: "G/F", ppg: 26.9, rpg: 8.1, apg: 4.9, fg: "47.1%", tp: "37.6%", ft: "83.3%", no: "0", college: "Duke", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1628369.png" },
-            { id: "bos_27", name: "Jordan Walsh", team: "BOS", pos: "G", ppg: 4.8, rpg: 2.1, apg: 0.6, fg: "43.0%", tp: "32.0%", ft: "70.0%", no: "27", college: "Arkansas", img: "" },
             { id: "bos_9", name: "Derrick White", team: "BOS", pos: "G", ppg: 15.2, rpg: 4.2, apg: 5.1, fg: "46.1%", tp: "39.5%", ft: "90.1%", no: "9", college: "Colorado", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1628401.png" },
-            { id: "bos_77", name: "Amari Williams", team: "BOS", pos: "F/C", ppg: 3.0, rpg: 2.5, apg: 0.3, fg: "52.0%", tp: "0.0%", ft: "60.0%", no: "77", college: "Kentucky", img: "" },
-
-            // Philadelphia 76ers
-            { id: "phi_25", name: "Dominick Barlow", team: "PHI", pos: "F", ppg: 4.5, rpg: 2.8, apg: 0.6, fg: "52.0%", tp: "25.0%", ft: "70.0%", no: "25", college: "Saint Joseph's", img: "" },
-            { id: "phi_30", name: "Adem Bona", team: "PHI", pos: "F/C", ppg: 2.5, rpg: 2.0, apg: 0.3, fg: "58.0%", tp: "0.0%", ft: "60.0%", no: "30", college: "UCLA", img: "" },
-            { id: "phi_7", name: "Jaylen Brown", team: "PHI", pos: "G/F", ppg: 23.0, rpg: 5.5, apg: 3.6, fg: "49.9%", tp: "35.4%", ft: "70.3%", no: "7", college: "California", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1627759.png" },
-            { id: "phi_1", name: "Kentavious Caldwell-Pope", team: "PHI", pos: "G", ppg: 10.1, rpg: 2.4, apg: 1.8, fg: "44.0%", tp: "39.2%", ft: "87.0%", no: "1", college: "Georgia", img: "" },
-            { id: "phi_77", name: "V. J. Edgecombe", team: "PHI", pos: "G", ppg: 9.0, rpg: 2.5, apg: 1.5, fg: "45.0%", tp: "35.0%", ft: "80.0%", no: "77", college: "Baylor", img: "" },
-            { id: "phi_11", name: "Justin Edwards", team: "PHI", pos: "F", ppg: 4.0, rpg: 1.5, apg: 0.5, fg: "42.0%", tp: "34.0%", ft: "75.0%", no: "11", college: "Kentucky", img: "" },
             { id: "phi_21", name: "Joel Embiid", team: "PHI", pos: "C", ppg: 34.7, rpg: 11.0, apg: 5.6, fg: "52.9%", tp: "38.8%", ft: "88.3%", no: "21", college: "Kansas", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/203954.png" },
-            { id: "phi_55", name: "Ariel Hukporti", team: "PHI", pos: "C", ppg: 4.2, rpg: 3.8, apg: 0.4, fg: "56.0%", tp: "0.0%", ft: "62.0%", no: "55", college: "Germany", img: "" },
-            { id: "phi_23", name: "LeBron James", team: "PHI", pos: "F", ppg: 25.4, rpg: 7.3, apg: 8.2, fg: "52.4%", tp: "39.1%", ft: "76.5%", no: "23", college: "St. Vincent-St. Mary HS", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "phi_8", name: "Caleb Love", team: "PHI", pos: "G", ppg: 6.5, rpg: 1.8, apg: 1.5, fg: "40.0%", tp: "33.5%", ft: "79.0%", no: "8", college: "Arizona", img: "" },
             { id: "phi_0", name: "Tyrese Maxey", team: "PHI", pos: "G", ppg: 25.9, rpg: 3.7, apg: 6.2, fg: "45.0%", tp: "37.3%", ft: "86.8%", no: "0", college: "Kentucky", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1630178.png" },
-            { id: "phi_00", name: "Labaron Philon Jr.", team: "PHI", pos: "G", ppg: 5.0, rpg: 1.2, apg: 2.0, fg: "43.0%", tp: "34.0%", ft: "81.0%", no: "00", college: "Alabama", img: "" },
-            { id: "phi_12", name: "Rayan Rupert", team: "PHI", pos: "G/F", ppg: 4.1, rpg: 1.9, apg: 0.8, fg: "41.0%", tp: "32.0%", ft: "74.0%", no: "12", college: "France", img: "" },
-            { id: "phi_5", name: "Anfernee Simons", team: "PHI", pos: "G", ppg: 19.3, rpg: 2.6, apg: 4.5, fg: "43.0%", tp: "38.5%", ft: "91.2%", no: "5", college: "IMG Academy", img: "" },
-            { id: "phi_45", name: "Dean Wade", team: "PHI", pos: "F/C", ppg: 5.4, rpg: 3.2, apg: 1.0, fg: "45.0%", tp: "39.0%", ft: "75.0%", no: "45", college: "Kansas State", img: "" },
-            { id: "phi_33", name: "Jabari Walker", team: "PHI", pos: "F", ppg: 7.8, rpg: 4.8, apg: 0.8, fg: "46.0%", tp: "33.0%", ft: "75.0%", no: "33", college: "Colorado", img: "" },
-
-            // Los Angeles Lakers
-            { id: "lal_43", name: "Cameron Carr", team: "LAL", pos: "G", ppg: 3.5, rpg: 1.0, apg: 0.5, fg: "41.0%", tp: "34.0%", ft: "75.0%", no: "43", college: "Baylor", img: "" },
             { id: "lal_77", name: "Luka Dončić", team: "LAL", pos: "G", ppg: 33.9, rpg: 9.2, apg: 9.8, fg: "48.7%", tp: "38.2%", ft: "78.6%", no: "77", college: "Slovenia", img: "" },
-            { id: "lal_5", name: "Quentin Grimes", team: "LAL", pos: "G", ppg: 9.1, rpg: 2.5, apg: 1.5, fg: "43.0%", tp: "37.1%", ft: "81.0%", no: "5", college: "Houston", img: "" },
-            { id: "lal_11", name: "Jaxson Hayes", team: "LAL", pos: "C", ppg: 4.3, rpg: 3.0, apg: 0.5, fg: "72.0%", tp: "0.0%", ft: "62.2%", no: "11", college: "Texas", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1629637.png" },
-            { id: "lal_9", name: "Bronny James", team: "LAL", pos: "G", ppg: 2.1, rpg: 0.5, apg: 0.8, fg: "31.2%", tp: "18.5%", ft: "66.0%", no: "9", college: "USC", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1642295.png" },
-            { id: "lal_4", name: "Dalton Knecht", team: "LAL", pos: "G", ppg: 9.5, rpg: 2.5, apg: 1.0, fg: "45.0%", tp: "39.2%", ft: "81.0%", no: "4", college: "Tennessee", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1642261.png" },
-            { id: "lal_15", name: "Austin Reaves", team: "LAL", pos: "G", ppg: 15.9, rpg: 4.3, apg: 5.5, fg: "43.0%", tp: "36.7%", ft: "85.3%", no: "15", college: "Oklahoma", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1630559.png" },
-            { id: "lal_1", name: "D'Angelo Russell", team: "LAL", pos: "G", ppg: 18.0, rpg: 3.1, apg: 6.3, fg: "45.6%", tp: "41.5%", ft: "82.8%", no: "1", college: "Ohio State", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1626156.png" }
+            { id: "lal_15", name: "Austin Reaves", team: "LAL", pos: "G", ppg: 15.9, rpg: 4.3, apg: 5.5, fg: "43.0%", tp: "36.7%", ft: "85.3%", no: "15", college: "Oklahoma", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1630559.png" }
         ];
 
-        // Populate fallback 15-man roster data for remaining teams to ensure smooth navigation
-        Object.keys(teamsData).forEach(code => {
-            const existing = playersDatabase.filter(p => p.team === code);
-            const sampleNames = [
-                "Marcus Howard", "Julian Wright", "Trey Burke", "Dante Cunningham", "Will Barton",
-                "Stanley Johnson", "D.J. Augustin", "Ben McLemore", "Ish Smith", "Austin Rivers",
-                "Garrett Temple", "Anthony Tolliver", "Tyler Johnson", "Michael Mulder", "Frank Kaminsky"
-            ];
-            const positions = ["PG", "SG", "SF", "PF", "C", "SG", "SF", "PG", "C", "PF", "SG", "PG", "SF", "PF", "C"];
-            
-            for (let i = existing.length; i < 15; i++) {
-                playersDatabase.push({
-                    id: code.toLowerCase() + "_p" + (i + 1),
-                    name: sampleNames[i] + " (" + code + ")",
-                    team: code,
-                    pos: positions[i],
-                    ppg: (6.0 + (i * 0.7)).toFixed(1),
-                    rpg: (2.0 + (i * 0.2)).toFixed(1),
-                    apg: (1.0 + (i * 0.2)).toFixed(1),
-                    fg: "45.2%",
-                    tp: "36.5%",
-                    ft: "78.4%",
-                    no: String(10 + i),
-                    college: "NCAA",
-                    img: ""
-                });
-            }
-        });
-
-        // Fully Populated 2026-27 NBA Schedule Database with actual scores for past dates
-        const scheduleDatabase = {
-            "2026-10-20": [
-                { id: "g_1020_1", status: "FINAL", time: "3:00 PM", home: "DET", away: "BOS", homeScore: 121, awayScore: 113, arena: "Little Caesars Arena, Detroit" },
-                { id: "g_1020_2", status: "FINAL", time: "7:00 PM", home: "NYK", away: "PHI", homeScore: 100, awayScore: 106, arena: "Madison Square Garden, New York" },
-                { id: "g_1020_3", status: "FINAL", time: "9:30 PM", home: "SAS", away: "OKC", homeScore: 104, awayScore: 116, arena: "Frost Bank Center, San Antonio" }
-            ],
-            "2026-10-21": [
-                { id: "g_1021_1", status: "FINAL", time: "7:00 PM", home: "WAS", away: "MIL", homeScore: 128, awayScore: 116, arena: "Capital One Arena, Washington" },
-                { id: "g_1021_2", status: "FINAL", time: "7:00 PM", home: "ORL", away: "ATL", homeScore: 125, awayScore: 132, arena: "Kia Center, Orlando" },
-                { id: "g_1021_3", status: "FINAL", time: "7:30 PM", home: "BKN", away: "CHA", homeScore: 103, awayScore: 110, arena: "Barclays Center, New York" },
-                { id: "g_1021_4", status: "FINAL", time: "7:30 PM", home: "TOR", away: "CHI", homeScore: 135, awayScore: 92, arena: "Scotiabank Arena, Toronto" },
-                { id: "g_1021_5", status: "FINAL", time: "7:30 PM", home: "MIA", away: "MIN", homeScore: 106, awayScore: 131, arena: "Kaseya Center, Miami" },
-                { id: "g_1021_6", status: "FINAL", time: "8:00 PM", home: "MEM", away: "UTA", homeScore: 123, awayScore: 103, arena: "FedExForum, Memphis" },
-                { id: "g_1021_7", status: "FINAL", time: "8:00 PM", home: "NOP", away: "IND", homeScore: 120, awayScore: 123, arena: "Smoothie King Center, New Orleans" },
-                { id: "g_1021_8", status: "FINAL", time: "8:30 PM", home: "HOU", away: "DAL", homeScore: 128, awayScore: 110, arena: "Toyota Center, Houston" },
-                { id: "g_1021_9", status: "FINAL", time: "10:00 PM", home: "LAL", away: "GSW", homeScore: 127, awayScore: 105, arena: "Crypto.com Arena, Los Angeles" },
-                { id: "g_1021_10", status: "FINAL", time: "10:00 PM", home: "POR", away: "PHX", homeScore: 124, awayScore: 83, arena: "Moda Center, Portland" },
-                { id: "g_1021_11", status: "FINAL", time: "10:30 PM", home: "LAC", away: "SAC", homeScore: 121, awayScore: 96, arena: "Intuit Dome, Inglewood" }
-            ],
-            "2026-10-22": [
-                { id: "g_1022_1", status: "FINAL", time: "7:00 PM", home: "PHI", away: "CLE", homeScore: 114, awayScore: 106, arena: "Xfinity Mobile Arena, Philadelphia" },
-                { id: "g_1022_2", status: "FINAL", time: "9:30 PM", home: "OKC", away: "DEN", homeScore: 96, awayScore: 84, arena: "Paycom Center, Oklahoma City" }
-            ],
-            "2026-10-23": [
-                { id: "g_1023_1", status: "FINAL", time: "4:00 PM", home: "MIL", away: "CHI", homeScore: 125, awayScore: 132, arena: "Fiserv Forum, Milwaukee" },
-                { id: "g_1023_2", status: "FINAL", time: "7:00 PM", home: "WAS", away: "TOR", homeScore: 102, awayScore: 112, arena: "Capital One Arena, Washington" },
-                { id: "g_1023_3", status: "FINAL", time: "7:00 PM", home: "ORL", away: "MIN", homeScore: 93, awayScore: 115, arena: "Kia Center, Orlando" },
-                { id: "g_1023_4", status: "FINAL", time: "7:00 PM", home: "CHA", away: "ATL", homeScore: 81, awayScore: 128, arena: "Spectrum Center, Charlotte" },
-                { id: "g_1023_5", status: "FINAL", time: "7:00 PM", home: "BOS", away: "NYK", homeScore: 107, awayScore: 103, arena: "TD Garden, Boston" },
-                { id: "g_1023_6", status: "FINAL", time: "7:00 PM", home: "IND", away: "DAL", homeScore: 105, awayScore: 121, arena: "Gainbridge Fieldhouse, Indianapolis" },
-                { id: "g_1023_7", status: "FINAL", time: "8:00 PM", home: "MIA", away: "DET", homeScore: 111, awayScore: 128, arena: "Kaseya Center, Miami" },
-                { id: "g_1023_8", status: "FINAL", time: "9:30 PM", home: "SAS", away: "HOU", homeScore: 110, awayScore: 114, arena: "Moody Center, Austin" },
-                { id: "g_1023_9", status: "FINAL", time: "9:30 PM", home: "UTA", away: "NOP", homeScore: 120, awayScore: 119, arena: "Delta Center, Salt Lake City" },
-                { id: "g_1023_10", status: "FINAL", time: "10:00 PM", home: "LAL", away: "LAC", homeScore: 125, awayScore: 117, arena: "Crypto.com Arena, Los Angeles" },
-                { id: "g_1023_11", status: "FINAL", time: "10:00 PM", home: "GSW", away: "MEM", homeScore: 108, awayScore: 111, arena: "Chase Center, San Francisco" },
-                { id: "g_1023_12", status: "FINAL", time: "10:00 PM", home: "SAC", away: "POR", homeScore: 120, awayScore: 128, arena: "Golden 1 Center, Sacramento" }
-            ],
-            "2026-10-24": [
-                { id: "g_1024_1", status: "UPCOMING", time: "6:00 PM", home: "CHA", away: "MIA", homeScore: 0, awayScore: 0, arena: "Spectrum Center, Charlotte" },
-                { id: "g_1024_2", status: "UPCOMING", time: "7:30 PM", home: "PHI", away: "MIL", homeScore: 0, awayScore: 0, arena: "Xfinity Mobile Arena, Philadelphia" },
-                { id: "g_1024_3", status: "UPCOMING", time: "7:30 PM", home: "CLE", away: "BKN", homeScore: 0, awayScore: 0, arena: "Rocket Arena, Cleveland" },
-                { id: "g_1024_4", status: "UPCOMING", time: "8:00 PM", home: "DAL", away: "SAS", homeScore: 0, awayScore: 0, arena: "American Airlines Center, Dallas" },
-                { id: "g_1024_5", status: "UPCOMING", time: "8:00 PM", home: "CHI", away: "WAS", homeScore: 0, awayScore: 0, arena: "United Center, Chicago" },
-                { id: "g_1024_6", status: "UPCOMING", time: "8:30 PM", home: "ATL", away: "HOU", homeScore: 0, awayScore: 0, arena: "State Farm Arena, Atlanta" },
-                { id: "g_1024_7", status: "UPCOMING", time: "9:00 PM", home: "DEN", away: "NOP", homeScore: 0, awayScore: 0, arena: "Ball Arena, Denver" },
-                { id: "g_1024_8", status: "UPCOMING", time: "10:00 PM", home: "PHX", away: "GSW", homeScore: 0, awayScore: 0, arena: "Mortgage Matchup Center, Phoenix" }
-            ],
+        const defaultScheduleDatabase = {
             "2026-10-25": [
-                { id: "g_1025_1", status: "UPCOMING", time: "5:00 PM", home: "UTA", away: "LAL", homeScore: 0, awayScore: 0, arena: "Delta Center, Salt Lake City" },
-                { id: "g_1025_2", status: "UPCOMING", time: "6:00 PM", home: "BKN", away: "IND", homeScore: 0, awayScore: 0, arena: "Barclays Center, New York" },
-                { id: "g_1025_3", status: "UPCOMING", time: "7:00 PM", home: "MIN", away: "TOR", homeScore: 0, awayScore: 0, arena: "Target Center, Minneapolis" },
-                { id: "g_1025_4", status: "UPCOMING", time: "7:00 PM", home: "NYK", away: "ORL", homeScore: 0, awayScore: 0, arena: "Madison Square Garden, New York" },
-                { id: "g_1025_5", status: "UPCOMING", time: "7:00 PM", home: "OKC", away: "LAC", homeScore: 0, awayScore: 0, arena: "Paycom Center, Oklahoma City" },
-                { id: "g_1025_6", status: "UPCOMING", time: "7:30 PM", home: "PHI", away: "DET", homeScore: 0, awayScore: 0, arena: "Xfinity Mobile Arena, Philadelphia" },
-                { id: "g_1025_7", status: "UPCOMING", time: "9:00 PM", home: "SAC", away: "MEM", homeScore: 0, awayScore: 0, arena: "Golden 1 Center, Sacramento" }
+                { id: "g_1025_1", status: "FINAL", time: "5:00 PM", home: "UTA", away: "LAL", homeScore: 108, awayScore: 116, arena: "Delta Center, Salt Lake City" },
+                { id: "g_1025_2", status: "FINAL", time: "6:00 PM", home: "BKN", away: "IND", homeScore: 99, awayScore: 104, arena: "Barclays Center, New York" },
+                { id: "g_1025_3", status: "UPCOMING", time: "7:00 PM", home: "MIN", away: "TOR", homeScore: 0, awayScore: 0, arena: "Target Center, Minneapolis" }
             ],
             "2026-10-26": [
-                { id: "g_1026_1", status: "UPCOMING", time: "7:00 PM", home: "CLE", away: "MIN", homeScore: 0, awayScore: 0, arena: "Rocket Arena, Cleveland" },
-                { id: "g_1026_2", status: "UPCOMING", time: "7:00 PM", home: "CHA", away: "WAS", homeScore: 0, awayScore: 0, arena: "Spectrum Center, Charlotte" },
-                { id: "g_1026_3", status: "UPCOMING", time: "7:30 PM", home: "MIA", away: "DAL", homeScore: 0, awayScore: 0, arena: "Kaseya Center, Miami" },
-                { id: "g_1026_4", status: "UPCOMING", time: "7:30 PM", home: "BOS", away: "CHI", homeScore: 0, awayScore: 0, arena: "TD Garden, Boston" },
-                { id: "g_1026_5", status: "UPCOMING", time: "8:00 PM", home: "MIL", away: "IND", homeScore: 0, awayScore: 0, arena: "Fiserv Forum, Milwaukee" },
-                { id: "g_1026_6", status: "UPCOMING", time: "8:00 PM", home: "OKC", away: "PHX", homeScore: 0, awayScore: 0, arena: "Paycom Center, Oklahoma City" },
-                { id: "g_1026_7", status: "UPCOMING", time: "8:30 PM", home: "HOU", away: "ATL", homeScore: 0, awayScore: 0, arena: "Toyota Center, Houston" },
-                { id: "g_1026_8", status: "UPCOMING", time: "9:00 PM", home: "UTA", away: "MEM", homeScore: 0, awayScore: 0, arena: "Delta Center, Salt Lake City" },
-                { id: "g_1026_9", status: "UPCOMING", time: "10:00 PM", home: "DEN", away: "GSW", homeScore: 0, awayScore: 0, arena: "Ball Arena, Denver" }
+                { id: "g_1026_1", status: "UPCOMING", time: "7:00 PM", home: "CLE", away: "MIN", homeScore: 0, awayScore: 0, arena: "Rocket Arena, Cleveland" }
             ]
         };
 
-        // Synchronized Standings Data for 2026-27 Season matching Basketball-Reference
-        const standingsData = {
+        const defaultStandingsData = {
             EAST: [
                 { rank: 1, team: "Philadelphia 76ers", w: 3, l: 0, pct: "1.000", gb: "-" },
                 { rank: 2, team: "Detroit Pistons", w: 2, l: 0, pct: "1.000", gb: "-" },
                 { rank: 3, team: "Toronto Raptors", w: 2, l: 0, pct: "1.000", gb: "-" },
-                { rank: 4, team: "Atlanta Hawks", w: 2, l: 1, pct: ".667", gb: "0.5" },
-                { rank: 5, team: "Charlotte Hornets", w: 2, l: 1, pct: ".667", gb: "0.5" },
-                { rank: 6, team: "Washington Wizards", w: 2, l: 1, pct: ".667", gb: "0.5" },
-                { rank: 7, team: "Boston Celtics", w: 1, l: 1, pct: ".500", gb: "1.0" },
-                { rank: 8, team: "Cleveland Cavaliers", w: 1, l: 1, pct: ".500", gb: "1.0" },
-                { rank: 9, team: "Indiana Pacers", w: 1, l: 1, pct: ".500", gb: "1.0" },
-                { rank: 10, team: "Chicago Bulls", w: 1, l: 2, pct: ".333", gb: "1.5" },
-                { rank: 11, team: "Orlando Magic", w: 0, l: 2, pct: ".000", gb: "2.0" },
-                { rank: 12, team: "New York Knicks", w: 0, l: 2, pct: ".000", gb: "2.0" },
-                { rank: 13, team: "Brooklyn Nets", w: 0, l: 2, pct: ".000", gb: "2.0" },
-                { rank: 14, team: "Miami Heat", w: 0, l: 3, pct: ".000", gb: "2.5" },
-                { rank: 15, team: "Milwaukee Bucks", w: 0, l: 3, pct: ".000", gb: "2.5" }
+                { rank: 4, team: "Atlanta Hawks", w: 2, l: 1, pct: ".667", gb: "0.5" }
             ],
             WEST: [
                 { rank: 1, team: "Houston Rockets", w: 3, l: 0, pct: "1.000", gb: "-" },
-                { rank: 2, team: "Los Angeles Lakers", w: 2, l: 0, pct: "1.000", gb: "-" },
+                { rank: 2, team: "Los Angeles Lakers", w: 3, l: 0, pct: "1.000", gb: "-" },
                 { rank: 3, team: "Oklahoma City Thunder", w: 2, l: 0, pct: "1.000", gb: "-" },
-                { rank: 4, team: "Portland Trail Blazers", w: 2, l: 0, pct: "1.000", gb: "-" },
-                { rank: 5, team: "Memphis Grizzlies", w: 2, l: 0, pct: "1.000", gb: "-" },
-                { rank: 6, team: "Minnesota Timberwolves", w: 2, l: 0, pct: "1.000", gb: "-" },
-                { rank: 7, team: "LA Clippers", w: 1, l: 1, pct: ".500", gb: "1.0" },
-                { rank: 8, team: "Denver Nuggets", w: 1, l: 1, pct: ".500", gb: "1.0" },
-                { rank: 9, team: "Utah Jazz", w: 1, l: 1, pct: ".500", gb: "1.0" },
-                { rank: 10, team: "Phoenix Suns", w: 1, l: 1, pct: ".500", gb: "1.0" },
-                { rank: 11, team: "San Antonio Spurs", w: 1, l: 2, pct: ".333", gb: "1.5" },
-                { rank: 12, team: "Dallas Mavericks", w: 1, l: 2, pct: ".333", gb: "1.5" },
-                { rank: 13, team: "Sacramento Kings", w: 0, l: 2, pct: ".000", gb: "2.0" },
-                { rank: 14, team: "New Orleans Pelicans", w: 0, l: 3, pct: ".000", gb: "2.5" },
-                { rank: 15, team: "Golden State Warriors", w: 0, l: 3, pct: ".000", gb: "2.5" }
+                { rank: 4, team: "Portland Trail Blazers", w: 2, l: 0, pct: "1.000", gb: "-" }
             ]
         };
 
-        let currentDate = "2026-10-23";
+        // Load from localStorage or defaults
+        let playersDatabase = JSON.parse(localStorage.getItem("hoopStatsPlayers")) || defaultPlayersDatabase;
+        let scheduleDatabase = JSON.parse(localStorage.getItem("hoopStatsSchedule")) || defaultScheduleDatabase;
+        let standingsData = JSON.parse(localStorage.getItem("hoopStatsStandings")) || defaultStandingsData;
+
+        let currentDate = "2026-10-25";
         let currentFilter = "ALL";
         let currentConf = "EAST";
         let activeGameId = null;
         let currentModalTab = 'summary';
+        let isAdmin = localStorage.getItem("hoopStatsAdmin") === "true";
 
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById("game-date-picker").value = currentDate;
+            updateAdminUIState();
             renderGames();
             renderStandings();
             populateDropdowns();
             renderPlayerTable();
         });
+
+        function toggleAdminSession() {
+            if (!isAdmin) {
+                let pass = prompt("Enter Admin Password:");
+                if (pass === "admin123") {
+                    localStorage.setItem("hoopStatsAdmin", "true");
+                    isAdmin = true;
+                    alert("Admin mode activated successfully!");
+                } else {
+                    alert("Incorrect password.");
+                }
+            } else {
+                localStorage.setItem("hoopStatsAdmin", "false");
+                isAdmin = false;
+                alert("Logged out of admin session.");
+            }
+            updateAdminUIState();
+        }
+
+        function updateAdminUIState() {
+            const panel = document.getElementById("admin-control-panel");
+            const label = document.getElementById("header-mode-label");
+            const btn = document.getElementById("admin-auth-btn");
+
+            if (isAdmin) {
+                panel.classList.remove("hidden");
+                label.innerText = "Admin Management Active";
+                label.className = "text-xs uppercase tracking-widest text-orange-400 font-bold block -mt-1";
+                btn.innerHTML = '<i class="fa-solid fa-lock-open mr-1.5"></i>Log Out';
+                btn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-orange-600 hover:bg-orange-500 text-white transition-all shadow";
+            } else {
+                panel.classList.add("hidden");
+                label.innerText = "Public View Mode";
+                label.className = "text-xs uppercase tracking-widest text-slate-400 font-bold block -mt-1";
+                btn.innerHTML = '<i class="fa-solid fa-lock mr-1.5"></i>Admin Login';
+                btn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-all shadow";
+            }
+        }
+
+        function adminAddGame() {
+            const dateStr = document.getElementById("adm-game-date").value;
+            const matchStr = document.getElementById("adm-game-match").value; // e.g. LAL @ UTA
+            const awayScore = parseInt(document.getElementById("adm-away-score").value) || 0;
+            const homeScore = parseInt(document.getElementById("adm-home-score").value) || 0;
+
+            if (!dateStr || !matchStr) {
+                alert("Please fill in the date and game matchup.");
+                return;
+            }
+
+            const parts = matchStr.split("@");
+            if(parts.length !== 2) {
+                alert("Format must be: AWAY @ HOME (e.g. LAL @ UTA)");
+                return;
+            }
+
+            const awayCode = parts[0].trim().toUpperCase();
+            const homeCode = parts[1].trim().toUpperCase();
+
+            const newGame = {
+                id: "g_" + Date.now(),
+                status: "FINAL",
+                time: "7:00 PM",
+                home: homeCode,
+                away: awayCode,
+                homeScore: homeScore,
+                awayScore: awayScore,
+                arena: "Custom Arena"
+            };
+
+            if (!scheduleDatabase[dateStr]) scheduleDatabase[dateStr] = [];
+            scheduleDatabase[dateStr].push(newGame);
+            localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
+
+            alert("Game published successfully!");
+            renderGames();
+        }
+
+        function adminUpdateStandings() {
+            const conf = document.getElementById("adm-standings-conf").value;
+            const team = document.getElementById("adm-team-name").value;
+            const w = parseInt(document.getElementById("adm-team-w").value) || 0;
+            const l = parseInt(document.getElementById("adm-team-l").value) || 0;
+            const pct = (w + l > 0) ? (w / (w + l)).toFixed(3) : ".000";
+
+            if(!team) {
+                alert("Please enter a team name.");
+                return;
+            }
+
+            let list = standingsData[conf];
+            let existing = list.find(x => x.team.toLowerCase() === team.toLowerCase());
+            if (existing) {
+                existing.w = w;
+                existing.l = l;
+                existing.pct = pct;
+            } else {
+                list.push({ rank: list.length + 1, team: team, w: w, l: l, pct: pct, gb: "0.0" });
+            }
+
+            localStorage.setItem("hoopStatsStandings", JSON.stringify(standingsData));
+            alert("Standings updated successfully!");
+            renderStandings();
+        }
+
+        function adminResetStorage() {
+            if(confirm("Are you sure you want to reset all data to default?")) {
+                localStorage.removeItem("hoopStatsSchedule");
+                localStorage.removeItem("hoopStatsStandings");
+                localStorage.removeItem("hoopStatsPlayers");
+                location.reload();
+            }
+        }
 
         function switchTab(tabId) {
             ['scores', 'standings', 'leaders'].forEach(t => {
@@ -472,15 +475,13 @@
         }
 
         function resetToToday() {
-            currentDate = "2026-10-23";
+            currentDate = "2026-10-25";
             document.getElementById("game-date-picker").value = currentDate;
             renderGames();
         }
 
         function getGamesForDate(dateStr) {
-            return scheduleDatabase[dateStr] || [
-                { id: "g_def", status: "UPCOMING", time: "7:30 PM", home: "NYK", away: "BOS", homeScore: 0, awayScore: 0, arena: "Madison Square Garden, New York" }
-            ];
+            return scheduleDatabase[dateStr] || [];
         }
 
         function filterGames(filter) {
@@ -496,7 +497,7 @@
             const filtered = games.filter(g => currentFilter === 'ALL' || (currentFilter === 'LIVE' && g.status === 'LIVE'));
 
             if (filtered.length === 0) {
-                container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 bg-slate-900/40 rounded-2xl border border-slate-800">No scheduled games found for ${currentDate}.</div>`;
+                container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 bg-slate-900/40 rounded-2xl border border-slate-800">No scheduled games found for ${currentDate}. ${isAdmin ? 'Use the Admin Panel above to add games.' : ''}</div>`;
                 return;
             }
 
@@ -580,6 +581,11 @@
             const filterTeam = document.getElementById("team-filter-select").value || "BOS";
             const filtered = playersDatabase.filter(p => p.team === filterTeam);
 
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-500">No players found for this team.</td></tr>`;
+                return;
+            }
+
             tbody.innerHTML = filtered.map(p => `
                 <tr class="hover:bg-slate-800/40 transition-all cursor-pointer" onclick="openPlayerModal('${p.id}')">
                     <td class="py-3 px-4 flex items-center space-x-3">
@@ -628,7 +634,7 @@
                 const found = dayGames.find(g => g.id === activeGameId);
                 if (found) game = found;
             });
-            if (!game) game = getGamesForDate(currentDate)[0];
+            if (!game) game = getGamesForDate(currentDate)[0] || { home: "LAL", away: "UTA", homeScore: 0, awayScore: 0, arena: "Arena", status: "UPCOMING" };
 
             const homeT = teamsData[game.home] || { name: game.home, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
             const awayT = teamsData[game.away] || { name: game.away, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
@@ -690,6 +696,7 @@
                 let homePlayers = playersDatabase.filter(p => p.team === game.home);
 
                 const renderTeamTableRows = (players) => {
+                    if(players.length === 0) return `<tr><td colspan="12" class="py-4 text-center text-slate-500">No player stats recorded for this team.</td></tr>`;
                     return players.map(p => `
                         <tr class="hover:bg-slate-900 cursor-pointer" onclick="openPlayerModal('${p.id}')">
                             <td class="py-2.5 px-3 font-bold text-white flex items-center space-x-1.5">
@@ -734,7 +741,7 @@
                     <div class="space-y-6">
                         <div class="space-y-3">
                             <h4 class="text-xs font-bold uppercase tracking-wider text-orange-400 flex items-center">
-                                <img src="${awayT.logo}" class="w-4 h-4 mr-2 object-contain">${awayT.name} Roster Box Score (${awayPlayers.length} Players)
+                                <img src="${awayT.logo}" class="w-4 h-4 mr-2 object-contain">${awayT.name} Roster Box Score
                             </h4>
                             <div class="overflow-x-auto bg-slate-950 rounded-xl border border-slate-800">
                                 <table class="w-full text-left text-xs">
@@ -748,7 +755,7 @@
 
                         <div class="space-y-3">
                             <h4 class="text-xs font-bold uppercase tracking-wider text-orange-400 flex items-center">
-                                <img src="${homeT.logo}" class="w-4 h-4 mr-2 object-contain">${homeT.name} Roster Box Score (${homePlayers.length} Players)
+                                <img src="${homeT.logo}" class="w-4 h-4 mr-2 object-contain">${homeT.name} Roster Box Score
                             </h4>
                             <div class="overflow-x-auto bg-slate-950 rounded-xl border border-slate-800">
                                 <table class="w-full text-left text-xs">
@@ -791,12 +798,6 @@
         function closePlayerModal() {
             document.getElementById("player-modal").classList.remove("flex");
             document.getElementById("player-modal").classList.add("hidden");
-        }
-
-        function handleSearch(query) {
-            if(!query) return;
-            const found = playersDatabase.find(p => p.name.toLowerCase().includes(query.toLowerCase()));
-            if(found) openPlayerModal(found.id);
         }
     </script>
 </body>
