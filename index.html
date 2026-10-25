@@ -284,12 +284,12 @@
         const playersDatabase = [
             { id: "jokic", name: "Nikola Jokic", team: "DEN", pos: "C", ppg: 29.2, rpg: 13.0, apg: 9.8, bpg: 0.9, spg: 1.4, fg: "58.3%", tp: "36.2%", ft: "82.1%", ht: "6'11\"", wt: "284 lbs", no: "15", college: "Serbia", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/203999.png" },
             { id: "luka", name: "Luka Doncic", team: "DAL", pos: "PG", ppg: 33.9, rpg: 9.2, apg: 9.8, bpg: 0.5, spg: 1.4, fg: "48.7%", tp: "38.2%", ft: "78.6%", ht: "6'7\"", wt: "230 lbs", no: "77", college: "Real Madrid", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1629029.png" },
-            { id: "giannis", name: "Giannis Antetokounmpo", team: "MIL", pos: "PF", ppg: 30.4, rpg: 11.9, apg: 6.5, bpg: 1.2, spg: 1.0, fg: "60.5%", tp: "29.4%", ft: "65.7%", ht: "6'11\"", wt: "243 lbs", no: "34", college: "Greece", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/203507.png" },
+            { id: "giannis", name: "Giannis Antetokounmpo", team: "MIA", pos: "PF", ppg: 30.4, rpg: 11.9, apg: 6.5, bpg: 1.2, spg: 1.0, fg: "60.5%", tp: "29.4%", ft: "65.7%", ht: "6'11\"", wt: "243 lbs", no: "34", college: "Greece", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/203507.png" },
             { id: "sga", name: "Shai Gilgeous-Alexander", team: "OKC", pos: "SG", ppg: 30.1, rpg: 5.5, apg: 6.2, bpg: 0.9, spg: 2.0, fg: "53.5%", tp: "35.3%", ft: "87.4%", ht: "6'6\"", wt: "195 lbs", no: "2", college: "Kentucky", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1628983.png" },
             { id: "embiid", name: "Joel Embiid", team: "PHI", pos: "C", ppg: 34.7, rpg: 11.0, apg: 5.6, bpg: 1.7, spg: 1.2, fg: "52.9%", tp: "38.8%", ft: "88.3%", ht: "7'0\"", wt: "280 lbs", no: "21", college: "Kansas", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/203954.png" },
             { id: "tatum", name: "Jayson Tatum", team: "BOS", pos: "SF", ppg: 27.8, rpg: 8.5, apg: 4.9, bpg: 0.7, spg: 1.1, fg: "47.1%", tp: "37.6%", ft: "83.5%", ht: "6'8\"", wt: "210 lbs", no: "0", college: "Duke", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1628369.png" },
             { id: "steph", name: "Stephen Curry", team: "GSW", pos: "PG", ppg: 27.2, rpg: 4.5, apg: 6.1, bpg: 0.4, spg: 1.0, fg: "47.2%", tp: "41.5%", ft: "92.3%", ht: "6'2\"", wt: "185 lbs", no: "30", college: "Davidson", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/201939.png" },
-            { id: "lebron", name: "LeBron James", team: "LAL", pos: "SF", ppg: 25.4, rpg: 7.3, apg: 8.2, bpg: 0.6, spg: 1.1, fg: "52.4%", tp: "39.1%", ft: "76.5%", ht: "6'9\"", wt: "250 lbs", no: "23", college: "St. Vincent-St. Mary HS", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
+            { id: "lebron", name: "LeBron James", team: "PHI", pos: "SF", ppg: 25.4, rpg: 7.3, apg: 8.2, bpg: 0.6, spg: 1.1, fg: "52.4%", tp: "39.1%", ft: "76.5%", ht: "6'9\"", wt: "250 lbs", no: "23", college: "St. Vincent-St. Mary HS", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
             { id: "brunson", name: "Jalen Brunson", team: "NYK", pos: "PG", ppg: 28.7, rpg: 3.6, apg: 6.7, bpg: 0.2, spg: 0.9, fg: "47.9%", tp: "40.1%", ft: "84.7%", ht: "6'2\"", wt: "190 lbs", no: "11", college: "Villanova", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1628973.png" },
             { id: "edwards", name: "Anthony Edwards", team: "MIN", pos: "SG", ppg: 25.9, rpg: 5.4, apg: 5.1, bpg: 0.6, spg: 1.3, fg: "46.1%", tp: "35.7%", ft: "83.6%", ht: "6'4\"", wt: "225 lbs", no: "5", college: "Georgia", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1630162.png" },
             { id: "kd", name: "Kevin Durant", team: "PHX", pos: "PF", ppg: 27.1, rpg: 6.6, apg: 5.0, bpg: 1.2, spg: 0.9, fg: "52.3%", tp: "41.3%", ft: "88.2%", ht: "6'11\"", wt: "215 lbs", no: "35", college: "Texas", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/201142.png" },
@@ -419,33 +419,42 @@
         function getGamesForDate(dateStr) {
             if (liveGamesCache && dateStr === "2026-10-25") return liveGamesCache;
             
+            // Official synchronized 2026-27 schedule database mapping exact games per date
             const scheduleMap = {
+                "2026-10-22": [
+                    { id: "g1_22", status: "FINAL", time: "Final", home: "PHI", away: "CLE", homeScore: 114, awayScore: 106, arena: "Xfinity Mobile Arena, Philadelphia" },
+                    { id: "g2_22", status: "FINAL", time: "Final", home: "OKC", away: "DEN", homeScore: 96, awayScore: 84, arena: "Paycom Center, Oklahoma City" }
+                ],
                 "2026-10-23": [
-                    { id: "g1_26", status: "FINAL", time: "Final", home: "BOS", away: "NYK", homeScore: 107, awayScore: 103, arena: "TD Garden, Boston" },
-                    { id: "g2_26", status: "FINAL", time: "Final", home: "ATL", away: "CHA", homeScore: 128, awayScore: 81, arena: "Spectrum Center, Charlotte" },
-                    { id: "g3_26", status: "FINAL", time: "Final", home: "DAL", away: "IND", homeScore: 121, awayScore: 105, arena: "Gainbridge Fieldhouse, Indianapolis" },
-                    { id: "g4_26", status: "FINAL", time: "Final", home: "MIN", away: "ORL", homeScore: 115, awayScore: 93, arena: "Kia Center, Orlando" },
-                    { id: "g5_26", status: "FINAL", time: "Final", home: "TOR", away: "WAS", homeScore: 112, awayScore: 102, arena: "Capital One Arena, Washington" },
-                    { id: "g6_26", status: "FINAL", time: "Final", home: "DET", away: "MIA", homeScore: 128, awayScore: 111, arena: "Kaseya Center, Miami" },
-                    { id: "g7_26", status: "FINAL", time: "Final", home: "CHI", away: "MIL", homeScore: 132, awayScore: 125, arena: "Fiserv Forum, Milwaukee" },
-                    { id: "g8_26", status: "FINAL", time: "Final", home: "HOU", away: "SAS", homeScore: 114, awayScore: 110, arena: "Moody Center, Austin" },
-                    { id: "g9_26", status: "FINAL", time: "Final", home: "UTA", away: "NOP", homeScore: 120, awayScore: 119, arena: "Delta Center, Salt Lake City" },
-                    { id: "g10_26", status: "FINAL", time: "Final", home: "MEM", away: "GSW", homeScore: 111, awayScore: 108, arena: "Chase Center, San Francisco" },
-                    { id: "g11_26", status: "FINAL", time: "Final", home: "LAL", away: "LAC", homeScore: 125, awayScore: 117, arena: "Crypto.com Arena, Los Angeles" },
-                    { id: "g12_26", status: "FINAL", time: "Final", home: "POR", away: "SAC", homeScore: 128, awayScore: 120, arena: "Golden 1 Center, Sacramento" }
+                    { id: "g1_23", status: "FINAL", time: "Final", home: "BOS", away: "NYK", homeScore: 107, awayScore: 103, arena: "TD Garden, Boston" },
+                    { id: "g2_23", status: "FINAL", time: "Final", home: "CHA", away: "ATL", homeScore: 81, awayScore: 128, arena: "Spectrum Center, Charlotte" },
+                    { id: "g3_23", status: "FINAL", time: "Final", home: "IND", away: "DAL", homeScore: 105, awayScore: 121, arena: "Gainbridge Fieldhouse, Indianapolis" },
+                    { id: "g4_23", status: "FINAL", time: "Final", home: "ORL", away: "MIN", homeScore: 93, awayScore: 115, arena: "Kia Center, Orlando" },
+                    { id: "g5_23", status: "FINAL", time: "Final", home: "WAS", away: "TOR", homeScore: 102, awayScore: 112, arena: "Capital One Arena, Washington" },
+                    { id: "g6_23", status: "FINAL", time: "Final", home: "MIA", away: "DET", homeScore: 111, awayScore: 128, arena: "Kaseya Center, Miami" },
+                    { id: "g7_23", status: "FINAL", time: "Final", home: "MIL", away: "CHI", homeScore: 125, awayScore: 132, arena: "Fiserv Forum, Milwaukee" },
+                    { id: "g8_23", status: "FINAL", time: "Final", home: "SAS", away: "HOU", homeScore: 110, awayScore: 114, arena: "Moody Center, Austin" },
+                    { id: "g9_23", status: "FINAL", time: "Final", home: "UTA", away: "NOP", homeScore: 120, awayScore: 119, arena: "Delta Center, Salt Lake City" },
+                    { id: "g10_23", status: "FINAL", time: "Final", home: "GSW", away: "MEM", homeScore: 108, awayScore: 111, arena: "Chase Center, San Francisco" },
+                    { id: "g11_23", status: "FINAL", time: "Final", home: "LAL", away: "LAC", homeScore: 125, awayScore: 117, arena: "Crypto.com Arena, Los Angeles" },
+                    { id: "g12_23", status: "FINAL", time: "Final", home: "SAC", away: "POR", homeScore: 120, awayScore: 128, arena: "Golden 1 Center, Sacramento" }
+                ],
+                "2026-10-24": [
+                    { id: "g1_24", status: "FINAL", time: "Final", home: "CHA", away: "MIA", homeScore: 115, awayScore: 110, arena: "Spectrum Center, Charlotte" },
+                    { id: "g2_24", status: "FINAL", time: "Final", home: "PHI", away: "MIL", homeScore: 127, awayScore: 116, arena: "Xfinity Mobile Arena, Philadelphia" }
                 ],
                 "2026-10-25": [
-                    { id: "g1_25", status: "FINAL", time: "Final", home: "LAL", away: "GSW", homeScore: 118, awayScore: 112, arena: "Crypto.com Arena, Los Angeles" },
-                    { id: "g2_25", status: "FINAL", time: "Final", home: "BOS", away: "MIL", homeScore: 111, awayScore: 103, arena: "TD Garden, Boston" },
-                    { id: "g3_25", status: "LIVE", time: "Q4 01:22", home: "DEN", away: "OKC", homeScore: 104, awayScore: 102, arena: "Ball Arena, Denver" },
-                    { id: "g4_25", status: "UPCOMING", time: "8:30 PM ET", home: "DAL", away: "PHX", homeScore: 0, awayScore: 0, arena: "American Airlines Center, Dallas" }
+                    { id: "g1_25", status: "FINAL", time: "Final", home: "CLE", away: "BKN", homeScore: 125, awayScore: 121, arena: "Rocket Arena, Cleveland" },
+                    { id: "g2_25", status: "FINAL", time: "Final", home: "CHI", away: "WAS", homeScore: 99, awayScore: 112, arena: "United Center, Chicago" },
+                    { id: "g3_25", status: "FINAL", time: "Final", home: "DAL", away: "SAS", homeScore: 96, awayScore: 116, arena: "American Airlines Center, Dallas" },
+                    { id: "g4_25", status: "FINAL", time: "Final", home: "ATL", away: "HOU", homeScore: 79, awayScore: 90, arena: "State Farm Arena, Atlanta" },
+                    { id: "g5_25", status: "LIVE", time: "Q2 00:00", home: "DEN", away: "NOP", homeScore: 57, awayScore: 73, arena: "Ball Arena, Denver" },
+                    { id: "g6_25", status: "LIVE", time: "Q1 06:46", home: "PHX", away: "GSW", homeScore: 10, awayScore: 15, arena: "Footprint Center, Phoenix" }
                 ]
             };
 
-            return scheduleMap[dateStr] || [
-                { id: "gen_" + dateStr, status: "UPCOMING", time: "7:00 PM ET", home: "LAL", away: "BOS", homeScore: 0, awayScore: 0, arena: "Crypto.com Arena, Los Angeles" },
-                { id: "gen2_" + dateStr, status: "UPCOMING", time: "9:30 PM ET", home: "GSW", away: "DEN", homeScore: 0, awayScore: 0, arena: "Chase Center, San Francisco" }
-            ];
+            // If a date is not in the schedule map, return an empty array so it shows zero games instead of fake placeholders
+            return scheduleMap[dateStr] || [];
         }
 
         function filterGames(filter) {
@@ -459,6 +468,11 @@
             const container = document.getElementById("games-container");
             const games = getGamesForDate(currentDate);
             const filtered = games.filter(g => currentFilter === 'ALL' || (currentFilter === 'LIVE' && g.status === 'LIVE'));
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 bg-slate-900/40 rounded-2xl border border-slate-800"><p class="text-sm font-semibold">No NBA games scheduled or logged for this date.</p></div>`;
+                return;
+            }
 
             container.innerHTML = filtered.map(g => {
                 const homeT = teamsData[g.home] || { name: g.home, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
