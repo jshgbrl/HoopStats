@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HoopStats</title>
+    <title>HoopStats Central | Pro Box Score & Backup Edition</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome Icons -->
@@ -102,30 +102,9 @@
                     <button onclick="adminAddGame()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Publish Game</button>
                 </div>
 
-                <!-- 2. UPDATE STANDINGS -->
+                <!-- 2. ADD PLAYER TO ROSTER -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
-                    <h3 class="font-bold text-orange-400 uppercase">2. Update Standings</h3>
-                    <div>
-                        <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Conference</label>
-                        <select id="adm-standings-conf" onchange="onAdminConfChanged()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
-                            <option value="EAST">Eastern Conference</option>
-                            <option value="WEST">Western Conference</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Team</label>
-                        <select id="adm-team-name-select" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white"></select>
-                    </div>
-                    <div class="flex space-x-2">
-                        <input type="number" id="adm-team-w" placeholder="Wins" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
-                        <input type="number" id="adm-team-l" placeholder="Losses" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
-                    </div>
-                    <button onclick="adminUpdateStandings()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Update Standings</button>
-                </div>
-
-                <!-- 3. ADD PLAYER TO ROSTER -->
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
-                    <h3 class="font-bold text-orange-400 uppercase">3. Add Player to Roster</h3>
+                    <h3 class="font-bold text-orange-400 uppercase">2. Add Player to Roster</h3>
                     <input type="text" id="adm-player-name" placeholder="Player Full Name" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
                     <div class="flex space-x-2">
                         <div class="w-2/3">
@@ -139,7 +118,7 @@
                     </div>
                     <div>
                         <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Position</label>
-                        <select id="adm-player-pos" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                        <select id="adm-player-pos" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white">
                             <option value="G">G (Guard)</option>
                             <option value="F">F (Forward)</option>
                             <option value="C">C (Center)</option>
@@ -148,13 +127,26 @@
                     <button onclick="adminSavePlayer()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Save Player to Roster</button>
                 </div>
 
-                <!-- 4. Reset Storage -->
+                <!-- 3. DATA BACKUP & RESTORE (JSON Export/Import) -->
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-orange-400 uppercase">3. Data Backup & Sync</h3>
+                        <p class="text-[11px] text-slate-400 mt-1">Export your data to transfer between browsers or restore from backup.</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="exportDataJSON()" class="py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-lg transition-all text-xs"><i class="fa-solid fa-download mr-1"></i>Export</button>
+                        <button onclick="document.getElementById('import-file-input').click()" class="py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-lg transition-all text-xs"><i class="fa-solid fa-upload mr-1"></i>Import</button>
+                        <input type="file" id="import-file-input" class="hidden" accept=".json" onchange="importDataJSON(event)">
+                    </div>
+                </div>
+
+                <!-- 4. Factory Reset -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 flex flex-col justify-between">
                     <div>
                         <h3 class="font-bold text-orange-400 uppercase">4. Factory Reset</h3>
                         <p class="text-[11px] text-slate-400 mt-1">Restore factory default schedules, box scores, rosters, and standings.</p>
                     </div>
-                    <button onclick="adminResetStorage()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-lg transition-all">Reset All Data</button>
+                    <button onclick="adminResetStorage()" class="w-full py-2 bg-red-950 hover:bg-red-900 text-red-300 font-bold rounded-lg transition-all">Reset All Data</button>
                 </div>
             </div>
         </section>
@@ -256,7 +248,7 @@
     <!-- FOOTER -->
     <footer class="bg-slate-900 border-t border-slate-800 mt-12 py-8 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4 space-y-2">
-            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Box Score & DNP Edition</p>
+            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Box Score & Backup Edition</p>
             <p>Automatic team totals, shooting percentages, and synced player profile averages.</p>
         </div>
     </footer>
@@ -382,7 +374,7 @@
         let currentDate = "2026-10-25";
         let currentConf = "EAST";
         let activeGameId = null;
-        let currentModalTab = 'players';
+        let currentModalTab = 'summary';
         let isAdmin = localStorage.getItem("hoopStatsAdmin") === "true";
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -406,15 +398,6 @@
             playerTeamSel.innerHTML = teamOptionsHTML;
             awaySel.value = "BOS";
             homeSel.value = "DET";
-
-            onAdminConfChanged();
-        }
-
-        function onAdminConfChanged() {
-            const conf = document.getElementById("adm-standings-conf").value;
-            const teamSelect = document.getElementById("adm-team-name-select");
-            const filteredTeams = nbaTeamsAlphabetical.filter(t => t.conf === conf);
-            teamSelect.innerHTML = filteredTeams.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
         }
 
         function toggleAdminSession() {
@@ -472,10 +455,13 @@
             const newGame = {
                 id: "g_" + Date.now(),
                 status: "FINAL",
+                time: "7:00 PM",
+                gameDate: dateStr,
                 home: homeCode,
                 away: awayCode,
                 homeScore: homeScore,
                 awayScore: awayScore,
+                arena: "Custom NBA Arena"
             };
 
             if (!scheduleDatabase[dateStr]) scheduleDatabase[dateStr] = [];
@@ -496,10 +482,6 @@
                 renderGames();
                 renderStandings();
             }
-        }
-
-        function adminUpdateStandings() {
-            alert("Standings are automatically calculated based on entered game scores!");
         }
 
         function adminSavePlayer() {
@@ -569,6 +551,43 @@
                 closeEditPlayerModal();
                 renderPlayerTable();
             }
+        }
+
+        function exportDataJSON() {
+            const dataToExport = {
+                players: playersDatabase,
+                schedule: scheduleDatabase
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `hoopstats_backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importDataJSON(event) {
+            const fileReader = new FileReader();
+            if(event.target.files.length === 0) return;
+            fileReader.readAsText(event.target.files[0], "UTF-8");
+            fileReader.onload = e => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if(imported.players && imported.schedule) {
+                        playersDatabase = imported.players;
+                        scheduleDatabase = imported.schedule;
+                        localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
+                        localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
+                        alert("Data imported successfully! The page will now reload.");
+                        location.reload();
+                    } else {
+                        alert("Invalid backup file format.");
+                    }
+                } catch(err) {
+                    alert("Error parsing JSON file.");
+                }
+            };
         }
 
         function adminAddGameStatLine(gameId) {
@@ -722,9 +741,7 @@
                 return `
                     <div class="bg-slate-900/80 border border-slate-800 hover:border-slate-700 rounded-2xl p-5 shadow-xl transition-all group space-y-4">
                         <div class="flex items-center justify-between text-xs cursor-pointer" onclick="openBoxScore('${g.id}')">
-                            <span class="font-semibold text-slate-400 flex items-center truncate max-w-[200px]">
-                                <i class="fa-solid fa-location-dot text-orange-500 mr-1.5 shrink-0"></i>${g.arena}
-                            </span>
+                            <span class="font-semibold text-slate-400">&nbsp;</span>
                             <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] tracking-wider uppercase bg-slate-800 text-slate-300">
                                 ${isFinal ? 'FINAL' : g.time}
                             </span>
@@ -861,7 +878,7 @@
 
         function openBoxScore(gameId) {
             activeGameId = gameId;
-            currentModalTab = 'players';
+            currentModalTab = 'summary';
             renderBoxScoreContent();
             document.getElementById("boxscore-modal").classList.remove("hidden");
             document.getElementById("boxscore-modal").classList.add("flex");
@@ -885,35 +902,133 @@
                 const found = dayGames.find(g => g.id === activeGameId);
                 if (found) game = found;
             });
-            if (!game) game = getGamesForDate(currentDate)[0] || { home: "DET", away: "BOS", homeScore: 108, awayScore: 116, arena: "Arena", status: "FINAL" };
+            if (!game) game = getGamesForDate(currentDate)[0] || { home: "DET", away: "BOS", homeScore: 108, awayScore: 116, gameDate: "2026-10-25", status: "FINAL" };
 
             const homeT = teamsData[game.home] || { name: game.home, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
             const awayT = teamsData[game.away] || { name: game.away, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
 
-            document.getElementById("modal-game-title").innerText = `${awayT.name} at ${homeT.name} (${game.time})`;
-            const tabsContainer = document.getElementById("modal-tabs-container");
+            // Modal Title without time
+            document.getElementById("modal-game-title").innerText = `${awayT.name} AT ${homeT.name}`;
             const content = document.getElementById("modal-body-content");
 
-            tabsContainer.classList.remove('hidden');
+            document.getElementById("modal-tab-summary").className = `py-3 text-xs font-bold uppercase tracking-wider border-b-2 ${currentModalTab === 'summary' ? 'border-orange-500 text-orange-400' : 'border-transparent text-slate-400'} transition-all`;
+            document.getElementById("modal-tab-players").className = `py-3 text-xs font-bold uppercase tracking-wider border-b-2 ${currentModalTab === 'players' ? 'border-orange-500 text-orange-400' : 'border-transparent text-slate-400'} transition-all`;
+
             if(currentModalTab === 'summary') {
+                let awayPlayers = playersDatabase.filter(p => p.team === game.away && p.role !== 'DNP');
+                let homePlayers = playersDatabase.filter(p => p.team === game.home && p.role !== 'DNP');
+
+                let calcTotals = (list) => {
+                    let fgM = 0, fgA = 0, tpM = 0, tpA = 0, ftM = 0, ftA = 0, to = 0, reb = 0;
+                    list.forEach(p => {
+                        fgM += (p.fgM || 0); fgA += (p.fgA || 0);
+                        tpM += (p.tpM || 0); tpA += (p.tpA || 0);
+                        ftM += (p.ftM || 0); ftA += (p.ftA || 0);
+                        to += (p.to || 0); reb += (p.reb || 0);
+                    });
+                    return { fgM, fgA, tpM, tpA, ftM, ftA, to, reb };
+                };
+
+                let awayTot = calcTotals(awayPlayers);
+                let homeTot = calcTotals(homePlayers);
+
+                let awayFgPct = awayTot.fgA > 0 ? ((awayTot.fgM / awayTot.fgA) * 100).toFixed(0) : 0;
+                let homeFgPct = homeTot.fgA > 0 ? ((homeTot.fgM / homeTot.fgA) * 100).toFixed(0) : 0;
+                let awayTpPct = awayTot.tpA > 0 ? ((awayTot.tpM / awayTot.tpA) * 100).toFixed(0) : 0;
+                let homeTpPct = homeTot.tpA > 0 ? ((homeTot.tpM / homeTot.tpA) * 100).toFixed(0) : 0;
+                let awayFtPct = awayTot.ftA > 0 ? ((awayTot.ftM / awayTot.ftA) * 100).toFixed(0) : 0;
+                let homeFtPct = homeTot.ftA > 0 ? ((homeTot.ftM / homeTot.ftA) * 100).toFixed(0) : 0;
+
                 content.innerHTML = `
                     <div class="space-y-6">
-                        <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 flex items-center justify-between">
-                            <div class="flex items-center space-x-3">
-                                <img src="${awayT.logo}" class="w-14 h-14 object-contain">
-                                <div><h4 class="font-bold text-white text-base">${awayT.name}</h4><span class="text-xs text-slate-400 uppercase">Away</span></div>
+                        <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-4">
+                            <div class="text-center pb-3 border-b border-slate-800 text-xs font-bold text-orange-400 uppercase tracking-widest">
+                                <i class="fa-regular fa-calendar-days mr-1.5"></i>Match Date: ${game.gameDate || currentDate}
                             </div>
-                            <div class="text-center">
-                                <span class="text-4xl font-black font-teko text-orange-400 tracking-wider">${game.awayScore} - ${game.homeScore}</span>
-                                <span class="text-[10px] text-slate-400 uppercase block font-bold">Final Score</span>
-                            </div>
-                            <div class="flex items-center space-x-3 text-right">
-                                <div><h4 class="font-bold text-white text-base">${homeT.name}</h4><span class="text-xs text-slate-400 uppercase">Home</span></div>
-                                <img src="${homeT.logo}" class="w-14 h-14 object-contain">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <img src="${awayT.logo}" class="w-14 h-14 object-contain">
+                                    <div><h4 class="font-bold text-white text-base">${awayT.name}</h4><span class="text-xs text-slate-400 uppercase">Away</span></div>
+                                </div>
+                                <div class="text-center">
+                                    <span class="text-4xl font-black font-teko text-orange-400 tracking-wider">${game.awayScore} - ${game.homeScore}</span>
+                                    <span class="text-[10px] text-slate-400 uppercase block font-bold">Final Score</span>
+                                </div>
+                                <div class="flex items-center space-x-3 text-right">
+                                    <div><h4 class="font-bold text-white text-base">${homeT.name}</h4><span class="text-xs text-slate-400 uppercase">Home</span></div>
+                                    <img src="${homeT.logo}" class="w-14 h-14 object-contain">
+                                </div>
                             </div>
                         </div>
-                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs text-slate-400 text-center">
-                            <span>Arena: <strong class="text-slate-200">${game.arena}</strong></span>
+
+                        <!-- TEAM COMPARISON STATS (Reference Image 3 Style) -->
+                        <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-6">
+                            <h4 class="text-xs font-black font-teko uppercase text-slate-400 tracking-wider border-b border-slate-800 pb-2">Team Stats Comparison</h4>
+                            
+                            <!-- Field Goal % -->
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs font-bold">
+                                    <span class="text-orange-400">${awayFgPct}% (${awayTot.fgM}-${awayTot.fgA})</span>
+                                    <span class="text-slate-300 uppercase tracking-wider">Field Goal %</span>
+                                    <span class="text-orange-400">${homeFgPct}% (${homeTot.fgM}-${homeTot.fgA})</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 h-2.5">
+                                    <div class="bg-slate-900 rounded-full overflow-hidden flex justify-end"><div class="bg-orange-500 h-full rounded-full" style="width: ${awayFgPct}%"></div></div>
+                                    <div class="bg-slate-900 rounded-full overflow-hidden flex"><div class="bg-slate-300 h-full rounded-full" style="width: ${homeFgPct}%"></div></div>
+                                </div>
+                            </div>
+
+                            <!-- Three Point % -->
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs font-bold">
+                                    <span class="text-orange-400">${awayTpPct}% (${awayTot.tpM}-${awayTot.tpA})</span>
+                                    <span class="text-slate-300 uppercase tracking-wider">Three Point %</span>
+                                    <span class="text-orange-400">${homeTpPct}% (${homeTot.tpM}-${homeTot.tpA})</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 h-2.5">
+                                    <div class="bg-slate-900 rounded-full overflow-hidden flex justify-end"><div class="bg-orange-500 h-full rounded-full" style="width: ${awayTpPct}%"></div></div>
+                                    <div class="bg-slate-900 rounded-full overflow-hidden flex"><div class="bg-slate-300 h-full rounded-full" style="width: ${homeTpPct}%"></div></div>
+                                </div>
+                            </div>
+
+                            <!-- Free Throw % -->
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs font-bold">
+                                    <span class="text-orange-400">${awayFtPct}% (${awayTot.ftM}-${awayTot.ftA})</span>
+                                    <span class="text-slate-300 uppercase tracking-wider">Free Throw %</span>
+                                    <span class="text-orange-400">${homeFtPct}% (${homeTot.ftM}-${homeTot.ftA})</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 h-2.5">
+                                    <div class="bg-slate-900 rounded-full overflow-hidden flex justify-end"><div class="bg-orange-500 h-full rounded-full" style="width: ${awayFtPct}%"></div></div>
+                                    <div class="bg-slate-900 rounded-full overflow-hidden flex"><div class="bg-slate-300 h-full rounded-full" style="width: ${homeFtPct}%"></div></div>
+                                </div>
+                            </div>
+
+                            <!-- Turnovers -->
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs font-bold">
+                                    <span class="text-white">${awayTot.to}</span>
+                                    <span class="text-slate-300 uppercase tracking-wider">Turnovers</span>
+                                    <span class="text-white">${homeTot.to}</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 h-2.5">
+                                    <div class="bg-slate-900 rounded-full overflow-hidden flex justify-end"><div class="bg-red-500 h-full rounded-full" style="width: ${Math.min(100, (awayTot.to / (awayTot.to + homeTot.to || 1)) * 100)}%"></div></div>
+                                    <div class="bg-slate-900 rounded-full overflow-hidden flex"><div class="bg-red-500 h-full rounded-full" style="width: ${Math.min(100, (homeTot.to / (awayTot.to + homeTot.to || 1)) * 100)}%"></div></div>
+                                </div>
+                            </div>
+
+                            <!-- Rebounds -->
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs font-bold">
+                                    <span class="text-white">${awayTot.reb}</span>
+                                    <span class="text-slate-300 uppercase tracking-wider">Rebounds</span>
+                                    <span class="text-white">${homeTot.reb}</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 h-2.5">
+                                    <div class="bg-slate-900 rounded-full overflow-hidden flex justify-end"><div class="bg-orange-500 h-full rounded-full" style="width: ${Math.min(100, (awayTot.reb / (awayTot.reb + homeTot.reb || 1)) * 100)}%"></div></div>
+                                    <div class="bg-slate-900 rounded-full overflow-hidden flex"><div class="bg-slate-300 h-full rounded-full" style="width: ${Math.min(100, (homeTot.reb / (awayTot.reb + homeTot.reb || 1)) * 100)}%"></div></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1031,7 +1146,7 @@
                                     <tbody class="divide-y divide-slate-900">
                                         <tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-orange-400 tracking-widest">Starters</td></tr>
                                         ${renderRows(starters)}
-                                        <tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-orange-400 tracking-widest">Bench</td></tr>
+                                        <tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-orange-400 tracking-widest">Bench (Sorted by Minutes)</td></tr>
                                         ${renderRows(bench)}
                                         ${dnp.length > 0 ? `
                                             <tr class="bg-slate-900/40"><td colspan="15" class="py-1.5 px-3 font-bold text-[10px] uppercase text-slate-400 tracking-widest">Did Not Play (DNP)</td></tr>
