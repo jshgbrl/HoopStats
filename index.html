@@ -843,6 +843,9 @@
             localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
             localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
             alert("Stat line permanently snapshotted to this game date!");
+            
+            // Switch tab to players so the user immediately sees the added stats
+            currentModalTab = 'players';
             renderBoxScoreContent();
             renderPlayerTable();
         }
@@ -1144,8 +1147,6 @@
 
         function switchModalTab(tab) {
             currentModalTab = tab;
-            document.getElementById("modal-tab-summary").className = `py-3 text-xs font-bold uppercase tracking-wider border-b-2 ${tab === 'summary' ? 'border-orange-500 text-orange-400' : 'border-transparent text-slate-400'} transition-all`;
-            document.getElementById("modal-tab-players").className = `py-3 text-xs font-bold uppercase tracking-wider border-b-2 ${tab === 'players' ? 'border-orange-500 text-orange-400' : 'border-transparent text-slate-400'} transition-all`;
             renderBoxScoreContent();
         }
 
@@ -1440,7 +1441,6 @@
 
                 let adminStatEntryForm = "";
                 if(isAdmin) {
-                    // Strictly filter dropdown players to ONLY include players from the away or home team of this game
                     const eligiblePlayers = playersDatabase.filter(p => p.team === game.away || p.team === game.home);
                     const rosterOptions = eligiblePlayers.map(p => `<option value="${p.id}">${p.name} (${p.team})</option>`).join('');
 
