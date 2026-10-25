@@ -251,107 +251,48 @@
 
         const nbaTeamsAlphabetical = Object.values(teamsData).sort((a, b) => a.name.localeCompare(b.name));
 
-        // Official Active Wikipedia Roster Database with exact player names and numbers
         const playersDatabase = [
             // Boston Celtics
-            { id: "bos_99", name: "Devin Carter", team: "BOS", pos: "G", ppg: 6.0, rpg: 2.0, apg: 1.5, fg: "45.2%", tp: "36.5%", ft: "78.4%", no: "99", college: "Providence", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bos_12", name: "Chris Cenac Jr.", team: "BOS", pos: "F", ppg: 7.2, rpg: 4.1, apg: 0.8, fg: "48.0%", tp: "30.0%", ft: "72.0%", no: "12", college: "Houston", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bos_45", name: "Mike Conley", team: "BOS", pos: "G", ppg: 11.4, rpg: 2.5, apg: 4.8, fg: "43.5%", tp: "38.1%", ft: "85.2%", no: "45", college: "Ohio State", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bos_52", name: "Luka Garza", team: "BOS", pos: "C", ppg: 8.5, rpg: 4.2, apg: 0.6, fg: "52.0%", tp: "35.0%", ft: "70.0%", no: "52", college: "Iowa", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
+            { id: "bos_99", name: "Devin Carter", team: "BOS", pos: "G", ppg: 6.0, rpg: 2.0, apg: 1.5, fg: "45.2%", tp: "36.5%", ft: "78.4%", no: "99", college: "Providence", img: "" },
+            { id: "bos_12", name: "Chris Cenac Jr.", team: "BOS", pos: "F", ppg: 7.2, rpg: 4.1, apg: 0.8, fg: "48.0%", tp: "30.0%", ft: "72.0%", no: "12", college: "Houston", img: "" },
+            { id: "bos_45", name: "Mike Conley", team: "BOS", pos: "G", ppg: 11.4, rpg: 2.5, apg: 4.8, fg: "43.5%", tp: "38.1%", ft: "85.2%", no: "45", college: "Ohio State", img: "" },
+            { id: "bos_52", name: "Luka Garza", team: "BOS", pos: "C", ppg: 8.5, rpg: 4.2, apg: 0.6, fg: "52.0%", tp: "35.0%", ft: "70.0%", no: "52", college: "Iowa", img: "" },
             { id: "bos_13", name: "Paul George", team: "BOS", pos: "F", ppg: 22.6, rpg: 5.2, apg: 3.5, fg: "47.1%", tp: "41.3%", ft: "90.7%", no: "13", college: "Fresno State", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/202331.png" },
-            { id: "bos_28", name: "Hugo González", team: "BOS", pos: "G", ppg: 4.0, rpg: 1.5, apg: 0.8, fg: "42.0%", tp: "33.0%", ft: "75.0%", no: "28", college: "Spain", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bos_8", name: "Ron Harper Jr.", team: "BOS", pos: "G/F", ppg: 5.1, rpg: 1.8, apg: 0.9, fg: "41.0%", tp: "34.0%", ft: "76.0%", no: "8", college: "Rutgers", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bos_30", name: "Sam Hauser", team: "BOS", pos: "F", ppg: 9.0, rpg: 3.5, apg: 1.0, fg: "44.0%", tp: "42.2%", ft: "87.0%", no: "30", college: "Virginia", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bos_20", name: "Dillon Mitchell", team: "BOS", pos: "F", ppg: 4.5, rpg: 2.9, apg: 0.5, fg: "50.0%", tp: "25.0%", ft: "65.0%", no: "20", college: "St. John's", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bos_11", name: "Payton Pritchard", team: "BOS", pos: "G", ppg: 14.1, rpg: 3.2, apg: 4.3, fg: "46.2%", tp: "40.5%", ft: "88.1%", no: "11", college: "Oregon", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bos_88", name: "Neemias Queta", team: "BOS", pos: "C", ppg: 6.8, rpg: 5.5, apg: 0.8, fg: "58.0%", tp: "0.0%", ft: "64.0%", no: "88", college: "Utah State", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bos_4", name: "Mitchell Robinson", team: "BOS", pos: "F/C", ppg: 7.5, rpg: 8.2, apg: 0.5, fg: "68.0%", tp: "0.0%", ft: "55.0%", no: "4", college: "Chalmette HS", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bos_55", name: "Baylor Scheierman", team: "BOS", pos: "G", ppg: 6.2, rpg: 2.4, apg: 1.1, fg: "42.0%", tp: "37.0%", ft: "80.0%", no: "55", college: "Creighton", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
+            { id: "bos_28", name: "Hugo González", team: "BOS", pos: "G", ppg: 4.0, rpg: 1.5, apg: 0.8, fg: "42.0%", tp: "33.0%", ft: "75.0%", no: "28", college: "Spain", img: "" },
+            { id: "bos_8", name: "Ron Harper Jr.", team: "BOS", pos: "G/F", ppg: 5.1, rpg: 1.8, apg: 0.9, fg: "41.0%", tp: "34.0%", ft: "76.0%", no: "8", college: "Rutgers", img: "" },
+            { id: "bos_30", name: "Sam Hauser", team: "BOS", pos: "F", ppg: 9.0, rpg: 3.5, apg: 1.0, fg: "44.0%", tp: "42.2%", ft: "87.0%", no: "30", college: "Virginia", img: "" },
+            { id: "bos_20", name: "Dillon Mitchell", team: "BOS", pos: "F", ppg: 4.5, rpg: 2.9, apg: 0.5, fg: "50.0%", tp: "25.0%", ft: "65.0%", no: "20", college: "St. John's", img: "" },
+            { id: "bos_11", name: "Payton Pritchard", team: "BOS", pos: "G", ppg: 14.1, rpg: 3.2, apg: 4.3, fg: "46.2%", tp: "40.5%", ft: "88.1%", no: "11", college: "Oregon", img: "" },
+            { id: "bos_88", name: "Neemias Queta", team: "BOS", pos: "C", ppg: 6.8, rpg: 5.5, apg: 0.8, fg: "58.0%", tp: "0.0%", ft: "64.0%", no: "88", college: "Utah State", img: "" },
+            { id: "bos_4", name: "Mitchell Robinson", team: "BOS", pos: "F/C", ppg: 7.5, rpg: 8.2, apg: 0.5, fg: "68.0%", tp: "0.0%", ft: "55.0%", no: "4", college: "Chalmette HS", img: "" },
+            { id: "bos_55", name: "Baylor Scheierman", team: "BOS", pos: "G", ppg: 6.2, rpg: 2.4, apg: 1.1, fg: "42.0%", tp: "37.0%", ft: "80.0%", no: "55", college: "Creighton", img: "" },
             { id: "bos_0", name: "Jayson Tatum", team: "BOS", pos: "G/F", ppg: 26.9, rpg: 8.1, apg: 4.9, fg: "47.1%", tp: "37.6%", ft: "83.3%", no: "0", college: "Duke", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1628369.png" },
-            { id: "bos_27", name: "Jordan Walsh", team: "BOS", pos: "G", ppg: 4.8, rpg: 2.1, apg: 0.6, fg: "43.0%", tp: "32.0%", ft: "70.0%", no: "27", college: "Arkansas", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
+            { id: "bos_27", name: "Jordan Walsh", team: "BOS", pos: "G", ppg: 4.8, rpg: 2.1, apg: 0.6, fg: "43.0%", tp: "32.0%", ft: "70.0%", no: "27", college: "Arkansas", img: "" },
             { id: "bos_9", name: "Derrick White", team: "BOS", pos: "G", ppg: 15.2, rpg: 4.2, apg: 5.1, fg: "46.1%", tp: "39.5%", ft: "90.1%", no: "9", college: "Colorado", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1628401.png" },
-            { id: "bos_77", name: "Amari Williams", team: "BOS", pos: "F/C", ppg: 3.0, rpg: 2.5, apg: 0.3, fg: "52.0%", tp: "0.0%", ft: "60.0%", no: "77", college: "Kentucky", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-
-            // Brooklyn Nets
-            { id: "bkn_34", name: "Tyler Bilodeau", team: "BKN", pos: "F", ppg: 5.0, rpg: 2.5, apg: 0.5, fg: "46.0%", tp: "34.0%", ft: "75.0%", no: "34", college: "UCLA", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bkn_0", name: "Mikel Brown Jr.", team: "BKN", pos: "G", ppg: 6.2, rpg: 1.8, apg: 2.1, fg: "42.0%", tp: "35.0%", ft: "80.0%", no: "0", college: "Louisville", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bkn_21", name: "Noah Clowney", team: "BKN", pos: "F/C", ppg: 8.8, rpg: 5.2, apg: 0.8, fg: "45.0%", tp: "36.2%", ft: "71.0%", no: "21", college: "Alabama", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bkn_8", name: "Egor Dëmin", team: "BKN", pos: "G", ppg: 7.0, rpg: 2.2, apg: 2.5, fg: "44.0%", tp: "37.0%", ft: "78.0%", no: "8", college: "BYU", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bkn_1", name: "Keon Ellis", team: "BKN", pos: "G", ppg: 8.1, rpg: 2.3, apg: 1.6, fg: "46.5%", tp: "41.1%", ft: "79.0%", no: "1", college: "Alabama", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bkn_9", name: "Joshua Jefferson", team: "BKN", pos: "F", ppg: 6.5, rpg: 4.0, apg: 1.2, fg: "48.0%", tp: "33.0%", ft: "70.0%", no: "9", college: "Iowa State", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bkn_31", name: "Chaney Johnson", team: "BKN", pos: "G/F", ppg: 4.2, rpg: 2.0, apg: 0.5, fg: "43.0%", tp: "31.0%", ft: "72.0%", no: "31", college: "Auburn", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bkn_14", name: "Terance Mann", team: "BKN", pos: "G/F", ppg: 9.8, rpg: 3.5, apg: 2.1, fg: "50.1%", tp: "35.0%", ft: "77.5%", no: "14", college: "Florida State", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bkn_00", name: "Josh Minott", team: "BKN", pos: "F", ppg: 5.5, rpg: 2.8, apg: 0.6, fg: "47.0%", tp: "32.0%", ft: "68.0%", no: "00", college: "Memphis", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bkn_16", name: "Grant Nelson", team: "BKN", pos: "F", ppg: 5.0, rpg: 3.1, apg: 0.7, fg: "46.0%", tp: "33.0%", ft: "75.0%", no: "16", college: "Alabama", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bkn_17", name: "Michael Porter Jr.", team: "BKN", pos: "G/F", ppg: 17.5, rpg: 7.0, apg: 1.5, fg: "48.2%", tp: "39.8%", ft: "80.0%", no: "17", college: "Missouri", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bkn_4", name: "Drake Powell", team: "BKN", pos: "G/F", ppg: 4.8, rpg: 2.0, apg: 0.8, fg: "43.0%", tp: "30.0%", ft: "70.0%", no: "4", college: "North Carolina", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bkn_30", name: "Julius Randle", team: "BKN", pos: "F/C", ppg: 22.4, rpg: 9.1, apg: 4.8, fg: "47.2%", tp: "33.5%", ft: "78.1%", no: "30", college: "Kentucky", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bkn_77", name: "Ben Saraf", team: "BKN", pos: "G", ppg: 5.2, rpg: 1.5, apg: 2.0, fg: "41.0%", tp: "32.0%", ft: "76.0%", no: "77", college: "Israel", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bkn_20", name: "Day'Ron Sharpe", team: "BKN", pos: "C", ppg: 7.8, rpg: 6.5, apg: 1.1, fg: "57.0%", tp: "15.0%", ft: "61.0%", no: "20", college: "North Carolina", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bkn_10", name: "Nolan Traoré", team: "BKN", pos: "G", ppg: 6.0, rpg: 1.8, apg: 3.2, fg: "42.0%", tp: "34.0%", ft: "79.0%", no: "10", college: "France", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bkn_13", name: "Moritz Wagner", team: "BKN", pos: "F/C", ppg: 10.5, rpg: 4.5, apg: 1.2, fg: "51.0%", tp: "35.1%", ft: "81.0%", no: "13", college: "Michigan", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "bkn_2", name: "Danny Wolf", team: "BKN", pos: "F", ppg: 5.8, rpg: 3.9, apg: 1.0, fg: "46.0%", tp: "36.0%", ft: "74.0%", no: "2", college: "Michigan", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-
-            // New York Knicks
-            { id: "nyk_14", name: "Jaden Akins", team: "NYK", pos: "PG", ppg: 4.5, rpg: 1.5, apg: 1.0, fg: "42.0%", tp: "35.0%", ft: "78.0%", no: "14", college: "Michigan State", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "nyk_5", name: "Jose Alvarado", team: "NYK", pos: "G", ppg: 7.1, rpg: 2.3, apg: 3.0, fg: "43.0%", tp: "36.0%", ft: "82.0%", no: "5", college: "Georgia Tech", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "nyk_8", name: "OG Anunoby", team: "NYK", pos: "G/F", ppg: 14.1, rpg: 4.4, apg: 1.5, fg: "48.9%", tp: "38.2%", ft: "68.2%", no: "8", college: "Indiana", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1628384.png" },
-            { id: "nyk_25", name: "Mikal Bridges", team: "NYK", pos: "G/F", ppg: 19.6, rpg: 4.5, apg: 3.6, fg: "47.6%", tp: "37.2%", ft: "81.4%", no: "25", college: "Villanova", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1628969.png" },
-            { id: "nyk_11", name: "Jalen Brunson", team: "NYK", pos: "G", ppg: 28.4, rpg: 3.6, apg: 6.7, fg: "47.9%", tp: "40.1%", ft: "84.7%", no: "11", college: "Villanova", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1628973.png" },
-            { id: "nyk_00", name: "Jordan Clarkson", team: "NYK", pos: "G", ppg: 14.2, rpg: 2.5, apg: 2.2, fg: "42.0%", tp: "35.0%", ft: "88.0%", no: "00", college: "Missouri", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "nyk_4", name: "Pacôme Dadiet", team: "NYK", pos: "F", ppg: 3.0, rpg: 1.2, apg: 0.4, fg: "40.0%", tp: "33.0%", ft: "75.0%", no: "4", college: "France", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "nyk_51", name: "Mohamed Diawara", team: "NYK", pos: "F", ppg: 2.0, rpg: 0.8, apg: 0.2, fg: "39.0%", tp: "30.0%", ft: "70.0%", no: "51", college: "France", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "nyk_0", name: "Andre Drummond", team: "NYK", pos: "C", ppg: 7.5, rpg: 8.0, apg: 0.5, fg: "55.0%", tp: "0.0%", ft: "60.0%", no: "0", college: "Connecticut", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/203083.png" },
-            { id: "nyk_3", name: "Josh Hart", team: "NYK", pos: "G", ppg: 12.0, rpg: 9.5, apg: 4.0, fg: "40.9%", tp: "33.3%", ft: "66.7%", no: "3", college: "Villanova", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1628404.png" },
-            { id: "nyk_13", name: "Tyler Kolek", team: "NYK", pos: "G", ppg: 3.5, rpg: 1.0, apg: 1.8, fg: "42.0%", tp: "35.0%", ft: "80.0%", no: "13", college: "Marquette", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "nyk_2", name: "Miles McBride", team: "NYK", pos: "G", ppg: 8.3, rpg: 1.5, apg: 1.7, fg: "45.2%", tp: "41.0%", ft: "86.0%", no: "2", college: "West Virginia", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1630540.png" },
-            { id: "nyk_9", name: "Kevin McCullar Jr.", team: "NYK", pos: "G", ppg: 3.0, rpg: 1.2, apg: 0.5, fg: "40.0%", tp: "32.0%", ft: "75.0%", no: "9", college: "Kansas", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "nyk_55", name: "Tyler Nickel", team: "NYK", pos: "F", ppg: 2.8, rpg: 1.0, apg: 0.3, fg: "41.0%", tp: "36.0%", ft: "78.0%", no: "55", college: "Vanderbilt", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "nyk_44", name: "Landry Shamet", team: "NYK", pos: "G", ppg: 6.5, rpg: 1.5, apg: 1.1, fg: "41.0%", tp: "39.0%", ft: "85.0%", no: "44", college: "Wichita State", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "nyk_32", name: "Karl-Anthony Towns", team: "NYK", pos: "F/C", ppg: 21.8, rpg: 10.2, apg: 3.0, fg: "52.8%", tp: "41.6%", ft: "87.3%", no: "32", college: "Kentucky", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1626157.png" },
-            { id: "nyk_35", name: "James Wiseman", team: "NYK", pos: "C", ppg: 6.0, rpg: 5.0, apg: 0.5, fg: "54.0%", tp: "20.0%", ft: "65.0%", no: "35", college: "Memphis", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
+            { id: "bos_77", name: "Amari Williams", team: "BOS", pos: "F/C", ppg: 3.0, rpg: 2.5, apg: 0.3, fg: "52.0%", tp: "0.0%", ft: "60.0%", no: "77", college: "Kentucky", img: "" },
 
             // Philadelphia 76ers
-            { id: "phi_25", name: "Dominick Barlow", team: "PHI", pos: "F", ppg: 4.5, rpg: 2.8, apg: 0.6, fg: "52.0%", tp: "25.0%", ft: "70.0%", no: "25", college: "Saint Joseph's", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "phi_30", name: "Adem Bona", team: "PHI", pos: "F/C", ppg: 2.5, rpg: 2.0, apg: 0.3, fg: "58.0%", tp: "0.0%", ft: "60.0%", no: "30", college: "UCLA", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
+            { id: "phi_25", name: "Dominick Barlow", team: "PHI", pos: "F", ppg: 4.5, rpg: 2.8, apg: 0.6, fg: "52.0%", tp: "25.0%", ft: "70.0%", no: "25", college: "Saint Joseph's", img: "" },
+            { id: "phi_30", name: "Adem Bona", team: "PHI", pos: "F/C", ppg: 2.5, rpg: 2.0, apg: 0.3, fg: "58.0%", tp: "0.0%", ft: "60.0%", no: "30", college: "UCLA", img: "" },
             { id: "phi_7", name: "Jaylen Brown", team: "PHI", pos: "G/F", ppg: 23.0, rpg: 5.5, apg: 3.6, fg: "49.9%", tp: "35.4%", ft: "70.3%", no: "7", college: "California", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1627759.png" },
-            { id: "phi_1", name: "Kentavious Caldwell-Pope", team: "PHI", pos: "G", ppg: 10.1, rpg: 2.4, apg: 1.8, fg: "44.0%", tp: "39.2%", ft: "87.0%", no: "1", college: "Georgia", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "phi_77", name: "V. J. Edgecombe", team: "PHI", pos: "G", ppg: 9.0, rpg: 2.5, apg: 1.5, fg: "45.0%", tp: "35.0%", ft: "80.0%", no: "77", college: "Baylor", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "phi_11", name: "Justin Edwards", team: "PHI", pos: "F", ppg: 4.0, rpg: 1.5, apg: 0.5, fg: "42.0%", tp: "34.0%", ft: "75.0%", no: "11", college: "Kentucky", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
+            { id: "phi_1", name: "Kentavious Caldwell-Pope", team: "PHI", pos: "G", ppg: 10.1, rpg: 2.4, apg: 1.8, fg: "44.0%", tp: "39.2%", ft: "87.0%", no: "1", college: "Georgia", img: "" },
+            { id: "phi_77", name: "V. J. Edgecombe", team: "PHI", pos: "G", ppg: 9.0, rpg: 2.5, apg: 1.5, fg: "45.0%", tp: "35.0%", ft: "80.0%", no: "77", college: "Baylor", img: "" },
+            { id: "phi_11", name: "Justin Edwards", team: "PHI", pos: "F", ppg: 4.0, rpg: 1.5, apg: 0.5, fg: "42.0%", tp: "34.0%", ft: "75.0%", no: "11", college: "Kentucky", img: "" },
             { id: "phi_21", name: "Joel Embiid", team: "PHI", pos: "C", ppg: 34.7, rpg: 11.0, apg: 5.6, fg: "52.9%", tp: "38.8%", ft: "88.3%", no: "21", college: "Kansas", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/203954.png" },
-            { id: "phi_55", name: "Ariel Hukporti", team: "PHI", pos: "C", ppg: 4.2, rpg: 3.8, apg: 0.4, fg: "56.0%", tp: "0.0%", ft: "62.0%", no: "55", college: "Germany", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
+            { id: "phi_55", name: "Ariel Hukporti", team: "PHI", pos: "C", ppg: 4.2, rpg: 3.8, apg: 0.4, fg: "56.0%", tp: "0.0%", ft: "62.0%", no: "55", college: "Germany", img: "" },
             { id: "phi_23", name: "LeBron James", team: "PHI", pos: "F", ppg: 25.4, rpg: 7.3, apg: 8.2, fg: "52.4%", tp: "39.1%", ft: "76.5%", no: "23", college: "St. Vincent-St. Mary HS", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "phi_8", name: "Caleb Love", team: "PHI", pos: "G", ppg: 6.5, rpg: 1.8, apg: 1.5, fg: "40.0%", tp: "33.5%", ft: "79.0%", no: "8", college: "Arizona", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
+            { id: "phi_8", name: "Caleb Love", team: "PHI", pos: "G", ppg: 6.5, rpg: 1.8, apg: 1.5, fg: "40.0%", tp: "33.5%", ft: "79.0%", no: "8", college: "Arizona", img: "" },
             { id: "phi_0", name: "Tyrese Maxey", team: "PHI", pos: "G", ppg: 25.9, rpg: 3.7, apg: 6.2, fg: "45.0%", tp: "37.3%", ft: "86.8%", no: "0", college: "Kentucky", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1630178.png" },
-            { id: "phi_00", name: "Labaron Philon Jr.", team: "PHI", pos: "G", ppg: 5.0, rpg: 1.2, apg: 2.0, fg: "43.0%", tp: "34.0%", ft: "81.0%", no: "00", college: "Alabama", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "phi_12", name: "Rayan Rupert", team: "PHI", pos: "G/F", ppg: 4.1, rpg: 1.9, apg: 0.8, fg: "41.0%", tp: "32.0%", ft: "74.0%", no: "12", college: "France", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "phi_5", name: "Anfernee Simons", team: "PHI", pos: "G", ppg: 19.3, rpg: 2.6, apg: 4.5, fg: "43.0%", tp: "38.5%", ft: "91.2%", no: "5", college: "IMG Academy", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "phi_45", name: "Dean Wade", team: "PHI", pos: "F/C", ppg: 5.4, rpg: 3.2, apg: 1.0, fg: "45.0%", tp: "39.0%", ft: "75.0%", no: "45", college: "Kansas State", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "phi_33", name: "Jabari Walker", team: "PHI", pos: "F", ppg: 7.8, rpg: 4.8, apg: 0.8, fg: "46.0%", tp: "33.0%", ft: "75.0%", no: "33", college: "Colorado", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-
-            // Denver Nuggets
-            { id: "den_3", name: "Marvin Bagley III", team: "DEN", pos: "F", ppg: 10.2, rpg: 6.1, apg: 0.9, fg: "53.2%", tp: "28.0%", ft: "68.5%", no: "3", college: "Duke", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "den_0", name: "Christian Braun", team: "DEN", pos: "G", ppg: 11.5, rpg: 4.5, apg: 2.1, fg: "51.0%", tp: "38.4%", ft: "81.0%", no: "0", college: "Kansas", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "den_7", name: "Trevon Brazile", team: "DEN", pos: "F", ppg: 4.8, rpg: 3.1, apg: 0.4, fg: "47.0%", tp: "34.0%", ft: "70.0%", no: "7", college: "Arkansas", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "den_10", name: "DeMar DeRozan", team: "DEN", pos: "G/F", ppg: 23.4, rpg: 4.2, apg: 5.1, fg: "48.5%", tp: "33.2%", ft: "85.6%", no: "10", college: "USC", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "den_11", name: "Alpha Diallo", team: "DEN", pos: "G", ppg: 5.0, rpg: 2.2, apg: 1.1, fg: "43.0%", tp: "33.0%", ft: "75.0%", no: "11", college: "Providence", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "den_32", name: "Aaron Gordon", team: "DEN", pos: "F", ppg: 14.1, rpg: 6.5, apg: 3.2, fg: "55.6%", tp: "32.1%", ft: "65.0%", no: "32", college: "Arizona", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "den_14", name: "DaRon Holmes II", team: "DEN", pos: "F", ppg: 7.0, rpg: 4.0, apg: 1.0, fg: "50.0%", tp: "35.0%", ft: "72.0%", no: "14", college: "Dayton", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "den_13", name: "Bryce Hopkins", team: "DEN", pos: "F", ppg: 3.5, rpg: 2.0, apg: 0.4, fg: "41.0%", tp: "30.0%", ft: "70.0%", no: "13", college: "St. John's", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "den_23", name: "Cameron Johnson", team: "DEN", pos: "F", ppg: 14.2, rpg: 4.3, apg: 2.1, fg: "45.5%", tp: "39.5%", ft: "86.0%", no: "23", college: "North Carolina", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "den_15", name: "Nikola Jokić", team: "DEN", pos: "C", ppg: 26.4, rpg: 12.4, apg: 9.0, fg: "58.3%", tp: "35.9%", ft: "81.7%", no: "15", college: "Serbia", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "den_21", name: "Spencer Jones", team: "DEN", pos: "F", ppg: 4.0, rpg: 1.8, apg: 0.5, fg: "42.0%", tp: "37.0%", ft: "75.0%", no: "21", college: "Stanford", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "den_5", name: "Tyus Jones", team: "DEN", pos: "G", ppg: 9.8, rpg: 2.3, apg: 6.2, fg: "49.1%", tp: "41.0%", ft: "88.5%", no: "5", college: "Duke", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "den_27", name: "Jamal Murray", team: "DEN", pos: "G", ppg: 21.2, rpg: 4.1, apg: 6.5, fg: "45.2%", tp: "40.2%", ft: "83.3%", no: "27", college: "Kentucky", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "den_9", name: "Ryan Nembhard", team: "DEN", pos: "G", ppg: 3.2, rpg: 1.0, apg: 2.1, fg: "40.0%", tp: "33.0%", ft: "80.0%", no: "9", college: "Gonzaga", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "den_22", name: "Zeke Nnaji", team: "DEN", pos: "F/C", ppg: 4.1, rpg: 2.5, apg: 0.4, fg: "50.0%", tp: "31.0%", ft: "68.0%", no: "22", college: "Arizona", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "den_1", name: "Julian Strawther", team: "DEN", pos: "G", ppg: 7.5, rpg: 2.1, apg: 1.0, fg: "43.5%", tp: "37.5%", ft: "82.0%", no: "1", college: "Gonzaga", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "den_00", name: "Cam Whitmore", team: "DEN", pos: "F", ppg: 11.0, rpg: 3.8, apg: 0.8, fg: "44.5%", tp: "35.2%", ft: "71.0%", no: "00", college: "Villanova", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
+            { id: "phi_00", name: "Labaron Philon Jr.", team: "PHI", pos: "G", ppg: 5.0, rpg: 1.2, apg: 2.0, fg: "43.0%", tp: "34.0%", ft: "81.0%", no: "00", college: "Alabama", img: "" },
+            { id: "phi_12", name: "Rayan Rupert", team: "PHI", pos: "G/F", ppg: 4.1, rpg: 1.9, apg: 0.8, fg: "41.0%", tp: "32.0%", ft: "74.0%", no: "12", college: "France", img: "" },
+            { id: "phi_5", name: "Anfernee Simons", team: "PHI", pos: "G", ppg: 19.3, rpg: 2.6, apg: 4.5, fg: "43.0%", tp: "38.5%", ft: "91.2%", no: "5", college: "IMG Academy", img: "" },
+            { id: "phi_45", name: "Dean Wade", team: "PHI", pos: "F/C", ppg: 5.4, rpg: 3.2, apg: 1.0, fg: "45.0%", tp: "39.0%", ft: "75.0%", no: "45", college: "Kansas State", img: "" },
+            { id: "phi_33", name: "Jabari Walker", team: "PHI", pos: "F", ppg: 7.8, rpg: 4.8, apg: 0.8, fg: "46.0%", tp: "33.0%", ft: "75.0%", no: "33", college: "Colorado", img: "" },
 
             // Los Angeles Lakers
-            { id: "lal_43", name: "Cameron Carr", team: "LAL", pos: "G", ppg: 3.5, rpg: 1.0, apg: 0.5, fg: "41.0%", tp: "34.0%", ft: "75.0%", no: "43", college: "Baylor", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "lal_77", name: "Luka Dončić", team: "LAL", pos: "G", ppg: 33.9, rpg: 9.2, apg: 9.8, fg: "48.7%", tp: "38.2%", ft: "78.6%", no: "77", college: "Slovenia", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
-            { id: "lal_5", name: "Quentin Grimes", team: "LAL", pos: "G", ppg: 9.1, rpg: 2.5, apg: 1.5, fg: "43.0%", tp: "37.1%", ft: "81.0%", no: "5", college: "Houston", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
+            { id: "lal_43", name: "Cameron Carr", team: "LAL", pos: "G", ppg: 3.5, rpg: 1.0, apg: 0.5, fg: "41.0%", tp: "34.0%", ft: "75.0%", no: "43", college: "Baylor", img: "" },
+            { id: "lal_77", name: "Luka Dončić", team: "LAL", pos: "G", ppg: 33.9, rpg: 9.2, apg: 9.8, fg: "48.7%", tp: "38.2%", ft: "78.6%", no: "77", college: "Slovenia", img: "" },
+            { id: "lal_5", name: "Quentin Grimes", team: "LAL", pos: "G", ppg: 9.1, rpg: 2.5, apg: 1.5, fg: "43.0%", tp: "37.1%", ft: "81.0%", no: "5", college: "Houston", img: "" },
             { id: "lal_11", name: "Jaxson Hayes", team: "LAL", pos: "C", ppg: 4.3, rpg: 3.0, apg: 0.5, fg: "72.0%", tp: "0.0%", ft: "62.2%", no: "11", college: "Texas", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1629637.png" },
             { id: "lal_9", name: "Bronny James", team: "LAL", pos: "G", ppg: 2.1, rpg: 0.5, apg: 0.8, fg: "31.2%", tp: "18.5%", ft: "66.0%", no: "9", college: "USC", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1642295.png" },
             { id: "lal_4", name: "Dalton Knecht", team: "LAL", pos: "G", ppg: 9.5, rpg: 2.5, apg: 1.0, fg: "45.0%", tp: "39.2%", ft: "81.0%", no: "4", college: "Tennessee", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1642261.png" },
@@ -359,10 +300,9 @@
             { id: "lal_1", name: "D'Angelo Russell", team: "LAL", pos: "G", ppg: 18.0, rpg: 3.1, apg: 6.3, fg: "45.6%", tp: "41.5%", ft: "82.8%", no: "1", college: "Ohio State", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1626156.png" }
         ];
 
-        // Ensure all remaining teams have default 15 players if not fully explicit
+        // Populate fallback 15-man roster data for remaining teams to ensure smooth navigation
         Object.keys(teamsData).forEach(code => {
             const existing = playersDatabase.filter(p => p.team === code);
-            const teamInfo = teamsData[code];
             const sampleNames = [
                 "Marcus Howard", "Julian Wright", "Trey Burke", "Dante Cunningham", "Will Barton",
                 "Stanley Johnson", "D.J. Augustin", "Ben McLemore", "Ish Smith", "Austin Rivers",
@@ -384,10 +324,80 @@
                     ft: "78.4%",
                     no: String(10 + i),
                     college: "NCAA",
-                    img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png"
+                    img: ""
                 });
             }
         });
+
+        // Comprehensive 2026-27 NBA Schedule Database mapped by date
+        const scheduleDatabase = {
+            "2026-10-20": [
+                { id: "g_1020_1", status: "FINAL", time: "3:00 PM", home: "DET", away: "BOS", homeScore: 121, awayScore: 113, arena: "Little Caesars Arena, Detroit" },
+                { id: "g_1020_2", status: "FINAL", time: "7:00 PM", home: "NYK", away: "PHI", homeScore: 100, awayScore: 106, arena: "Madison Square Garden, New York" },
+                { id: "g_1020_3", status: "FINAL", time: "9:30 PM", home: "SAS", away: "OKC", homeScore: 104, awayScore: 116, arena: "Frost Bank Center, San Antonio" }
+            ],
+            "2026-10-21": [
+                { id: "g_1021_1", status: "FINAL", time: "7:00 PM", home: "WAS", away: "MIL", homeScore: 128, awayScore: 116, arena: "Capital One Arena, Washington" },
+                { id: "g_1021_2", status: "FINAL", time: "7:00 PM", home: "ORL", away: "ATL", homeScore: 125, awayScore: 132, arena: "Kia Center, Orlando" },
+                { id: "g_1021_3", status: "FINAL", time: "7:30 PM", home: "BKN", away: "CHA", homeScore: 103, awayScore: 110, arena: "Barclays Center, New York" },
+                { id: "g_1021_4", status: "FINAL", time: "7:30 PM", home: "TOR", away: "CHI", homeScore: 135, awayScore: 92, arena: "Scotiabank Arena, Toronto" },
+                { id: "g_1021_5", status: "FINAL", time: "7:30 PM", home: "MIA", away: "MIN", homeScore: 106, awayScore: 131, arena: "Kaseya Center, Miami" },
+                { id: "g_1021_6", status: "FINAL", time: "8:00 PM", home: "MEM", away: "UTA", homeScore: 123, awayScore: 103, arena: "FedExForum, Memphis" },
+                { id: "g_1021_7", status: "FINAL", time: "8:00 PM", home: "NOP", away: "IND", homeScore: 120, awayScore: 123, arena: "Smoothie King Center, New Orleans" },
+                { id: "g_1021_8", status: "FINAL", time: "8:30 PM", home: "HOU", away: "DAL", homeScore: 128, awayScore: 110, arena: "Toyota Center, Houston" },
+                { id: "g_1021_9", status: "FINAL", time: "10:00 PM", home: "LAL", away: "GSW", homeScore: 127, awayScore: 105, arena: "Crypto.com Arena, Los Angeles" },
+                { id: "g_1021_10", status: "FINAL", time: "10:00 PM", home: "POR", away: "PHX", homeScore: 124, awayScore: 83, arena: "Moda Center, Portland" },
+                { id: "g_1021_11", status: "FINAL", time: "10:30 PM", home: "LAC", away: "SAC", homeScore: 121, awayScore: 96, arena: "Intuit Dome, Inglewood" }
+            ],
+            "2026-10-22": [
+                { id: "g_1022_1", status: "FINAL", time: "7:00 PM", home: "PHI", away: "CLE", homeScore: 114, awayScore: 106, arena: "Xfinity Mobile Arena, Philadelphia" },
+                { id: "g_1022_2", status: "FINAL", time: "9:30 PM", home: "OKC", away: "DEN", homeScore: 96, awayScore: 84, arena: "Paycom Center, Oklahoma City" }
+            ],
+            "2026-10-23": [
+                { id: "g_1023_1", status: "FINAL", time: "4:00 PM", home: "MIL", away: "CHI", homeScore: 125, awayScore: 132, arena: "Fiserv Forum, Milwaukee" },
+                { id: "g_1023_2", status: "FINAL", time: "7:00 PM", home: "WAS", away: "TOR", homeScore: 102, awayScore: 112, arena: "Capital One Arena, Washington" },
+                { id: "g_1023_3", status: "FINAL", time: "7:00 PM", home: "ORL", away: "MIN", homeScore: 93, awayScore: 115, arena: "Kia Center, Orlando" },
+                { id: "g_1023_4", status: "FINAL", time: "7:00 PM", home: "CHA", away: "ATL", homeScore: 81, awayScore: 128, arena: "Spectrum Center, Charlotte" },
+                { id: "g_1023_5", status: "FINAL", time: "7:00 PM", home: "BOS", away: "NYK", homeScore: 107, awayScore: 103, arena: "TD Garden, Boston" },
+                { id: "g_1023_6", status: "FINAL", time: "7:00 PM", home: "IND", away: "DAL", homeScore: 105, awayScore: 121, arena: "Gainbridge Fieldhouse, Indianapolis" },
+                { id: "g_1023_7", status: "FINAL", time: "8:00 PM", home: "MIA", away: "DET", homeScore: 111, awayScore: 128, arena: "Kaseya Center, Miami" },
+                { id: "g_1023_8", status: "FINAL", time: "9:30 PM", home: "SAS", away: "HOU", homeScore: 110, awayScore: 114, arena: "Moody Center, Austin" },
+                { id: "g_1023_9", status: "FINAL", time: "9:30 PM", home: "UTA", away: "NOP", homeScore: 120, awayScore: 119, arena: "Delta Center, Salt Lake City" },
+                { id: "g_1023_10", status: "FINAL", time: "10:00 PM", home: "LAL", away: "LAC", homeScore: 125, awayScore: 117, arena: "Crypto.com Arena, Los Angeles" },
+                { id: "g_1023_11", status: "FINAL", time: "10:00 PM", home: "GSW", away: "MEM", homeScore: 108, awayScore: 111, arena: "Chase Center, San Francisco" },
+                { id: "g_1023_12", status: "FINAL", time: "10:00 PM", home: "SAC", away: "POR", homeScore: 120, awayScore: 128, arena: "Golden 1 Center, Sacramento" }
+            ],
+            "2026-10-24": [
+                { id: "g_1024_1", status: "UPCOMING", time: "6:00 PM", home: "CHA", away: "MIA", homeScore: 0, awayScore: 0, arena: "Spectrum Center, Charlotte" },
+                { id: "g_1024_2", status: "UPCOMING", time: "7:30 PM", home: "PHI", away: "MIL", homeScore: 0, awayScore: 0, arena: "Xfinity Mobile Arena, Philadelphia" },
+                { id: "g_1024_3", status: "UPCOMING", time: "7:30 PM", home: "CLE", away: "BKN", homeScore: 0, awayScore: 0, arena: "Rocket Arena, Cleveland" },
+                { id: "g_1024_4", status: "UPCOMING", time: "8:00 PM", home: "DAL", away: "SAS", homeScore: 0, awayScore: 0, arena: "American Airlines Center, Dallas" },
+                { id: "g_1024_5", status: "UPCOMING", time: "8:00 PM", home: "CHI", away: "WAS", homeScore: 0, awayScore: 0, arena: "United Center, Chicago" },
+                { id: "g_1024_6", status: "UPCOMING", time: "8:30 PM", home: "ATL", away: "HOU", homeScore: 0, awayScore: 0, arena: "State Farm Arena, Atlanta" },
+                { id: "g_1024_7", status: "UPCOMING", time: "9:00 PM", home: "DEN", away: "NOP", homeScore: 0, awayScore: 0, arena: "Ball Arena, Denver" },
+                { id: "g_1024_8", status: "UPCOMING", time: "10:00 PM", home: "PHX", away: "GSW", homeScore: 0, awayScore: 0, arena: "Mortgage Matchup Center, Phoenix" }
+            ],
+            "2026-10-25": [
+                { id: "g_1025_1", status: "UPCOMING", time: "5:00 PM", home: "UTA", away: "LAL", homeScore: 0, awayScore: 0, arena: "Delta Center, Salt Lake City" },
+                { id: "g_1025_2", status: "UPCOMING", time: "6:00 PM", home: "BKN", away: "IND", homeScore: 0, awayScore: 0, arena: "Barclays Center, New York" },
+                { id: "g_1025_3", status: "UPCOMING", time: "7:00 PM", home: "MIN", away: "TOR", homeScore: 0, awayScore: 0, arena: "Target Center, Minneapolis" },
+                { id: "g_1025_4", status: "UPCOMING", time: "7:00 PM", home: "NYK", away: "ORL", homeScore: 0, awayScore: 0, arena: "Madison Square Garden, New York" },
+                { id: "g_1025_5", status: "UPCOMING", time: "7:00 PM", home: "OKC", away: "LAC", homeScore: 0, awayScore: 0, arena: "Paycom Center, Oklahoma City" },
+                { id: "g_1025_6", status: "UPCOMING", time: "7:30 PM", home: "PHI", away: "DET", homeScore: 0, awayScore: 0, arena: "Xfinity Mobile Arena, Philadelphia" },
+                { id: "g_1025_7", status: "UPCOMING", time: "9:00 PM", home: "SAC", away: "MEM", homeScore: 0, awayScore: 0, arena: "Golden 1 Center, Sacramento" }
+            ],
+            "2026-10-26": [
+                { id: "g_1026_1", status: "UPCOMING", time: "7:00 PM", home: "CLE", away: "MIN", homeScore: 0, awayScore: 0, arena: "Rocket Arena, Cleveland" },
+                { id: "g_1026_2", status: "UPCOMING", time: "7:00 PM", home: "CHA", away: "WAS", homeScore: 0, awayScore: 0, arena: "Spectrum Center, Charlotte" },
+                { id: "g_1026_3", status: "UPCOMING", time: "7:30 PM", home: "MIA", away: "DAL", homeScore: 0, awayScore: 0, arena: "Kaseya Center, Miami" },
+                { id: "g_1026_4", status: "UPCOMING", time: "7:30 PM", home: "BOS", away: "CHI", homeScore: 0, awayScore: 0, arena: "TD Garden, Boston" },
+                { id: "g_1026_5", status: "UPCOMING", time: "8:00 PM", home: "MIL", away: "IND", homeScore: 0, awayScore: 0, arena: "Fiserv Forum, Milwaukee" },
+                { id: "g_1026_6", status: "UPCOMING", time: "8:00 PM", home: "OKC", away: "PHX", homeScore: 0, awayScore: 0, arena: "Paycom Center, Oklahoma City" },
+                { id: "g_1026_7", status: "UPCOMING", time: "8:30 PM", home: "HOU", away: "ATL", homeScore: 0, awayScore: 0, arena: "Toyota Center, Houston" },
+                { id: "g_1026_8", status: "UPCOMING", time: "9:00 PM", home: "UTA", away: "MEM", homeScore: 0, awayScore: 0, arena: "Delta Center, Salt Lake City" },
+                { id: "g_1026_9", status: "UPCOMING", time: "10:00 PM", home: "DEN", away: "GSW", homeScore: 0, awayScore: 0, arena: "Ball Arena, Denver" }
+            ]
+        };
 
         // Synchronized Standings Data for 2026-27 Season
         const standingsData = {
@@ -468,15 +478,7 @@
         }
 
         function getGamesForDate(dateStr) {
-            const scheduleMap = {
-                "2026-10-25": [
-                    { id: "g1_25", status: "UPCOMING", time: "5:00 PM", home: "UTA", away: "LAL", homeScore: 0, awayScore: 0, arena: "Delta Center, Salt Lake City" },
-                    { id: "g2_25", status: "UPCOMING", time: "6:00 PM", home: "BKN", away: "IND", homeScore: 0, awayScore: 0, arena: "Barclays Center, New York" },
-                    { id: "g3_25", status: "UPCOMING", time: "7:00 PM", home: "MIN", away: "TOR", homeScore: 0, awayScore: 0, arena: "Target Center, Minneapolis" },
-                    { id: "g4_25", status: "UPCOMING", time: "7:00 PM", home: "NYK", away: "ORL", homeScore: 0, awayScore: 0, arena: "Madison Square Garden, New York" }
-                ]
-            };
-            return scheduleMap[dateStr] || [
+            return scheduleDatabase[dateStr] || [
                 { id: "g_def", status: "UPCOMING", time: "7:30 PM", home: "NYK", away: "BOS", homeScore: 0, awayScore: 0, arena: "Madison Square Garden, New York" }
             ];
         }
@@ -493,6 +495,11 @@
             const games = getGamesForDate(currentDate);
             const filtered = games.filter(g => currentFilter === 'ALL' || (currentFilter === 'LIVE' && g.status === 'LIVE'));
 
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 bg-slate-900/40 rounded-2xl border border-slate-800">No scheduled games found for ${currentDate}.</div>`;
+                return;
+            }
+
             container.innerHTML = filtered.map(g => {
                 const homeT = teamsData[g.home] || { name: g.home, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
                 const awayT = teamsData[g.away] || { name: g.away, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
@@ -502,8 +509,8 @@
                 return `
                     <div onclick="openBoxScore('${g.id}')" class="bg-slate-900/80 border border-slate-800 hover:border-slate-700 rounded-2xl p-5 shadow-xl cursor-pointer transition-all hover:scale-[1.01] group space-y-4">
                         <div class="flex items-center justify-between text-xs">
-                            <span class="font-semibold text-slate-400 flex items-center">
-                                <i class="fa-solid fa-location-dot text-orange-500 mr-1.5"></i>${g.arena}
+                            <span class="font-semibold text-slate-400 flex items-center truncate max-w-[200px]">
+                                <i class="fa-solid fa-location-dot text-orange-500 mr-1.5 shrink-0"></i>${g.arena}
                             </span>
                             <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] tracking-wider uppercase ${isLive ? 'bg-red-950 text-red-400 border border-red-800 animate-pulse' : isFinal ? 'bg-slate-800 text-slate-300' : 'bg-orange-950 text-orange-400 border border-orange-800'}">
                                 ${g.time}
@@ -576,7 +583,7 @@
             tbody.innerHTML = filtered.map(p => `
                 <tr class="hover:bg-slate-800/40 transition-all cursor-pointer" onclick="openPlayerModal('${p.id}')">
                     <td class="py-3 px-4 flex items-center space-x-3">
-                        <img src="${p.img}" class="w-9 h-9 rounded-lg object-cover bg-slate-950 border border-slate-700" onerror="this.src='https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png'">
+                        ${p.img ? `<img src="${p.img}" class="w-9 h-9 rounded-lg object-cover bg-slate-950 border border-slate-700" onerror="this.style.display='none'">` : `<div class="w-9 h-9 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center text-slate-600 text-xs font-bold"><i class="fa-solid fa-user"></i></div>`}
                         <span class="font-bold text-white hover:text-orange-400">#${p.no} ${p.name}</span>
                     </td>
                     <td class="py-3 px-4 text-slate-300 font-semibold">${p.team}</td>
@@ -616,8 +623,13 @@
         }
 
         function renderBoxScoreContent() {
-            const games = getGamesForDate(currentDate);
-            const game = games.find(g => g.id === activeGameId) || games[0];
+            let game = null;
+            Object.values(scheduleDatabase).forEach(dayGames => {
+                const found = dayGames.find(g => g.id === activeGameId);
+                if (found) game = found;
+            });
+            if (!game) game = getGamesForDate(currentDate)[0];
+
             const homeT = teamsData[game.home] || { name: game.home, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
             const awayT = teamsData[game.away] || { name: game.away, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
             const isUpcoming = game.status === 'UPCOMING';
@@ -631,18 +643,19 @@
                 content.innerHTML = `
                     <div class="space-y-6">
                         <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 text-center space-y-4">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold uppercase bg-orange-950 text-orange-400 border border-orange-800">UPCOMING GAME - ${game.time}</span>
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-3">
-                                    <img src="${awayT.logo}" class="w-12 h-12 object-contain">
-                                    <h4 class="font-bold text-white text-base">${awayT.name}</h4>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold uppercase bg-orange-950 text-orange-400 border border-orange-800">UPCOMING GAME &bull; ${game.time}</span>
+                            <div class="flex items-center justify-between max-w-md mx-auto">
+                                <div class="flex flex-col items-center space-y-2">
+                                    <img src="${awayT.logo}" class="w-16 h-16 object-contain">
+                                    <h4 class="font-bold text-white text-sm">${awayT.name}</h4>
                                 </div>
-                                <span class="text-xl font-bold text-slate-400">VS</span>
-                                <div class="flex items-center space-x-3">
-                                    <h4 class="font-bold text-white text-base">${homeT.name}</h4>
-                                    <img src="${homeT.logo}" class="w-12 h-12 object-contain">
+                                <span class="text-2xl font-black font-teko text-slate-500">VS</span>
+                                <div class="flex flex-col items-center space-y-2">
+                                    <img src="${homeT.logo}" class="w-16 h-16 object-contain">
+                                    <h4 class="font-bold text-white text-sm">${homeT.name}</h4>
                                 </div>
                             </div>
+                            <p class="text-xs text-slate-400">Location: ${game.arena}</p>
                         </div>
                     </div>
                 `;
@@ -715,7 +728,7 @@
                     <div class="space-y-6">
                         <div class="space-y-3">
                             <h4 class="text-xs font-bold uppercase tracking-wider text-orange-400 flex items-center">
-                                <img src="${awayT.logo}" class="w-4 h-4 mr-2 object-contain">${awayT.name} Complete Full 15-Man Box Score (${awayPlayers.length} Players)
+                                <img src="${awayT.logo}" class="w-4 h-4 mr-2 object-contain">${awayT.name} Roster Box Score (${awayPlayers.length} Players)
                             </h4>
                             <div class="overflow-x-auto bg-slate-950 rounded-xl border border-slate-800">
                                 <table class="w-full text-left text-xs">
@@ -729,7 +742,7 @@
 
                         <div class="space-y-3">
                             <h4 class="text-xs font-bold uppercase tracking-wider text-orange-400 flex items-center">
-                                <img src="${homeT.logo}" class="w-4 h-4 mr-2 object-contain">${homeT.name} Complete Full 15-Man Box Score (${homePlayers.length} Players)
+                                <img src="${homeT.logo}" class="w-4 h-4 mr-2 object-contain">${homeT.name} Roster Box Score (${homePlayers.length} Players)
                             </h4>
                             <div class="overflow-x-auto bg-slate-950 rounded-xl border border-slate-800">
                                 <table class="w-full text-left text-xs">
@@ -748,11 +761,11 @@
         function openPlayerModal(playerId) {
             let p = playersDatabase.find(x => x.id === playerId);
             if(!p) {
-                p = { name: playerId, team: "NBA", pos: "G", ppg: "15.0", rpg: "4.0", apg: "4.0", no: "0", college: "NBA", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" };
+                p = { name: playerId, team: "NBA", pos: "G", ppg: "15.0", rpg: "4.0", apg: "4.0", no: "0", college: "NBA", img: "" };
             }
             document.getElementById("player-modal-content").innerHTML = `
                 <div class="flex items-center space-x-5 bg-slate-950 p-5 rounded-2xl border border-slate-800">
-                    <img src="${p.img}" class="w-24 h-24 rounded-2xl object-cover bg-slate-900 border-2 border-orange-500" onerror="this.src='https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png'">
+                    ${p.img ? `<img src="${p.img}" class="w-24 h-24 rounded-2xl object-cover bg-slate-900 border-2 border-orange-500" onerror="this.style.display='none'">` : `<div class="w-24 h-24 rounded-2xl bg-slate-900 border-2 border-orange-500 flex items-center justify-center text-slate-500 text-2xl"><i class="fa-solid fa-user"></i></div>`}
                     <div>
                         <span class="text-xs font-bold uppercase text-orange-400">#${p.no} &bull; ${p.pos}</span>
                         <h3 class="text-2xl font-black text-white">${p.name}</h3>
