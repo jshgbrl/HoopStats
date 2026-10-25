@@ -663,7 +663,66 @@
             }
         }
 
-        // ================= QUICK TEXT / CSV PASTE IMPORTER (WITH DNP SUPPORT) =================
+        // ================= DELETE INDIVIDUAL PLAYER FROM BOX SCORE SNAPSHOT =================
+        function deleteSnapshotPlayer(gameId, snapshotPlayerId) {
+            if (!confirm("Are you sure you want to delete this player entry from the box score?")) return;
+
+            let targetGame = null;
+            Object.values(scheduleDatabase).forEach(dayGames => {
+                const found = dayGames.find(g => g.id === gameId);
+                if (found) targetGame = found;
+            });
+
+            if (!targetGame || !targetGame.boxscoreSnapshots) return;
+
+            // Remove player stats from global player totals & games played count
+            let removedData = targetGame.boxscoreSnapshots[snapshotPlayerId];
+            if (removedData && removedData.role !== 'DNP') {
+                let pRecord = playersDatabase.find(p => p.id === snapshotPlayerId);
+                if (pRecord) {
+                    pRecord.gamesPlayed = Math.max(0, (pRecord.gamesPlayed || 1) - 1);
+                    pRecord.totalPts = Math.max(0, (pRecord.totalPts || 0) - (removedData.pts || 0));
+                    pRecord.totalReb = Math.max(0, (pRecord.totalReb || 0) - (removedData.reb || 0));
+                    pRecord.totalAst = Math.max(0, (pRecord.totalAst || 0) - (removedData.ast || 0));
+                    pRecord.totalBlk = Math.max(0, (pRecord.totalBlk || 0) - (removedData.blk || 0));
+                    pRecord.totalStl = Math.max(0, (pRecord.totalStl || 0) - (removedData.stl || 0));
+
+                    if (pRecord.gamesPlayed > 0) {
+                        pRecord.ppg = parseFloat((pRecord.totalPts / pRecord.gamesPlayed).toFixed(1));
+                        pRecord.rpg = parseFloat((pRecord.totalReb / pRecord.gamesPlayed).toFixed(1));
+                        pRecord.apg = parseFloat((pRecord.totalAst / pRecord.gamesPlayed).toFixed(1));
+                        pRecord.bpg = parseFloat((pRecord.totalBlk / pRecord.gamesPlayed).toFixed(1));
+                        pRecord.spg = parseFloat((pRecord.totalStl / pRecord.gamesPlayed).toFixed(1));
+                    } else {
+                        pRecord.ppg = 0; pRecord.rpg = 0; pRecord.apg = 0; pRecord.bpg = 0; pRecord.spg = 0;
+                    }
+                }
+            }
+
+            delete targetGame.boxscoreSnapshots[snapshotPlayerId];
+
+            // Re-tally team scores
+            let awaySum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.away && p.role !== 'DNP').reduce((acc, curr) => acc + curr.pts, 0);
+            let homeSum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.home && p.role !== 'DNP').reduce((acc, curr) => acc + curr.pts, 0);
+            targetGame.awayScore = awaySum;
+            targetGame.homeScore = homeSum;
+
+            localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
+            localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
+
+            renderBoxScoreContent();
+            renderPlayerTable();
+            renderGames();
+            renderStandings();
+        }
+
+        // ================= PARSE SHOOTING SPLITS (FG, 3PT, FT) =================
+        function parseShootSplit(str) {
+            if (!str || !str.includes('-')) return { made: 0, att: 0 };
+            let parts = str.split('-').map(s => parseInt(s.trim()) || 0);
+            return { made: parts[0], att: parts[1] };
+        }
+
         function processTextPasteImport(gameId) {
             const rawText = document.getElementById(`quick-paste-input-${gameId}`).value.trim();
             const targetTeam = document.getElementById(`quick-paste-team-${gameId}`).value;
@@ -696,29 +755,34 @@
                 if (parts.length >= 2) {
                     let name = parts[0];
                     let rawNo = parts[1] || "#23";
-                    let no = rawNo.replace(/^#+/, ''); // Cleans up ## to single #
+                    let no = rawNo.replace(/^#+/, ''); 
+                    
                     let min = parseInt(parts[2]) || 30;
                     let pts = parseInt(parts[3]) || 0;
-                    let reb = parseInt(parts[4]) || 0;
-                    let ast = parseInt(parts[5]) || 0;
-                    let stl = parseInt(parts[6]) || 0;
-                    let blk = parseInt(parts[7]) || 0;
-                    let to = parseInt(parts[8]) || 1;
-                    let pf = parseInt(parts[9]) || 2;
-                    let plusMinus = parts[10] || "+0";
+                    
+                    let fgSplit = parseShootSplit(parts[4]);
+                    let tpSplit = parseShootSplit(parts[5]);
+                    let ftSplit = parseShootSplit(parts[6]);
+
+                    let reb = parseInt(parts[7]) || 0;
+                    let ast = parseInt(parts[8]) || 0;
+                    let stl = parseInt(parts[9]) || 0;
+                    let blk = parseInt(parts[10]) || 0;
+                    let to = parseInt(parts[11]) || 1;
+                    let pf = parseInt(parts[12]) || 2;
+                    let plusMinus = parts[13] || "+0";
 
                     let playerId = targetTeam.toLowerCase() + "_" + name.toLowerCase().replace(/\s+/g, '_') + "_" + no;
                     
                     let pData = {
                         id: playerId, name: name, team: targetTeam, role: playerRole, pos: "G", no: no,
-                        min: min, pts: pts, fgM: Math.floor(pts/2), fgA: pts, tpM: 2, tpA: 5, ftM: 2, ftA: 2,
+                        min: min, pts: pts, fgM: fgSplit.made, fgA: fgSplit.att, tpM: tpSplit.made, tpA: tpSplit.att, ftM: ftSplit.made, ftA: ftSplit.att,
                         reb: reb, ast: ast, to: to, stl: stl, blk: blk, oreb: 1, dreb: reb > 1 ? reb - 1 : 0, pf: pf, plusMinus: plusMinus
                     };
 
                     targetGame.boxscoreSnapshots[playerId] = pData;
                     importedCount++;
 
-                    // Only count stats for season averages if player actually played (not DNP)
                     if (playerRole !== 'DNP') {
                         let existingPlayer = playersDatabase.find(p => p.id === playerId);
                         if(!existingPlayer) {
@@ -745,7 +809,6 @@
                 }
             });
 
-            // Automatically calculate team scores based on active player points
             let awaySum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.away && p.role !== 'DNP').reduce((acc, curr) => acc + curr.pts, 0);
             let homeSum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.home && p.role !== 'DNP').reduce((acc, curr) => acc + curr.pts, 0);
             if(awaySum > 0) targetGame.awayScore = awaySum;
@@ -941,7 +1004,7 @@
             teamSel.value = "BOS";
         }
 
-        // ================= SMART SURNAME SORTING HELPER (IGNORING "JR.", "SR.", ETC.) =================
+        // ================= SMART SURNAME SORTING (IGNORING "JR.", "SR.", ETC.) =================
         function getPlayerSurname(fullName) {
             if (!fullName) return "";
             let cleaned = fullName.replace(/\b(Jr\.?|Sr\.?|II|III|IV|V)\b/gi, "").trim();
@@ -994,7 +1057,6 @@
             const filterTeamCode = document.getElementById("team-filter-select").value || "BOS";
             const filtered = playersDatabase.filter(p => p.team === filterTeamCode);
 
-            // Sort players alphabetically by their surname (ignoring Jr./Sr.)
             filtered.sort((a, b) => {
                 let surnameA = getPlayerSurname(a.name);
                 let surnameB = getPlayerSurname(b.name);
@@ -1058,8 +1120,8 @@
             });
             if (!game) game = getGamesForDate(currentDate)[0] || { home: "DET", away: "BOS", homeScore: 121, awayScore: 113, gameDate: "2026-10-25", status: "FINAL" };
 
-            const homeT = teamsData[game.home] || { name: game.home, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
-            const awayT = teamsData[game.away] || { name: game.away, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
+            const homeT = teamsData[game.home] || { name: game.home, code: game.home, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
+            const awayT = teamsData[game.away] || { name: game.away, code: game.away, logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" };
 
             document.getElementById("modal-game-title").innerText = `${awayT.name} AT ${homeT.name}`;
             const content = document.getElementById("modal-body-content");
@@ -1071,8 +1133,59 @@
             let snapList = Object.values(snapshots);
 
             if(currentModalTab === 'summary') {
+                // Compute Team Totals for comparison widget
+                let awayPlayers = snapList.filter(p => p.team === game.away && p.role !== 'DNP');
+                let homePlayers = snapList.filter(p => p.team === game.home && p.role !== 'DNP');
+
+                const calcTeamTotals = (pList) => {
+                    let fgM = 0, fgA = 0, tpM = 0, tpA = 0, ftM = 0, ftA = 0, to = 0, reb = 0;
+                    pList.forEach(p => {
+                        fgM += (p.fgM || 0); fgA += (p.fgA || 0);
+                        tpM += (p.tpM || 0); tpA += (p.tpA || 0);
+                        ftM += (p.ftM || 0); ftA += (p.ftA || 0);
+                        to += (p.to || 0); reb += (p.reb || 0);
+                    });
+                    let fgPct = fgA > 0 ? Math.round((fgM / fgA) * 100) : 0;
+                    let tpPct = tpA > 0 ? Math.round((tpM / tpA) * 100) : 0;
+                    let ftPct = ftA > 0 ? Math.round((ftM / ftA) * 100) : 0;
+                    return { fgM, fgA, fgPct, tpM, tpA, tpPct, ftM, ftA, ftPct, to, reb };
+                };
+
+                let awayTot = calcTeamTotals(awayPlayers);
+                let homeTot = calcTeamTotals(homePlayers);
+
+                const makeStatBarRow = (label, awayValStr, awayPct, homeValStr, homePct, isPercent = true) => {
+                    let awayBarWidth = isPercent ? awayPct : Math.min(100, Math.max(10, (parseInt(awayValStr) / Math.max(1, parseInt(awayValStr) + parseInt(homeValStr))) * 100));
+                    let homeBarWidth = isPercent ? homePct : Math.min(100, Math.max(10, (parseInt(homeValStr) / Math.max(1, parseInt(awayValStr) + parseInt(homeValStr))) * 100));
+
+                    return `
+                        <div class="space-y-1.5 py-3 border-b border-slate-900">
+                            <div class="flex items-center justify-between text-xs font-bold">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-white text-sm font-teko text-lg">${isPercent ? awayPct + '%' : awayValStr}</span>
+                                    <span class="text-[10px] text-slate-400 font-mono">(${awayValStr})</span>
+                                </div>
+                                <span class="text-xs uppercase tracking-widest text-slate-400 font-bold">${label}</span>
+                                <div class="flex items-center space-x-2 text-right">
+                                    <span class="text-[10px] text-slate-400 font-mono">(${homeValStr})</span>
+                                    <span class="text-white text-sm font-teko text-lg">${isPercent ? homePct + '%' : homeValStr}</span>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 h-2">
+                                <div class="bg-slate-900 rounded-l-full overflow-hidden flex justify-end">
+                                    <div class="bg-orange-500 h-full rounded-l-full transition-all duration-500" style="width: ${awayBarWidth}%"></div>
+                                </div>
+                                <div class="bg-slate-900 rounded-r-full overflow-hidden flex justify-start">
+                                    <div class="bg-slate-200 h-full rounded-r-full transition-all duration-500" style="width: ${homeBarWidth}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                };
+
                 content.innerHTML = `
                     <div class="space-y-6">
+                        <!-- Score Header Box -->
                         <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-4">
                             <div class="text-center pb-3 border-b border-slate-800 text-xs font-bold text-orange-400 uppercase tracking-widest">
                                 <i class="fa-regular fa-calendar-days mr-1.5"></i>Match Date: ${game.gameDate || currentDate}
@@ -1092,6 +1205,29 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- TEAM STATS COMPARISON WIDGET -->
+                        <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-4">
+                            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                                <div class="flex items-center space-x-2">
+                                    <img src="${awayT.logo}" class="w-6 h-6 object-contain">
+                                    <span class="font-bold text-xs text-white uppercase">${awayT.code}</span>
+                                </div>
+                                <h3 class="text-sm font-black font-teko uppercase text-orange-400 tracking-wider text-lg">Team Stats Comparison</h3>
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-bold text-xs text-white uppercase">${homeT.code}</span>
+                                    <img src="${homeT.logo}" class="w-6 h-6 object-contain">
+                                </div>
+                            </div>
+
+                            <div class="space-y-1">
+                                ${makeStatBarRow("Field Goal %", `${awayTot.fgM}-${awayTot.fgA}`, awayTot.fgPct, `${homeTot.fgM}-${homeTot.fgA}`, homeTot.fgPct, true)}
+                                ${makeStatBarRow("Three Point %", `${awayTot.tpM}-${awayTot.tpA}`, awayTot.tpPct, `${homeTot.tpM}-${homeTot.tpA}`, homeTot.tpPct, true)}
+                                ${makeStatBarRow("Free Throw %", `${awayTot.ftM}-${awayTot.ftA}`, awayTot.ftPct, `${homeTot.ftM}-${homeTot.ftA}`, homeTot.ftPct, true)}
+                                ${makeStatBarRow("Turnovers", awayTot.to, 50, homeTot.to, 50, false)}
+                                ${makeStatBarRow("Rebounds", awayTot.reb, 50, homeTot.reb, 50, false)}
+                            </div>
+                        </div>
                     </div>
                 `;
             } else {
@@ -1105,8 +1241,13 @@
 
                     const renderRows = (list) => {
                         return list.map(p => `
-                            <tr class="hover:bg-slate-900/80 text-xs">
-                                <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap">${p.name} #${p.no}</td>
+                            <tr class="hover:bg-slate-900/80 text-xs group">
+                                <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap flex items-center justify-between space-x-2">
+                                    <span>${p.name} #${p.no}</span>
+                                    <button onclick="deleteSnapshotPlayer('${game.id}', '${p.id}')" title="Delete player entry" class="text-slate-500 hover:text-red-400 transition-all opacity-0 group-hover:opacity-100 p-1">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
                                 <td class="py-2.5 px-2 text-center text-slate-300">${p.min || 0}</td>
                                 <td class="py-2.5 px-2 text-center font-bold text-orange-400">${p.pts || 0}</td>
                                 <td class="py-2.5 px-2 text-center text-slate-300">${p.fgM || 0}-${p.fgA || 0}</td>
@@ -1127,8 +1268,13 @@
 
                     const renderDNPRows = (list) => {
                         return list.map(p => `
-                            <tr class="hover:bg-slate-900/80 text-xs text-slate-400 italic">
-                                <td class="py-2.5 px-3 font-bold text-slate-300 whitespace-nowrap">${p.name} #${p.no}</td>
+                            <tr class="hover:bg-slate-900/80 text-xs text-slate-400 italic group">
+                                <td class="py-2.5 px-3 font-bold text-slate-300 whitespace-nowrap flex items-center justify-between space-x-2">
+                                    <span>${p.name} #${p.no}</span>
+                                    <button onclick="deleteSnapshotPlayer('${game.id}', '${p.id}')" title="Delete player entry" class="text-slate-500 hover:text-red-400 transition-all opacity-0 group-hover:opacity-100 p-1">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
                                 <td colspan="14" class="py-2.5 px-3 text-left text-slate-500 font-semibold tracking-wide">DNP-COACH'S DECISION</td>
                             </tr>
                         `).join('');
@@ -1170,7 +1316,7 @@
                                         <tr class="bg-slate-900/40 text-[10px] font-bold text-orange-400 uppercase tracking-wider"><td colspan="15" class="py-1.5 px-3">Bench</td></tr>
                                         ${bench.length > 0 ? renderRows(bench) : '<tr><td colspan="15" class="py-2 px-3 text-slate-500 italic">No bench players listed.</td></tr>'}
 
-                                        <!-- DNP HEADER (If any) -->
+                                        <!-- DNP HEADER -->
                                         ${dnps.length > 0 ? `
                                             <tr class="bg-slate-900/40 text-[10px] font-bold text-slate-400 uppercase tracking-wider"><td colspan="15" class="py-1.5 px-3">Did Not Play</td></tr>
                                             ${renderDNPRows(dnps)}
@@ -1188,7 +1334,7 @@
                         <div class="bg-orange-950/30 border-2 border-orange-600/50 p-4 rounded-2xl space-y-3">
                             <div class="flex items-center justify-between">
                                 <h4 class="text-xs font-black font-teko uppercase text-orange-400 tracking-wider">⚡ Quick Text/CSV Box Score Importer</h4>
-                                <span class="text-[10px] text-slate-400">Format: Name, #no, Min, Pts, Reb, Ast, Stl, Blk, TO, PF, +/-</span>
+                                <span class="text-[10px] text-slate-400">Format: Name, #no, Min, Pts, FG (e.g. 5-13), 3PT (e.g. 0-3), FT (e.g. 4-6), Reb, Ast, Stl, Blk, TO, PF, +/-</span>
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                 <select id="quick-paste-team-${game.id}" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold">
@@ -1204,7 +1350,7 @@
                                     <i class="fa-solid fa-bolt mr-1"></i>Parse & Sync Box Score
                                 </button>
                             </div>
-                            <textarea id="quick-paste-input-${game.id}" rows="3" placeholder="Example lines:\nLeBron James, #23, 34, 14, 9, 7, 1, 1, 1, 4, -2\nJustin Edwards, #11 (For DNP, you can just paste Name and Jersey #)" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white font-mono focus:outline-none focus:border-orange-500"></textarea>
+                            <textarea id="quick-paste-input-${game.id}" rows="3" placeholder="Example lines:\nLeBron James, #23, 34, 14, 5-13, 0-3, 4-6, 9, 7, 1, 1, 1, 4, -2" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white font-mono focus:outline-none focus:border-orange-500"></textarea>
                         </div>
 
                         ${renderTeamProBoxScore(awayT, awayPlayers)}
