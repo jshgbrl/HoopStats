@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HoopStats Central | Pro Box Score & Stat-Sheet Editor Edition</title>
+    <title>HoopStats Central | Pro Box Score & Dynamic Standings Edition</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome Icons -->
@@ -123,7 +123,7 @@
                     <button onclick="adminUpdateStandings()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Update Standings</button>
                 </div>
 
-                <!-- 3. ADD / EDIT PLAYER STATS (Yellow line elements removed) -->
+                <!-- 3. ADD PLAYER TO ROSTER (Starter dropdown removed) -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                     <h3 class="font-bold text-orange-400 uppercase">3. Add Player to Roster</h3>
                     <input type="text" id="adm-player-name" placeholder="Player Full Name" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
@@ -137,22 +137,13 @@
                             <input type="text" id="adm-player-no" placeholder="#" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white">
                         </div>
                     </div>
-                    <div class="flex space-x-2">
-                        <div class="w-1/2">
-                            <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Position</label>
-                            <select id="adm-player-pos" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white">
-                                <option value="G">G (Guard)</option>
-                                <option value="F">F (Forward)</option>
-                                <option value="C">C (Center)</option>
-                            </select>
-                        </div>
-                        <div class="w-1/2">
-                            <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Role</label>
-                            <select id="adm-player-role" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white text-xs">
-                                <option value="STARTER">Starter</option>
-                                <option value="BENCH">Bench</option>
-                            </select>
-                        </div>
+                    <div>
+                        <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Position</label>
+                        <select id="adm-player-pos" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white">
+                            <option value="G">G (Guard)</option>
+                            <option value="F">F (Forward)</option>
+                            <option value="C">C (Center)</option>
+                        </select>
                     </div>
                     <button onclick="adminSavePlayer()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Save Player to Roster</button>
                 </div>
@@ -198,7 +189,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 class="text-2xl sm:text-3xl font-black font-teko uppercase tracking-wide text-white">2026-27 Conference Standings</h1>
-                    <p class="text-xs sm:text-sm text-slate-400">Official synchronized regular season standings.</p>
+                    <p class="text-xs sm:text-sm text-slate-400">Official synchronized regular season standings (auto-generated from game scores).</p>
                 </div>
                 <div class="flex bg-slate-900 border border-slate-800 rounded-xl p-1 self-start">
                     <button onclick="switchConference('EAST')" id="conf-east" class="px-4 py-1.5 text-xs font-bold rounded-lg bg-orange-600 text-white transition-all">Eastern Conference</button>
@@ -263,7 +254,7 @@
     <!-- FOOTER -->
     <footer class="bg-slate-900 border-t border-slate-800 mt-12 py-8 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4 space-y-2">
-            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Box Score & Stat-Sheet Editor Edition</p>
+            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Box Score & Dynamic Standings Edition</p>
             <p>Automatic team totals, shooting percentages, and synced player profile averages.</p>
         </div>
     </footer>
@@ -349,20 +340,8 @@
             ]
         };
 
-        const defaultStandingsData = {
-            EAST: [
-                { rank: 1, team: "Boston Celtics", w: 3, l: 0, pct: "1.000", gb: "-" },
-                { rank: 2, team: "Detroit Pistons", w: 2, l: 1, pct: ".667", gb: "1.0" }
-            ],
-            WEST: [
-                { rank: 1, team: "Los Angeles Lakers", w: 3, l: 0, pct: "1.000", gb: "-" },
-                { rank: 2, team: "Golden State Warriors", w: 2, l: 1, pct: ".667", gb: "1.0" }
-            ]
-        };
-
         let playersDatabase = JSON.parse(localStorage.getItem("hoopStatsPlayers")) || defaultPlayersDatabase;
         let scheduleDatabase = JSON.parse(localStorage.getItem("hoopStatsSchedule")) || defaultScheduleDatabase;
-        let standingsData = JSON.parse(localStorage.getItem("hoopStatsStandings")) || defaultStandingsData;
 
         let currentDate = "2026-10-25";
         let currentConf = "EAST";
@@ -471,6 +450,7 @@
 
             alert("Game published successfully!");
             renderGames();
+            renderStandings();
         }
 
         function adminDeleteGame(gameId) {
@@ -480,29 +460,12 @@
                 }
                 localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
                 renderGames();
+                renderStandings();
             }
         }
 
         function adminUpdateStandings() {
-            const conf = document.getElementById("adm-standings-conf").value;
-            const team = document.getElementById("adm-team-name-select").value;
-            const w = parseInt(document.getElementById("adm-team-w").value) || 0;
-            const l = parseInt(document.getElementById("adm-team-l").value) || 0;
-            const pct = (w + l > 0) ? (w / (w + l)).toFixed(3) : ".000";
-
-            let list = standingsData[conf];
-            let existing = list.find(x => x.team.toLowerCase() === team.toLowerCase());
-            if (existing) {
-                existing.w = w;
-                existing.l = l;
-                existing.pct = pct;
-            } else {
-                list.push({ rank: list.length + 1, team: team, w: w, l: l, pct: pct, gb: "0.0" });
-            }
-
-            localStorage.setItem("hoopStatsStandings", JSON.stringify(standingsData));
-            alert("Standings updated successfully!");
-            renderStandings();
+            alert("Standings are now automatically calculated based on entered game scores!");
         }
 
         function adminSavePlayer() {
@@ -510,7 +473,6 @@
             const team = document.getElementById("adm-player-team").value;
             const no = document.getElementById("adm-player-no").value.trim() || "23";
             const pos = document.getElementById("adm-player-pos").value;
-            const role = document.getElementById("adm-player-role").value;
 
             if(!name) {
                 alert("Please enter a player name.");
@@ -524,16 +486,15 @@
                 existing.name = name;
                 existing.team = team;
                 existing.pos = pos;
-                existing.role = role;
             } else {
                 playersDatabase.push({
                     id: playerId,
                     name: name,
                     team: team,
-                    role: role,
+                    role: "BENCH",
                     pos: pos,
                     no: no,
-                    min: 0, pts: 0, fgM: 0, fgA: 0, tpM: 0, tpA: 0, ftM: 0, ftA: 0, reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, plusMinus: "0",
+                    min: 0, pts: 0, fgM: 0, fgA: 0, tpM: 0, tpA: 0, ftM: 0, ftA: 0, reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, plusMinus: "+0",
                     ppg: 0.0, rpg: 0.0, apg: 0.0, gamesPlayed: 0
                 });
             }
@@ -596,7 +557,6 @@
                 p.pf = pf;
                 p.plusMinus = plusMinus;
 
-                // Automatically recalculate cumulative season averages (PPG, RPG, APG)
                 p.gamesPlayed = (p.gamesPlayed || 0) + 1;
                 p.totalPts = (p.totalPts || 0) + pts;
                 p.totalReb = (p.totalReb || 0) + reb;
@@ -616,7 +576,7 @@
         function adminRemovePlayerStatLine(playerId) {
             let p = playersDatabase.find(x => x.id === playerId);
             if(p) {
-                p.min = 0; p.pts = 0; p.fgM = 0; p.fgA = 0; p.tpM = 0; p.tpA = 0; p.ftM = 0; p.ftA = 0; p.reb = 0; p.ast = 0; p.to = 0; p.stl = 0; p.blk = 0; p.oreb = 0; p.dreb = 0; p.pf = 0; p.plusMinus = "0";
+                p.min = 0; p.pts = 0; p.fgM = 0; p.fgA = 0; p.tpM = 0; p.tpA = 0; p.ftM = 0; p.ftA = 0; p.reb = 0; p.ast = 0; p.to = 0; p.stl = 0; p.blk = 0; p.oreb = 0; p.dreb = 0; p.pf = 0; p.plusMinus = "+0";
                 localStorage.setItem("hoopStatsPlayers", JSON.stringify(playersDatabase));
                 alert("Stat line removed.");
                 renderBoxScoreContent();
@@ -735,18 +695,54 @@
             renderStandings();
         }
 
+        // Dynamically compute standings based strictly on entered games
         function renderStandings() {
             const tbody = document.getElementById("standings-tbody");
-            tbody.innerHTML = standingsData[currentConf].map(row => `
-                <tr class="hover:bg-slate-800/40 transition-all">
-                    <td class="py-3 px-4 font-bold text-slate-400">${row.rank}</td>
-                    <td class="py-3 px-4 font-bold text-white">${row.team}</td>
-                    <td class="py-3 px-4 text-center font-bold text-emerald-400">${row.w}</td>
-                    <td class="py-3 px-4 text-center text-slate-400">${row.l}</td>
-                    <td class="py-3 px-4 text-center text-slate-300">${row.pct}</td>
-                    <td class="py-3 px-4 text-center text-slate-400">${row.gb}</td>
-                </tr>
-            `).join('');
+            let teamRecords = {};
+
+            Object.values(scheduleDatabase).forEach(dayGames => {
+                dayGames.forEach(g => {
+                    if(g.status === 'FINAL') {
+                        if(!teamRecords[g.home]) teamRecords[g.home] = { name: teamsData[g.home]?.name || g.home, conf: teamsData[g.home]?.conf || 'EAST', w: 0, l: 0 };
+                        if(!teamRecords[g.away]) teamRecords[g.away] = { name: teamsData[g.away]?.name || g.away, conf: teamsData[g.away]?.conf || 'EAST', w: 0, l: 0 };
+
+                        if(g.homeScore > g.awayScore) {
+                            teamRecords[g.home].w += 1;
+                            teamRecords[g.away].l += 1;
+                        } else {
+                            teamRecords[g.away].w += 1;
+                            teamRecords[g.home].l += 1;
+                        }
+                    }
+                });
+            });
+
+            let confTeams = Object.values(teamRecords).filter(t => t.conf === currentConf);
+            confTeams.sort((a, b) => {
+                let pctA = (a.w + a.l > 0) ? (a.w / (a.w + a.l)) : 0;
+                let pctB = (b.w + b.l > 0) ? (b.w / (b.w + b.l)) : 0;
+                return pctB - pctA;
+            });
+
+            if(confTeams.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500">No standings data available. Publish game scores to generate standings.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = confTeams.map((t, idx) => {
+                let total = t.w + t.l;
+                let pct = total > 0 ? (t.w / total).toFixed(3) : ".000";
+                return `
+                    <tr class="hover:bg-slate-800/40 transition-all">
+                        <td class="py-3 px-4 font-bold text-slate-400">${idx + 1}</td>
+                        <td class="py-3 px-4 font-bold text-white">${t.name}</td>
+                        <td class="py-3 px-4 text-center font-bold text-emerald-400">${t.w}</td>
+                        <td class="py-3 px-4 text-center text-slate-400">${t.l}</td>
+                        <td class="py-3 px-4 text-center text-slate-300">${pct}</td>
+                        <td class="py-3 px-4 text-center text-slate-400">-</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         function populateDropdowns() {
@@ -846,7 +842,6 @@
                     </div>
                 `;
             } else {
-                let gamePlayers = playersDatabase.filter(p => p.team === game.away || p.team === game.home);
                 let awayPlayers = playersDatabase.filter(p => p.team === game.away);
                 let homePlayers = playersDatabase.filter(p => p.team === game.home);
 
@@ -879,29 +874,36 @@
                     const ftPct = tftA > 0 ? ((tftM / tftA) * 100).toFixed(1) + '%' : '0.0%';
 
                     const renderRows = (list) => {
-                        if(list.length === 0) return `<tr><td colspan="16" class="py-2 px-3 text-xs text-slate-500 italic">No players listed.</td></tr>`;
-                        return list.map(p => `
-                            <tr class="hover:bg-slate-900/80 text-xs">
-                                <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap flex items-center space-x-2">
-                                    <span class="cursor-pointer hover:underline" onclick="openPlayerModal('${p.id}')">${p.name} #${p.no}</span>
-                                    ${isAdmin ? `<button onclick="adminRemovePlayerStatLine('${p.id}')" class="text-red-400 hover:text-red-300 text-[10px]"><i class="fa-solid fa-trash"></i></button>` : ''}
-                                </td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.min || 0}</td>
-                                <td class="py-2.5 px-2 text-center font-bold text-orange-400">${p.pts || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.fgM || 0}-${p.fgA || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.tpM || 0}-${p.tpA || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.ftM || 0}-${p.ftA || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.reb || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.ast || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.to || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.stl || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.blk || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.oreb || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.dreb || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.pf || 0}</td>
-                                <td class="py-2.5 px-2 text-center font-semibold text-emerald-400">${p.plusMinus || '+0'}</td>
-                            </tr>
-                        `).join('');
+                        if(list.length === 0) return `<tr><td colspan="15" class="py-2 px-3 text-xs text-slate-500 italic">No players listed.</td></tr>`;
+                        return list.map(p => {
+                            let pmVal = p.plusMinus || "+0";
+                            let pmColor = "text-slate-300";
+                            if(pmVal.startsWith("-")) pmColor = "text-red-400 font-bold";
+                            else if(pmVal.startsWith("+") && pmVal !== "+0") pmColor = "text-emerald-400 font-bold";
+
+                            return `
+                                <tr class="hover:bg-slate-900/80 text-xs">
+                                    <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap flex items-center space-x-2">
+                                        <span class="cursor-pointer hover:underline" onclick="openPlayerModal('${p.id}')">${p.name} #${p.no}</span>
+                                        ${isAdmin ? `<button onclick="adminRemovePlayerStatLine('${p.id}')" class="text-red-400 hover:text-red-300 text-[10px]"><i class="fa-solid fa-trash"></i></button>` : ''}
+                                    </td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.min || 0}</td>
+                                    <td class="py-2.5 px-2 text-center font-bold text-orange-400">${p.pts || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.fgM || 0}-${p.fgA || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.tpM || 0}-${p.tpA || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.ftM || 0}-${p.ftA || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.reb || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.ast || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.to || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.stl || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.blk || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.oreb || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.dreb || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.pf || 0}</td>
+                                    <td class="py-2.5 px-2 text-center ${pmColor}">${pmVal}</td>
+                                </tr>
+                            `;
+                        }).join('');
                     };
 
                     const tableHeaders = `
@@ -973,14 +975,17 @@
 
                 let adminStatEntryForm = "";
                 if(isAdmin) {
-                    const rosterOptions = gamePlayers.map(p => `<option value="${p.id}">${p.name} (${p.team})</option>`).join('');
+                    // Filter player dropdown to ONLY show players from the two teams playing in this game
+                    const eligiblePlayers = playersDatabase.filter(p => p.team === game.away || p.team === game.home);
+                    const rosterOptions = eligiblePlayers.map(p => `<option value="${p.id}">${p.name} (${p.team})</option>`).join('');
+
                     adminStatEntryForm = `
                         <div class="bg-orange-950/40 border-2 border-orange-600/60 p-4 rounded-2xl space-y-3">
                             <h4 class="text-xs font-black font-teko uppercase text-orange-400 tracking-wider">🔒 Admin Stat-Sheet Entry (Add Player Stats for this Game)</h4>
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                                 <div>
-                                    <label class="text-[10px] text-slate-400 block mb-1">Select Player</label>
-                                    <select id="stat-player-select" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white">${rosterOptions}</select>
+                                    <label class="text-[10px] text-slate-400 block mb-1">Select Player (Match Teams Only)</label>
+                                    <select id="stat-player-select" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white">${rosterOptions || '<option value="">No players in roster for these teams</option>'}</select>
                                 </div>
                                 <div>
                                     <label class="text-[10px] text-slate-400 block mb-1">Role</label>
