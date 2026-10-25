@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HoopStats Central | Pro Box Score & Auto-Calculation Edition</title>
+    <title>HoopStats Central | Pro Admin Dropdowns Edition</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome Icons -->
@@ -81,11 +81,20 @@
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-                <!-- 1. Game Scores Admin -->
+                <!-- 1. ADD GAME SCORE (Red Box Dropdowns) -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                     <h3 class="font-bold text-orange-400 uppercase">1. Add Game Score</h3>
                     <input type="date" id="adm-game-date" value="2026-10-25" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
-                    <input type="text" id="adm-game-match" placeholder="Away @ Home (e.g. BOS @ DET)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Away Team</label>
+                            <select id="adm-away-team" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white"></select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Home Team</label>
+                            <select id="adm-home-team" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white"></select>
+                        </div>
+                    </div>
                     <div class="flex space-x-2">
                         <input type="number" id="adm-away-score" placeholder="Away Pts" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
                         <input type="number" id="adm-home-score" placeholder="Home Pts" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
@@ -93,14 +102,20 @@
                     <button onclick="adminAddGame()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Publish Game</button>
                 </div>
 
-                <!-- 2. Standings Admin -->
+                <!-- 2. UPDATE STANDINGS (Yellow Box Cascading Dropdowns) -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                     <h3 class="font-bold text-orange-400 uppercase">2. Update Standings</h3>
-                    <select id="adm-standings-conf" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
-                        <option value="EAST">Eastern Conference</option>
-                        <option value="WEST">Western Conference</option>
-                    </select>
-                    <input type="text" id="adm-team-name" placeholder="Team Name (e.g. Boston Celtics)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                    <div>
+                        <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Conference</label>
+                        <select id="adm-standings-conf" onchange="onAdminConfChanged()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                            <option value="EAST">Eastern Conference</option>
+                            <option value="WEST">Western Conference</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Team</label>
+                        <select id="adm-team-name-select" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white"></select>
+                    </div>
                     <div class="flex space-x-2">
                         <input type="number" id="adm-team-w" placeholder="Wins" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
                         <input type="number" id="adm-team-l" placeholder="Losses" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
@@ -108,25 +123,43 @@
                     <button onclick="adminUpdateStandings()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Update Standings</button>
                 </div>
 
-                <!-- 3. Player Stats & Roster Admin -->
+                <!-- 3. ADD / EDIT PLAYER STATS (White & Blue Box Dropdowns) -->
                 <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                     <h3 class="font-bold text-orange-400 uppercase">3. Add / Edit Player Stats</h3>
                     <input type="text" id="adm-player-name" placeholder="Player Full Name" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
                     <div class="flex space-x-2">
-                        <input type="text" id="adm-player-team" placeholder="Team Code (e.g. BOS)" class="w-2/3 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
-                        <input type="text" id="adm-player-no" placeholder="Jersey #" class="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                        <!-- White Box Roster Team Dropdown -->
+                        <div class="w-2/3">
+                            <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Team</label>
+                            <select id="adm-player-team" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white"></select>
+                        </div>
+                        <div class="w-1/3">
+                            <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Jersey #</label>
+                            <input type="text" id="adm-player-no" placeholder="#" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white">
+                        </div>
                     </div>
                     <div class="flex space-x-2">
-                        <select id="adm-player-role" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-xs">
-                            <option value="STARTER">Starter</option>
-                            <option value="BENCH">Bench</option>
-                        </select>
-                        <input type="text" id="adm-player-pos" placeholder="Pos (G/F/C)" class="w-1/2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                        <!-- Blue Box Position Dropdown (G, F, C only) -->
+                        <div class="w-1/2">
+                            <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Position</label>
+                            <select id="adm-player-pos" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white">
+                                <option value="G">G (Guard)</option>
+                                <option value="F">F (Forward)</option>
+                                <option value="C">C (Center)</option>
+                            </select>
+                        </div>
+                        <div class="w-1/2">
+                            <label class="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Role</label>
+                            <select id="adm-player-role" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white text-xs">
+                                <option value="STARTER">Starter</option>
+                                <option value="BENCH">Bench</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="flex space-x-2">
-                        <input type="number" step="0.1" id="adm-player-ppg" placeholder="PPG" class="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
-                        <input type="number" step="0.1" id="adm-player-rpg" placeholder="RPG" class="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
-                        <input type="number" step="0.1" id="adm-player-apg" placeholder="APG" class="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white">
+                        <input type="number" step="0.1" id="adm-player-ppg" placeholder="PPG" class="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white">
+                        <input type="number" step="0.1" id="adm-player-rpg" placeholder="RPG" class="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white">
+                        <input type="number" step="0.1" id="adm-player-apg" placeholder="APG" class="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white">
                     </div>
                     <button onclick="adminSavePlayer()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-lg transition-all">Save Player to Roster</button>
                 </div>
@@ -241,7 +274,7 @@
     <!-- FOOTER -->
     <footer class="bg-slate-900 border-t border-slate-800 mt-12 py-8 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4 space-y-2">
-            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Box Score & Auto-Calculation Engine</p>
+            <p class="font-bold text-slate-400">HoopStats Central &bull; Pro Admin Dropdowns Edition</p>
             <p>Automatic team totals, shooting percentages, and synced player profile averages.</p>
         </div>
     </footer>
@@ -282,75 +315,55 @@
     <!-- ================= JAVASCRIPT LOGIC ================= -->
     <script>
         const teamsData = {
-            "ATL": { name: "Atlanta Hawks", code: "ATL", logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" },
-            "BOS": { name: "Boston Celtics", code: "BOS", logo: "https://cdn.nba.com/logos/nba/1610612738/global/L/logo.svg" },
-            "BKN": { name: "Brooklyn Nets", code: "BKN", logo: "https://cdn.nba.com/logos/nba/1610612751/global/L/logo.svg" },
-            "CHA": { name: "Charlotte Hornets", code: "CHA", logo: "https://cdn.nba.com/logos/nba/1610612766/global/L/logo.svg" },
-            "CHI": { name: "Chicago Bulls", code: "CHI", logo: "https://cdn.nba.com/logos/nba/1610612741/global/L/logo.svg" },
-            "CLE": { name: "Cleveland Cavaliers", code: "CLE", logo: "https://cdn.nba.com/logos/nba/1610612739/global/L/logo.svg" },
-            "DAL": { name: "Dallas Mavericks", code: "DAL", logo: "https://cdn.nba.com/logos/nba/1610612742/global/L/logo.svg" },
-            "DEN": { name: "Denver Nuggets", code: "DEN", logo: "https://cdn.nba.com/logos/nba/1610612743/global/L/logo.svg" },
-            "DET": { name: "Detroit Pistons", code: "DET", logo: "https://cdn.nba.com/logos/nba/1610612765/global/L/logo.svg" },
-            "GSW": { name: "Golden State Warriors", code: "GSW", logo: "https://cdn.nba.com/logos/nba/1610612744/global/L/logo.svg" },
-            "HOU": { name: "Houston Rockets", code: "HOU", logo: "https://cdn.nba.com/logos/nba/1610612745/global/L/logo.svg" },
-            "IND": { name: "Indiana Pacers", code: "IND", logo: "https://cdn.nba.com/logos/nba/1610612754/global/L/logo.svg" },
-            "LAC": { name: "Los Angeles Clippers", code: "LAC", logo: "https://cdn.nba.com/logos/nba/1610612746/global/L/logo.svg" },
-            "LAL": { name: "Los Angeles Lakers", code: "LAL", logo: "https://cdn.nba.com/logos/nba/1610612747/global/L/logo.svg" },
-            "MEM": { name: "Memphis Grizzlies", code: "MEM", logo: "https://cdn.nba.com/logos/nba/1610612763/global/L/logo.svg" },
-            "MIA": { name: "Miami Heat", code: "MIA", logo: "https://cdn.nba.com/logos/nba/1610612748/global/L/logo.svg" },
-            "MIL": { name: "Milwaukee Bucks", code: "MIL", logo: "https://cdn.nba.com/logos/nba/1610612749/global/L/logo.svg" },
-            "MIN": { name: "Minnesota Timberwolves", code: "MIN", logo: "https://cdn.nba.com/logos/nba/1610612750/global/L/logo.svg" },
-            "NOP": { name: "New Orleans Pelicans", code: "NOP", logo: "https://cdn.nba.com/logos/nba/1610612740/global/L/logo.svg" },
-            "NYK": { name: "New York Knicks", code: "NYK", logo: "https://cdn.nba.com/logos/nba/1610612752/global/L/logo.svg" },
-            "OKC": { name: "Oklahoma City Thunder", code: "OKC", logo: "https://cdn.nba.com/logos/nba/1610612760/global/L/logo.svg" },
-            "ORL": { name: "Orlando Magic", code: "ORL", logo: "https://cdn.nba.com/logos/nba/1610612753/global/L/logo.svg" },
-            "PHI": { name: "Philadelphia 76ers", code: "PHI", logo: "https://cdn.nba.com/logos/nba/1610612755/global/L/logo.svg" },
-            "PHX": { name: "Phoenix Suns", code: "PHX", logo: "https://cdn.nba.com/logos/nba/1610612756/global/L/logo.svg" },
-            "POR": { name: "Portland Trail Blazers", code: "POR", logo: "https://cdn.nba.com/logos/nba/1610612757/global/L/logo.svg" },
-            "SAC": { name: "Sacramento Kings", code: "SAC", logo: "https://cdn.nba.com/logos/nba/1610612758/global/L/logo.svg" },
-            "SAS": { name: "San Antonio Spurs", code: "SAS", logo: "https://cdn.nba.com/logos/nba/1610612759/global/L/logo.svg" },
-            "TOR": { name: "Toronto Raptors", code: "TOR", logo: "https://cdn.nba.com/logos/nba/1610612761/global/L/logo.svg" },
-            "UTA": { name: "Utah Jazz", code: "UTA", logo: "https://cdn.nba.com/logos/nba/1610612762/global/L/logo.svg" },
-            "WAS": { name: "Washington Wizards", code: "WAS", logo: "https://cdn.nba.com/logos/nba/1610612764/global/L/logo.svg" }
+            "ATL": { name: "Atlanta Hawks", code: "ATL", conf: "EAST", logo: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg" },
+            "BOS": { name: "Boston Celtics", code: "BOS", conf: "EAST", logo: "https://cdn.nba.com/logos/nba/1610612738/global/L/logo.svg" },
+            "BKN": { name: "Brooklyn Nets", code: "BKN", conf: "EAST", logo: "https://cdn.nba.com/logos/nba/1610612751/global/L/logo.svg" },
+            "CHA": { name: "Charlotte Hornets", code: "CHA", conf: "EAST", logo: "https://cdn.nba.com/logos/nba/1610612766/global/L/logo.svg" },
+            "CHI": { name: "Chicago Bulls", code: "CHI", conf: "EAST", logo: "https://cdn.nba.com/logos/nba/1610612741/global/L/logo.svg" },
+            "CLE": { name: "Cleveland Cavaliers", code: "CLE", conf: "EAST", logo: "https://cdn.nba.com/logos/nba/1610612739/global/L/logo.svg" },
+            "DAL": { name: "Dallas Mavericks", code: "DAL", conf: "WEST", logo: "https://cdn.nba.com/logos/nba/1610612742/global/L/logo.svg" },
+            "DEN": { name: "Denver Nuggets", code: "DEN", conf: "WEST", logo: "https://cdn.nba.com/logos/nba/1610612743/global/L/logo.svg" },
+            "DET": { name: "Detroit Pistons", code: "DET", conf: "EAST", logo: "https://cdn.nba.com/logos/nba/1610612765/global/L/logo.svg" },
+            "GSW": { name: "Golden State Warriors", code: "GSW", conf: "WEST", logo: "https://cdn.nba.com/logos/nba/1610612744/global/L/logo.svg" },
+            "HOU": { name: "Houston Rockets", code: "HOU", conf: "WEST", logo: "https://cdn.nba.com/logos/nba/1610612745/global/L/logo.svg" },
+            "IND": { name: "Indiana Pacers", code: "IND", conf: "EAST", logo: "https://cdn.nba.com/logos/nba/1610612754/global/L/logo.svg" },
+            "LAC": { name: "Los Angeles Clippers", code: "LAC", conf: "WEST", logo: "https://cdn.nba.com/logos/nba/1610612746/global/L/logo.svg" },
+            "LAL": { name: "Los Angeles Lakers", code: "LAL", conf: "WEST", logo: "https://cdn.nba.com/logos/nba/1610612747/global/L/logo.svg" },
+            "MEM": { name: "Memphis Grizzlies", code: "MEM", conf: "WEST", logo: "https://cdn.nba.com/logos/nba/1610612763/global/L/logo.svg" },
+            "MIA": { name: "Miami Heat", code: "MIA", conf: "EAST", logo: "https://cdn.nba.com/logos/nba/1610612748/global/L/logo.svg" },
+            "MIL": { name: "Milwaukee Bucks", code: "MIL", conf: "EAST", logo: "https://cdn.nba.com/logos/nba/1610612749/global/L/logo.svg" },
+            "MIN": { name: "Minnesota Timberwolves", code: "MIN", conf: "WEST", logo: "https://cdn.nba.com/logos/nba/1610612750/global/L/logo.svg" },
+            "NOP": { name: "New Orleans Pelicans", code: "NOP", conf: "WEST", logo: "https://cdn.nba.com/logos/nba/1610612740/global/L/logo.svg" },
+            "NYK": { name: "New York Knicks", code: "NYK", conf: "EAST", logo: "https://cdn.nba.com/logos/nba/1610612752/global/L/logo.svg" },
+            "OKC": { name: "Oklahoma City Thunder", code: "OKC", conf: "WEST", logo: "https://cdn.nba.com/logos/nba/1610612760/global/L/logo.svg" },
+            "ORL": { name: "Orlando Magic", code: "ORL", conf: "EAST", logo: "https://cdn.nba.com/logos/nba/1610612753/global/L/logo.svg" },
+            "PHI": { name: "Philadelphia 76ers", code: "PHI", conf: "EAST", logo: "https://cdn.nba.com/logos/nba/1610612755/global/L/logo.svg" },
+            "PHX": { name: "Phoenix Suns", code: "PHX", conf: "WEST", logo: "https://cdn.nba.com/logos/nba/1610612756/global/L/logo.svg" },
+            "POR": { name: "Portland Trail Blazers", code: "POR", conf: "WEST", logo: "https://cdn.nba.com/logos/nba/1610612757/global/L/logo.svg" },
+            "SAC": { name: "Sacramento Kings", code: "SAC", conf: "WEST", logo: "https://cdn.nba.com/logos/nba/1610612758/global/L/logo.svg" },
+            "SAS": { name: "San Antonio Spurs", code: "SAS", conf: "WEST", logo: "https://cdn.nba.com/logos/nba/1610612759/global/L/logo.svg" },
+            "TOR": { name: "Toronto Raptors", code: "TOR", conf: "EAST", logo: "https://cdn.nba.com/logos/nba/1610612761/global/L/logo.svg" },
+            "UTA": { name: "Utah Jazz", code: "UTA", conf: "WEST", logo: "https://cdn.nba.com/logos/nba/1610612762/global/L/logo.svg" },
+            "WAS": { name: "Washington Wizards", code: "WAS", conf: "EAST", logo: "https://cdn.nba.com/logos/nba/1610612764/global/L/logo.svg" }
         };
 
         const nbaTeamsAlphabetical = Object.values(teamsData).sort((a, b) => a.name.localeCompare(b.name));
 
         const defaultPlayersDatabase = [
-            // Boston Celtics Starters
-            { id: "bos_0", name: "Jayson Tatum", team: "BOS", role: "STARTER", pos: "F", no: "0", min: 38, pts: 27, fgM: 9, fgA: 20, tpM: 4, tpA: 9, ftM: 5, ftA: 6, reb: 8, ast: 5, to: 2, stl: 1, blk: 1, oreb: 1, dreb: 7, pf: 2, plusMinus: "+8", college: "Duke", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1628369.png" },
-            { id: "bos_9", name: "Derrick White", team: "BOS", role: "STARTER", pos: "G", no: "9", min: 35, pts: 18, fgM: 6, fgA: 12, tpM: 3, tpA: 7, ftM: 3, ftA: 3, reb: 4, ast: 7, to: 3, stl: 1, blk: 1, oreb: 1, dreb: 3, pf: 1, plusMinus: "+5", college: "Colorado", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1628401.png" },
-            { id: "bos_7", name: "Jaylen Brown", team: "BOS", role: "STARTER", pos: "G/F", no: "7", min: 36, pts: 24, fgM: 9, fgA: 18, tpM: 2, tpA: 6, ftM: 4, ftA: 5, reb: 6, ast: 4, to: 2, stl: 2, blk: 0, oreb: 1, dreb: 5, pf: 3, plusMinus: "+6", college: "Cal", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1627759.png" },
-            { id: "bos_42", name: "Al Horford", team: "BOS", role: "STARTER", pos: "C", no: "42", min: 28, pts: 10, fgM: 4, fgA: 7, tpM: 2, tpA: 4, ftM: 0, ftA: 0, reb: 7, ast: 3, to: 1, stl: 0, blk: 2, oreb: 2, dreb: 5, pf: 2, plusMinus: "+2", college: "Florida", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/201143.png" },
-            { id: "bos_4", name: "Jrue Holiday", team: "BOS", role: "STARTER", pos: "G", no: "4", min: 34, pts: 15, fgM: 6, fgA: 11, tpM: 3, tpA: 5, ftM: 0, ftA: 0, reb: 5, ast: 6, to: 1, stl: 2, blk: 0, oreb: 1, dreb: 4, pf: 3, plusMinus: "+4", college: "UCLA", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/201950.png" },
-            // Boston Celtics Bench
-            { id: "bos_30", name: "Sam Hauser", team: "BOS", role: "BENCH", pos: "F", no: "30", min: 18, pts: 11, fgM: 4, fgA: 7, tpM: 3, tpA: 5, ftM: 0, ftA: 0, reb: 4, ast: 1, to: 0, stl: 0, blk: 0, oreb: 1, dreb: 3, pf: 3, plusMinus: "+3", college: "Virginia", img: "" },
-            { id: "bos_11", name: "Payton Pritchard", team: "BOS", role: "BENCH", pos: "G", no: "11", min: 24, pts: 14, fgM: 5, fgA: 10, tpM: 4, tpA: 8, ftM: 0, ftA: 0, reb: 2, ast: 3, to: 1, stl: 1, blk: 0, oreb: 0, dreb: 2, pf: 2, plusMinus: "-2", college: "Oregon", img: "" },
-
-            // Detroit Pistons Starters
-            { id: "det_2", name: "Cade Cunningham", team: "DET", role: "STARTER", pos: "G", no: "2", min: 36, pts: 28, fgM: 10, fgA: 21, tpM: 3, tpA: 7, ftM: 5, ftA: 6, reb: 5, ast: 9, to: 4, stl: 1, blk: 1, oreb: 0, dreb: 5, pf: 1, plusMinus: "-1", college: "Oklahoma State", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1630595.png" },
-            { id: "det_0", name: "Jalen Duren", team: "DET", role: "STARTER", pos: "C", no: "0", min: 30, pts: 18, fgM: 8, fgA: 12, tpM: 0, tpA: 0, ftM: 2, ftA: 3, reb: 11, ast: 2, to: 1, stl: 1, blk: 2, oreb: 4, dreb: 7, pf: 3, plusMinus: "-3", college: "Memphis", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1631105.png" },
-            { id: "det_9", name: "Ausar Thompson", team: "DET", role: "STARTER", pos: "G/F", no: "9", min: 32, pts: 14, fgM: 5, fgA: 10, tpM: 1, tpA: 3, ftM: 3, ftA: 4, reb: 8, ast: 3, to: 2, stl: 2, blk: 1, oreb: 3, dreb: 5, pf: 2, plusMinus: "+2", college: "Overtime Elite", img: "" },
-            { id: "det_23", name: "Jaden Ivey", team: "DET", role: "STARTER", pos: "G", no: "23", min: 31, pts: 19, fgM: 7, fgA: 15, tpM: 3, tpA: 6, ftM: 2, ftA: 2, reb: 3, ast: 4, to: 3, stl: 1, blk: 0, oreb: 0, dreb: 3, pf: 3, plusMinus: "-4", college: "Purdue", img: "" },
-            { id: "det_28", name: "Isaiah Stewart", team: "DET", role: "STARTER", pos: "F/C", no: "28", min: 28, pts: 11, fgM: 4, fgA: 8, tpM: 2, tpA: 4, ftM: 1, ftA: 2, reb: 6, ast: 1, to: 1, stl: 0, blk: 1, oreb: 2, dreb: 4, pf: 4, plusMinus: "-2", college: "Washington", img: "" },
-            // Detroit Pistons Bench
-            { id: "det_7", name: "Paul Reed", team: "DET", role: "BENCH", pos: "F", no: "7", min: 18, pts: 8, fgM: 3, fgA: 5, tpM: 0, tpA: 1, ftM: 2, ftA: 2, reb: 5, ast: 1, to: 0, stl: 1, blk: 1, oreb: 2, dreb: 3, pf: 3, plusMinus: "+4", college: "DePaul", img: "" },
-            { id: "det_31", name: "Javonte Green", team: "DET", role: "BENCH", pos: "G/F", no: "31", min: 15, pts: 10, fgM: 4, fgA: 7, tpM: 2, tpA: 3, ftM: 0, ftA: 0, reb: 3, ast: 0, to: 0, stl: 1, blk: 0, oreb: 1, dreb: 2, pf: 2, plusMinus: "+3", college: "Radford", img: "" }
+            { id: "bos_0", name: "Jayson Tatum", team: "BOS", role: "STARTER", pos: "F", no: "0", min: 38, pts: 27, fgM: 9, fgA: 20, tpM: 4, tpA: 9, ftM: 5, ftA: 6, reb: 8, ast: 5, to: 2, stl: 1, blk: 1, oreb: 1, dreb: 7, pf: 2, plusMinus: "+8", college: "Duke", ppg: 27.0, rpg: 8.0, apg: 5.0, img: "" },
+            { id: "det_2", name: "Cade Cunningham", team: "DET", role: "STARTER", pos: "G", no: "2", min: 36, pts: 28, fgM: 10, fgA: 21, tpM: 3, tpA: 7, ftM: 5, ftA: 6, reb: 5, ast: 9, to: 4, stl: 1, blk: 1, oreb: 0, dreb: 5, pf: 1, plusMinus: "-1", college: "Oklahoma State", ppg: 28.0, rpg: 5.0, apg: 9.0, img: "" }
         ];
 
         const defaultScheduleDatabase = {
             "2026-10-25": [
-                { id: "g_1025_1", status: "FINAL", time: "5:00 PM", home: "DET", away: "BOS", homeScore: 108, awayScore: 116, arena: "Little Caesars Arena, Detroit" },
-                { id: "g_1025_2", status: "FINAL", time: "6:00 PM", home: "LAL", away: "GSW", homeScore: 122, awayScore: 119, arena: "Crypto.com Arena, Los Angeles" },
-                { id: "g_1025_3", status: "UPCOMING", time: "7:00 PM", home: "MIA", away: "NYK", homeScore: 0, awayScore: 0, arena: "Kaseya Center, Miami" }
+                { id: "g_1025_1", status: "FINAL", time: "5:00 PM", home: "DET", away: "BOS", homeScore: 108, awayScore: 116, arena: "Little Caesars Arena, Detroit" }
             ]
         };
 
         const defaultStandingsData = {
             EAST: [
                 { rank: 1, team: "Boston Celtics", w: 3, l: 0, pct: "1.000", gb: "-" },
-                { rank: 2, team: "Detroit Pistons", w: 2, l: 1, pct: ".667", gb: "1.0" },
-                { rank: 3, team: "New York Knicks", w: 2, l: 1, pct: ".667", gb: "1.0" }
+                { rank: 2, team: "Detroit Pistons", w: 2, l: 1, pct: ".667", gb: "1.0" }
             ],
             WEST: [
                 { rank: 1, team: "Los Angeles Lakers", w: 3, l: 0, pct: "1.000", gb: "-" },
@@ -358,7 +371,6 @@
             ]
         };
 
-        // Load from localStorage or defaults
         let playersDatabase = JSON.parse(localStorage.getItem("hoopStatsPlayers")) || defaultPlayersDatabase;
         let scheduleDatabase = JSON.parse(localStorage.getItem("hoopStatsSchedule")) || defaultScheduleDatabase;
         let standingsData = JSON.parse(localStorage.getItem("hoopStatsStandings")) || defaultStandingsData;
@@ -372,12 +384,37 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById("game-date-picker").value = currentDate;
+            populateAdminDropdowns();
             updateAdminUIState();
             renderGames();
             renderStandings();
             populateDropdowns();
             renderPlayerTable();
         });
+
+        function populateAdminDropdowns() {
+            // 1. Populate Red Box Away & Home Team Dropdowns
+            const awaySel = document.getElementById("adm-away-team");
+            const homeSel = document.getElementById("adm-home-team");
+            const playerTeamSel = document.getElementById("adm-player-team");
+
+            const teamOptionsHTML = nbaTeamsAlphabetical.map(t => `<option value="${t.code}">${t.name} (${t.code})</option>`).join('');
+            awaySel.innerHTML = teamOptionsHTML;
+            homeSel.innerHTML = teamOptionsHTML;
+            playerTeamSel.innerHTML = teamOptionsHTML;
+            awaySel.value = "BOS";
+            homeSel.value = "DET";
+
+            // 2. Populate Yellow Box Conference Team Dropdown
+            onAdminConfChanged();
+        }
+
+        function onAdminConfChanged() {
+            const conf = document.getElementById("adm-standings-conf").value;
+            const teamSelect = document.getElementById("adm-team-name-select");
+            const filteredTeams = nbaTeamsAlphabetical.filter(t => t.conf === conf);
+            teamSelect.innerHTML = filteredTeams.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+        }
 
         function toggleAdminSession() {
             if (!isAdmin) {
@@ -420,23 +457,15 @@
 
         function adminAddGame() {
             const dateStr = document.getElementById("adm-game-date").value;
-            const matchStr = document.getElementById("adm-game-match").value;
+            const awayCode = document.getElementById("adm-away-team").value;
+            const homeCode = document.getElementById("adm-home-team").value;
             const awayScore = parseInt(document.getElementById("adm-away-score").value) || 0;
             const homeScore = parseInt(document.getElementById("adm-home-score").value) || 0;
 
-            if (!dateStr || !matchStr) {
-                alert("Please fill in the date and game matchup.");
+            if (!dateStr || awayCode === homeCode) {
+                alert("Please select valid distinct teams for the game matchup.");
                 return;
             }
-
-            const parts = matchStr.split("@");
-            if(parts.length !== 2) {
-                alert("Format must be: AWAY @ HOME (e.g. BOS @ DET)");
-                return;
-            }
-
-            const awayCode = parts[0].trim().toUpperCase();
-            const homeCode = parts[1].trim().toUpperCase();
 
             const newGame = {
                 id: "g_" + Date.now(),
@@ -459,15 +488,10 @@
 
         function adminUpdateStandings() {
             const conf = document.getElementById("adm-standings-conf").value;
-            const team = document.getElementById("adm-team-name").value;
+            const team = document.getElementById("adm-team-name-select").value;
             const w = parseInt(document.getElementById("adm-team-w").value) || 0;
             const l = parseInt(document.getElementById("adm-team-l").value) || 0;
             const pct = (w + l > 0) ? (w / (w + l)).toFixed(3) : ".000";
-
-            if(!team) {
-                alert("Please enter a team name.");
-                return;
-            }
 
             let list = standingsData[conf];
             let existing = list.find(x => x.team.toLowerCase() === team.toLowerCase());
@@ -486,16 +510,16 @@
 
         function adminSavePlayer() {
             const name = document.getElementById("adm-player-name").value.trim();
-            const team = document.getElementById("adm-player-team").value.trim().toUpperCase();
+            const team = document.getElementById("adm-player-team").value;
             const no = document.getElementById("adm-player-no").value.trim() || "23";
+            const pos = document.getElementById("adm-player-pos").value; // G, F, or C
             const role = document.getElementById("adm-player-role").value;
-            const pos = document.getElementById("adm-player-pos").value.trim().toUpperCase() || "G";
             const ppg = parseFloat(document.getElementById("adm-player-ppg").value) || 15.0;
             const rpg = parseFloat(document.getElementById("adm-player-rpg").value) || 5.0;
             const apg = parseFloat(document.getElementById("adm-player-apg").value) || 4.0;
 
-            if(!name || !team) {
-                alert("Please enter at least player name and team code.");
+            if(!name) {
+                alert("Please enter a player name.");
                 return;
             }
 
@@ -543,7 +567,6 @@
             alert(`Player ${name} saved successfully! Profile averages automatically synced.`);
             
             document.getElementById("adm-player-name").value = "";
-            document.getElementById("adm-player-team").value = "";
             document.getElementById("adm-player-no").value = "";
             document.getElementById("adm-player-ppg").value = "";
             document.getElementById("adm-player-rpg").value = "";
@@ -612,7 +635,7 @@
             const filtered = games.filter(g => currentFilter === 'ALL' || (currentFilter === 'LIVE' && g.status === 'LIVE'));
 
             if (filtered.length === 0) {
-                container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 bg-slate-900/40 rounded-2xl border border-slate-800">No scheduled games found for ${currentDate}. ${isAdmin ? 'Use the Admin Panel above to add games.' : ''}</div>`;
+                container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 bg-slate-900/40 rounded-2xl border border-slate-800">No scheduled games found for ${currentDate}.</div>`;
                 return;
             }
 
@@ -726,7 +749,7 @@
 
         function openBoxScore(gameId) {
             activeGameId = gameId;
-            currentModalTab = 'players'; // Default to Pro Box Score tab!
+            currentModalTab = 'players';
             renderBoxScoreContent();
             document.getElementById("boxscore-modal").classList.remove("hidden");
             document.getElementById("boxscore-modal").classList.add("flex");
@@ -815,7 +838,6 @@
                     const starters = players.filter(p => p.role === 'STARTER');
                     const bench = players.filter(p => p.role === 'BENCH');
 
-                    // Compute Team Totals automatically
                     let tMin = 0, tPts = 0, tFgM = 0, tFgA = 0, t3pM = 0, t3pA = 0, tftM = 0, tftA = 0, tReb = 0, tAst = 0, tTo = 0, tStl = 0, tBlk = 0, tOreb = 0, tDreb = 0, tPf = 0;
                     players.forEach(p => {
                         tMin += (p.min || 25);
@@ -841,7 +863,7 @@
                     const ftPct = tftA > 0 ? ((tftM / tftA) * 100).toFixed(1) + '%' : '0.0%';
 
                     const renderRows = (list) => {
-                        if(list.length === 0) return `<tr><td colspan="17" class="py-2 px-3 text-xs text-slate-500 italic">No players listed.</td></tr>`;
+                        if(list.length === 0) return `<tr><td colspan="15" class="py-2 px-3 text-xs text-slate-500 italic">No players listed.</td></tr>`;
                         return list.map(p => `
                             <tr class="hover:bg-slate-900/80 cursor-pointer text-xs" onclick="openPlayerModal('${p.id}')">
                                 <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap">
