@@ -83,7 +83,6 @@
 
         <!-- ================= TAB 1: SCORES & GAMES ================= -->
         <section id="tab-scores" class="space-y-6">
-            <!-- Interactive Date Picker -->
             <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-lg backdrop-blur flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center">
@@ -97,7 +96,6 @@
                 </div>
             </div>
 
-            <!-- Scoreboard Grid Header -->
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-2xl sm:text-3xl font-black font-teko uppercase tracking-wide text-white" id="scoreboard-title">Game Scoreboard</h1>
@@ -109,7 +107,6 @@
                 </div>
             </div>
 
-            <!-- Games Grid / Loader -->
             <div id="games-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div class="col-span-full py-16 text-center text-slate-400">
                     <i class="fa-solid fa-spinner fa-spin text-3xl text-orange-500 mb-3"></i>
@@ -144,9 +141,7 @@
                                 <th class="py-3.5 px-4 font-bold text-center">GB</th>
                             </tr>
                         </thead>
-                        <tbody id="standings-tbody" class="divide-y divide-slate-800/60 text-xs sm:text-sm">
-                            <!-- Injected dynamically -->
-                        </tbody>
+                        <tbody id="standings-tbody" class="divide-y divide-slate-800/60 text-xs sm:text-sm"></tbody>
                     </table>
                 </div>
             </div>
@@ -159,9 +154,7 @@
                 <p class="text-xs sm:text-sm text-slate-400">Top performers across points, rebounds, assists, blocks, and steals.</p>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" id="leader-cards-container">
-                <!-- Injected dynamically -->
-            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" id="leader-cards-container"></div>
 
             <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -185,9 +178,7 @@
                                 <th class="py-3 px-4 font-bold text-center">ACTION</th>
                             </tr>
                         </thead>
-                        <tbody id="player-table-tbody" class="divide-y divide-slate-800/60 text-xs sm:text-sm">
-                            <!-- Injected -->
-                        </tbody>
+                        <tbody id="player-table-tbody" class="divide-y divide-slate-800/60 text-xs sm:text-sm"></tbody>
                     </table>
                 </div>
             </div>
@@ -228,7 +219,7 @@
 
     <!-- ================= MODAL: BOX SCORE & GAME DETAILS ================= -->
     <div id="boxscore-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div class="flex items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800">
                 <div class="flex items-center space-x-3">
                     <div class="w-3 h-3 rounded-full bg-orange-500 animate-pulse"></div>
@@ -240,7 +231,7 @@
             </div>
             <div class="flex border-b border-slate-800 bg-slate-950/60 px-6 space-x-4">
                 <button onclick="switchModalTab('summary')" id="modal-tab-summary" class="py-3 text-xs font-bold uppercase tracking-wider border-b-2 border-orange-500 text-orange-400 transition-all">Quarter Summary</button>
-                <button onclick="switchModalTab('players')" id="modal-tab-players" class="py-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all">Player Box Score</button>
+                <button onclick="switchModalTab('players')" id="modal-tab-players" class="py-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all">Full Player Box Score</button>
             </div>
             <div class="p-6 overflow-y-auto space-y-6 flex-grow" id="modal-body-content"></div>
         </div>
@@ -259,7 +250,7 @@
         </div>
     </div>
 
-    <!-- ================= JAVASCRIPT LOGIC (ESPN API INTEGRATION) ================= -->
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
     <script>
         let currentGames = [];
         let activeGameId = null;
@@ -267,7 +258,7 @@
         let currentConf = 'EAST';
         let currentFilter = 'ALL';
 
-        // Sample robust players database for stats, leaders, and H2H comparison
+        // Comprehensive active NBA players database for Stats & Leaders and H2H
         const playersDatabase = [
             { id: "jokic", name: "Nikola Jokic", team: "DEN", pos: "C", ppg: 29.2, rpg: 13.0, apg: 9.8, bpg: 0.9, spg: 1.4, fg: "58.3%", tp: "36.2%", ft: "82.1%", ht: "6'11\"", wt: "284 lbs", no: "15", college: "Serbia", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/203999.png" },
             { id: "luka", name: "Luka Doncic", team: "DAL", pos: "PG", ppg: 33.9, rpg: 9.2, apg: 9.8, bpg: 0.5, spg: 1.4, fg: "48.7%", tp: "38.2%", ft: "78.6%", ht: "6'7\"", wt: "230 lbs", no: "77", college: "Real Madrid", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1629029.png" },
@@ -278,7 +269,9 @@
             { id: "steph", name: "Stephen Curry", team: "GSW", pos: "PG", ppg: 27.2, rpg: 4.5, apg: 6.1, bpg: 0.4, spg: 1.0, fg: "47.2%", tp: "41.5%", ft: "92.3%", ht: "6'2\"", wt: "185 lbs", no: "30", college: "Davidson", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/201939.png" },
             { id: "lebron", name: "LeBron James", team: "LAL", pos: "SF", ppg: 25.4, rpg: 7.3, apg: 8.2, bpg: 0.6, spg: 1.1, fg: "52.4%", tp: "39.1%", ft: "76.5%", ht: "6'9\"", wt: "250 lbs", no: "23", college: "St. Vincent-St. Mary HS", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png" },
             { id: "brunson", name: "Jalen Brunson", team: "NYK", pos: "PG", ppg: 28.7, rpg: 3.6, apg: 6.7, bpg: 0.2, spg: 0.9, fg: "47.9%", tp: "40.1%", ft: "84.7%", ht: "6'2\"", wt: "190 lbs", no: "11", college: "Villanova", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1628973.png" },
-            { id: "edwards", name: "Anthony Edwards", team: "MIN", pos: "SG", ppg: 25.9, rpg: 5.4, apg: 5.1, bpg: 0.6, spg: 1.3, fg: "46.1%", tp: "35.7%", ft: "83.6%", ht: "6'4\"", wt: "225 lbs", no: "5", college: "Georgia", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1630162.png" }
+            { id: "edwards", name: "Anthony Edwards", team: "MIN", pos: "SG", ppg: 25.9, rpg: 5.4, apg: 5.1, bpg: 0.6, spg: 1.3, fg: "46.1%", tp: "35.7%", ft: "83.6%", ht: "6'4\"", wt: "225 lbs", no: "5", college: "Georgia", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1630162.png" },
+            { id: "kd", name: "Kevin Durant", team: "PHX", pos: "PF", ppg: 27.1, rpg: 6.6, apg: 5.0, bpg: 1.2, spg: 0.9, fg: "52.3%", tp: "41.3%", ft: "88.2%", ht: "6'11\"", wt: "215 lbs", no: "35", college: "Texas", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/201142.png" },
+            { id: "ja", name: "Ja Morant", team: "MEM", pos: "PG", ppg: 25.1, rpg: 5.6, apg: 8.1, bpg: 0.4, spg: 1.1, fg: "47.1%", tp: "31.8%", ft: "77.5%", ht: "6'2\"", wt: "174 lbs", no: "12", college: "Murray State", img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1629630.png" }
         ];
 
         const standingsData = {
@@ -315,7 +308,6 @@
             updateComparison();
         });
 
-        // TAB SWITCHING
         function switchTab(tabId) {
             ['scores', 'standings', 'leaders', 'compare'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
@@ -327,27 +319,16 @@
             document.getElementById(`mob-nav-${tabId}`).className = "mob-nav-btn px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap bg-orange-600 text-white";
         }
 
-        function onDateChanged(dateStr) {
-            fetchGames(dateStr);
-        }
-
+        function onDateChanged(dateStr) { fetchGames(dateStr); }
         function resetToToday() {
             const todayStr = new Date().toISOString().split('T')[0];
             document.getElementById("game-date-picker").value = todayStr;
             fetchGames(todayStr);
         }
 
-        // FETCH REAL NBA GAMES FROM ESPN API
         async function fetchGames(dateStr) {
             const container = document.getElementById("games-container");
-            container.innerHTML = `
-                <div class="col-span-full py-16 text-center text-slate-400">
-                    <i class="fa-solid fa-spinner fa-spin text-3xl text-orange-500 mb-3"></i>
-                    <p class="text-sm">Syncing games for ${dateStr} from ESPN API...</p>
-                </div>
-            `;
-
-            // Format YYYYMMDD for ESPN API
+            container.innerHTML = `<div class="col-span-full py-16 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin text-3xl text-orange-500 mb-3"></i><p class="text-sm">Fetching live NBA games from ESPN API...</p></div>`;
             const formattedDate = dateStr.replace(/-/g, '');
             try {
                 const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${formattedDate}`);
@@ -355,14 +336,7 @@
                 currentGames = data.events || [];
                 renderGames();
             } catch (err) {
-                console.error("API Error:", err);
-                container.innerHTML = `
-                    <div class="col-span-full py-12 text-center text-red-400 bg-slate-900/40 border border-slate-800 rounded-2xl">
-                        <i class="fa-solid fa-triangle-exclamation text-2xl mb-2"></i>
-                        <p class="text-sm font-bold">Could not fetch live games from ESPN API for this date.</p>
-                        <p class="text-xs text-slate-400 mt-1">Try selecting today's date or check your internet connection.</p>
-                    </div>
-                `;
+                container.innerHTML = `<div class="col-span-full py-12 text-center text-red-400 bg-slate-900/40 border border-slate-800 rounded-2xl"><p class="text-sm font-bold">Could not fetch games from ESPN API for this date.</p></div>`;
             }
         }
 
@@ -376,8 +350,8 @@
         function renderGames() {
             const container = document.getElementById("games-container");
             const filtered = currentGames.filter(g => {
-                const statusType = g.status.type.state; // pre, in, post
-                if(currentFilter === 'LIVE') return statusType === 'in';
+                const state = g.status.type.state;
+                if(currentFilter === 'LIVE') return state === 'in';
                 return true;
             });
 
@@ -390,10 +364,9 @@
                 const competition = g.competitions[0];
                 const homeTeam = competition.competitors.find(c => c.homeAway === 'home');
                 const awayTeam = competition.competitors.find(c => c.homeAway === 'away');
-                const state = g.status.type.state; // 'pre', 'in', 'post'
+                const state = g.status.type.state;
                 const statusDetail = g.status.type.detail;
                 const venue = competition.venue ? competition.venue.fullName : "NBA Arena";
-
                 const isLive = state === 'in';
                 const isFinal = state === 'post';
 
@@ -440,7 +413,6 @@
             }).join('');
         }
 
-        // STANDINGS
         function switchConference(conf) {
             currentConf = conf;
             document.getElementById("conf-east").className = `px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${conf === 'EAST' ? 'bg-orange-600 text-white' : 'text-slate-400 hover:text-white'}`;
@@ -450,8 +422,7 @@
 
         function renderStandings() {
             const tbody = document.getElementById("standings-tbody");
-            const data = standingsData[currentConf];
-            tbody.innerHTML = data.map(row => `
+            tbody.innerHTML = standingsData[currentConf].map(row => `
                 <tr class="hover:bg-slate-800/40 transition-all">
                     <td class="py-3 px-4 font-bold text-slate-400">${row.rank}</td>
                     <td class="py-3 px-4 font-bold text-white">${row.team}</td>
@@ -463,7 +434,6 @@
             `).join('');
         }
 
-        // LEADERS & STATS
         function renderLeaders() {
             const container = document.getElementById("leader-cards-container");
             const categories = [
@@ -477,7 +447,6 @@
             container.innerHTML = categories.map(cat => {
                 const sorted = [...playersDatabase].sort((a,b) => b[cat.key] - a[cat.key]);
                 const top = sorted[0];
-
                 return `
                     <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col justify-between relative overflow-hidden group">
                         <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${cat.color} opacity-10 rounded-bl-full"></div>
@@ -506,7 +475,7 @@
                 <tr class="hover:bg-slate-800/40 transition-all cursor-pointer" onclick="openPlayerModal('${p.id}')">
                     <td class="py-3 px-4 flex items-center space-x-3">
                         <img src="${p.img}" class="w-9 h-9 rounded-lg object-cover bg-slate-950 border border-slate-700" onerror="this.src='https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png'">
-                        <span class="font-bold text-white hover:text-orange-400">${p.name}</span>
+                        <span class="font-bold text-white hover:text-orange-400">#${p.no} ${p.name}</span>
                     </td>
                     <td class="py-3 px-4 text-slate-300 font-semibold">${p.team}</td>
                     <td class="py-3 px-4 text-slate-400">${p.pos}</td>
@@ -522,7 +491,6 @@
 
         function filterPlayerTable() {}
 
-        // H2H COMPARISON
         function populateDropdowns() {
             const p1Sel = document.getElementById("compare-p1-select");
             const p2Sel = document.getElementById("compare-p2-select");
@@ -584,7 +552,6 @@
             `;
         }
 
-        // MODALS (FETCH BOX SCORE FROM ESPN API)
         async function openBoxScore(gameId) {
             activeGameId = gameId;
             currentModalTab = 'summary';
@@ -640,19 +607,18 @@
                     <div class="space-y-6">
                         <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 flex items-center justify-between">
                             <div class="flex items-center space-x-3">
-                                <img src="${away.team?.logo}" class="w-12 h-12 object-contain">
+                                <img src="${away.team?.logo}" class="w-12 h-12 object-contain" onerror="this.src='https://a.espncdn.com/i/teamlogos/nba/500/lal.png'">
                                 <div><h4 class="font-bold text-white text-base">${away.team?.displayName}</h4><span class="text-xs text-slate-400 uppercase">Away</span></div>
                             </div>
                             <span class="text-3xl font-black font-teko text-orange-400">${away.score || '0'} - ${home.score || '0'}</span>
                             <div class="flex items-center space-x-3 text-right">
                                 <div><h4 class="font-bold text-white text-base">${home.team?.displayName}</h4><span class="text-xs text-slate-400 uppercase">Home</span></div>
-                                <img src="${home.team?.logo}" class="w-12 h-12 object-contain">
+                                <img src="${home.team?.logo}" class="w-12 h-12 object-contain" onerror="this.src='https://a.espncdn.com/i/teamlogos/nba/500/lal.png'">
                             </div>
                         </div>
                     </div>
                 `;
             } else {
-                // Players Box Score from ESPN Boxscore Endpoint
                 const boxscore = data.boxscore || {};
                 const players = boxscore.players || [];
 
@@ -661,7 +627,7 @@
                         ${players.map(teamStat => `
                             <div class="space-y-3">
                                 <h4 class="text-xs font-bold uppercase tracking-wider text-orange-400 flex items-center">
-                                    <img src="${teamStat.team?.logo}" class="w-4 h-4 mr-2 object-contain">${teamStat.team?.displayName || 'Team'} Box Score
+                                    <img src="${teamStat.team?.logo}" class="w-4 h-4 mr-2 object-contain" onerror="this.src='https://a.espncdn.com/i/teamlogos/nba/500/lal.png'">${teamStat.team?.displayName || 'Team'} Box Score
                                 </h4>
                                 <div class="overflow-x-auto bg-slate-950 rounded-xl border border-slate-800">
                                     <table class="w-full text-left text-xs">
@@ -672,23 +638,51 @@
                                                 <th class="py-2 px-3 text-center">PTS</th>
                                                 <th class="py-2 px-3 text-center">REB</th>
                                                 <th class="py-2 px-3 text-center">AST</th>
+                                                <th class="py-2 px-3 text-center">FG</th>
+                                                <th class="py-2 px-3 text-center">3PT</th>
+                                                <th class="py-2 px-3 text-center">FT</th>
+                                                <th class="py-2 px-3 text-center">STL</th>
+                                                <th class="py-2 px-3 text-center">BLK</th>
+                                                <th class="py-2 px-3 text-center">TO</th>
+                                                <th class="py-2 px-3 text-center">+/-</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-slate-800/60">
                                             ${(teamStat.statistics[0]?.athletes || []).map(ath => {
                                                 const stats = ath.stats || [];
-                                                // stats order in ESPN API typically: MIN, FG, 3PT, FT, REB, AST, STL, BLK, TO, PF, PTS
+                                                const name = ath.athlete.displayName;
+                                                const jersey = ath.athlete.jersey ? `#${ath.athlete.jersey}` : '';
+                                                const pos = ath.position?.abbreviation ? `(${ath.position.abbreviation})` : '';
+                                                // ESPN order: MIN, FGM-A, 3PM-A, FTM-A, OREB, DREB, REB, AST, STL, BLK, TO, PF, +/- , PTS
                                                 const min = stats[0] || '0';
-                                                const pts = stats[stats.length - 1] || '0';
-                                                const reb = stats[4] || '0';
-                                                const ast = stats[5] || '0';
+                                                const fg = stats[1] || '0-0';
+                                                const tp = stats[2] || '0-0';
+                                                const ft = stats[3] || '0-0';
+                                                const reb = stats[6] || stats[4] || '0';
+                                                const ast = stats[7] || stats[5] || '0';
+                                                const stl = stats[8] || '0';
+                                                const blk = stats[9] || '0';
+                                                const to = stats[10] || '0';
+                                                const plusminus = stats[12] || '0';
+                                                const pts = stats[stats.length - 1] || stats[13] || '0';
+
                                                 return `
                                                     <tr class="hover:bg-slate-900">
-                                                        <td class="py-2 px-3 font-bold text-white">${ath.athlete.displayName} (${ath.position?.abbreviation || ''})</td>
+                                                        <td class="py-2 px-3 font-bold text-white flex items-center space-x-1.5">
+                                                            <span class="text-orange-400 font-mono text-[11px]">${jersey}</span>
+                                                            <span>${name} ${pos}</span>
+                                                        </td>
                                                         <td class="py-2 px-3 text-center text-slate-400">${min}</td>
                                                         <td class="py-2 px-3 text-center font-bold text-orange-400">${pts}</td>
                                                         <td class="py-2 px-3 text-center text-slate-300">${reb}</td>
                                                         <td class="py-2 px-3 text-center text-slate-300">${ast}</td>
+                                                        <td class="py-2 px-3 text-center text-slate-300">${fg}</td>
+                                                        <td class="py-2 px-3 text-center text-slate-300">${tp}</td>
+                                                        <td class="py-2 px-3 text-center text-slate-300">${ft}</td>
+                                                        <td class="py-2 px-3 text-center text-slate-300">${stl}</td>
+                                                        <td class="py-2 px-3 text-center text-slate-300">${blk}</td>
+                                                        <td class="py-2 px-3 text-center text-slate-300">${to}</td>
+                                                        <td class="py-2 px-3 text-center font-semibold ${String(plusminus).startsWith('-') ? 'text-red-400' : 'text-emerald-400'}">${plusminus}</td>
                                                     </tr>
                                                 `;
                                             }).join('')}
