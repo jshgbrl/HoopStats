@@ -636,7 +636,7 @@
                 return;
             }
 
-            const playerId = team.toLowerCase() + "_" + name.toLowerCase().replace(/\s+/g, '_') + "_" + no;
+            const playerId = team.toLowerCase() + "_" + name.toLowerCase().replace(/[^a-z0-9]/g, '_') + "_" + no;
             const existing = playersDatabase.find(p => p.id === playerId);
 
             if(existing) {
@@ -744,8 +744,8 @@
             }
         }
 
-        // ================= DELETE INDIVIDUAL PLAYER FROM BOX SCORE SNAPSHOT =================
-        function deleteSnapshotPlayer(event, gameId, snapshotPlayerId) {
+        // ================= FIXED: DELETE INDIVIDUAL PLAYER FROM BOX SCORE SNAPSHOT =================
+        function deleteSnapshotPlayer(event, gameId, dictKey, snapshotPlayerId) {
             if (event) event.stopPropagation();
             if (!confirm("Are you sure you want to delete this player entry from the box score?")) return;
 
@@ -757,31 +757,47 @@
 
             if (!targetGame || !targetGame.boxscoreSnapshots) return;
 
-            let removedData = targetGame.boxscoreSnapshots[snapshotPlayerId];
-            if (removedData && removedData.role !== 'DNP') {
-                let pRecord = playersDatabase.find(p => p.id === snapshotPlayerId);
-                if (pRecord) {
-                    pRecord.gamesPlayed = Math.max(0, (pRecord.gamesPlayed || 1) - 1);
-                    pRecord.totalPts = Math.max(0, (pRecord.totalPts || 0) - (removedData.pts || 0));
-                    pRecord.totalReb = Math.max(0, (pRecord.totalReb || 0) - (removedData.reb || 0));
-                    pRecord.totalAst = Math.max(0, (pRecord.totalAst || 0) - (removedData.ast || 0));
-                    pRecord.totalBlk = Math.max(0, (pRecord.totalBlk || 0) - (removedData.blk || 0));
-                    pRecord.totalStl = Math.max(0, (pRecord.totalStl || 0) - (removedData.stl || 0));
-
-                    if (pRecord.gamesPlayed > 0) {
-                        pRecord.ppg = parseFloat((pRecord.totalPts / pRecord.gamesPlayed).toFixed(1));
-                        pRecord.rpg = parseFloat((pRecord.totalReb / pRecord.gamesPlayed).toFixed(1));
-                        pRecord.apg = parseFloat((pRecord.totalAst / pRecord.gamesPlayed).toFixed(1));
-                        pRecord.bpg = parseFloat((pRecord.totalBlk / pRecord.gamesPlayed).toFixed(1));
-                        pRecord.spg = parseFloat((pRecord.totalStl / pRecord.gamesPlayed).toFixed(1));
-                    } else {
-                        pRecord.ppg = 0; pRecord.rpg = 0; pRecord.apg = 0; pRecord.bpg = 0; pRecord.spg = 0;
-                    }
-                }
+            // Direct Key Deletion or Fallback Key Lookup
+            let keyToDelete = dictKey;
+            if (!targetGame.boxscoreSnapshots[keyToDelete]) {
+                // Look for key that matches snapshotPlayerId or name
+                keyToDelete = Object.keys(targetGame.boxscoreSnapshots).find(k => {
+                    let entry = targetGame.boxscoreSnapshots[k];
+                    return k === snapshotPlayerId || entry.id === snapshotPlayerId || entry.name === snapshotPlayerId;
+                });
             }
 
-            delete targetGame.boxscoreSnapshots[snapshotPlayerId];
+            if (keyToDelete && targetGame.boxscoreSnapshots[keyToDelete]) {
+                let removedData = targetGame.boxscoreSnapshots[keyToDelete];
+                
+                // Adjust profile stats if applicable
+                if (removedData && removedData.role !== 'DNP') {
+                    let pRecord = playersDatabase.find(p => p.id === (removedData.id || snapshotPlayerId));
+                    if (pRecord) {
+                        pRecord.gamesPlayed = Math.max(0, (pRecord.gamesPlayed || 1) - 1);
+                        pRecord.totalPts = Math.max(0, (pRecord.totalPts || 0) - (removedData.pts || 0));
+                        pRecord.totalReb = Math.max(0, (pRecord.totalReb || 0) - (removedData.reb || 0));
+                        pRecord.totalAst = Math.max(0, (pRecord.totalAst || 0) - (removedData.ast || 0));
+                        pRecord.totalBlk = Math.max(0, (pRecord.totalBlk || 0) - (removedData.blk || 0));
+                        pRecord.totalStl = Math.max(0, (pRecord.totalStl || 0) - (removedData.stl || 0));
 
+                        if (pRecord.gamesPlayed > 0) {
+                            pRecord.ppg = parseFloat((pRecord.totalPts / pRecord.gamesPlayed).toFixed(1));
+                            pRecord.rpg = parseFloat((pRecord.totalReb / pRecord.gamesPlayed).toFixed(1));
+                            pRecord.apg = parseFloat((pRecord.totalAst / pRecord.gamesPlayed).toFixed(1));
+                            pRecord.bpg = parseFloat((pRecord.totalBlk / pRecord.gamesPlayed).toFixed(1));
+                            pRecord.spg = parseFloat((pRecord.totalStl / pRecord.gamesPlayed).toFixed(1));
+                        } else {
+                            pRecord.ppg = 0; pRecord.rpg = 0; pRecord.apg = 0; pRecord.bpg = 0; pRecord.spg = 0;
+                        }
+                    }
+                }
+
+                // Delete entry from game object
+                delete targetGame.boxscoreSnapshots[keyToDelete];
+            }
+
+            // Recalculate game team scores dynamically
             let awaySum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.away && p.role !== 'DNP').reduce((acc, curr) => acc + (curr.pts || 0), 0);
             let homeSum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.home && p.role !== 'DNP').reduce((acc, curr) => acc + (curr.pts || 0), 0);
             targetGame.awayScore = awaySum;
@@ -852,10 +868,10 @@
                     let pf = parseInt(parts[12]) || 2;
                     let plusMinus = parts[13] || "+0";
 
-                    let playerId = targetTeam.toLowerCase() + "_" + name.toLowerCase().replace(/\s+/g, '_') + "_" + no;
+                    let playerId = targetTeam.toLowerCase() + "_" + name.toLowerCase().replace(/[^a-z0-9]/g, '_') + "_" + no;
                     
                     let pData = {
-                        id: playerId, name: name, team: targetTeam, role: playerRole, pos: "G", no: no,
+                        dictKey: playerId, id: playerId, name: name, team: targetTeam, role: playerRole, pos: "G", no: no,
                         min: min, pts: pts, fgM: fgSplit.made, fgA: fgSplit.att, tpM: tpSplit.made, tpA: tpSplit.att, ftM: ftSplit.made, ftA: ftSplit.att,
                         reb: reb, ast: ast, to: to, stl: stl, blk: blk, oreb: 1, dreb: reb > 1 ? reb - 1 : 0, pf: pf, plusMinus: plusMinus
                     };
@@ -1227,7 +1243,13 @@
             document.getElementById("modal-tab-players").className = `py-3 text-xs font-bold uppercase tracking-wider border-b-2 ${currentModalTab === 'players' ? 'border-orange-500 text-orange-400' : 'border-transparent text-slate-400'} transition-all`;
 
             let snapshots = game.boxscoreSnapshots || {};
-            let snapList = Object.values(snapshots);
+            
+            // Re-pair dictionary keys to snapshot objects
+            let snapList = Object.keys(snapshots).map(key => {
+                let p = snapshots[key];
+                p.dictKey = key;
+                return p;
+            });
 
             if(currentModalTab === 'summary') {
                 let awayPlayers = snapList.filter(p => p.team === game.away && p.role !== 'DNP');
@@ -1353,48 +1375,56 @@
                     let teamFtPct = totFtA > 0 ? Math.round((totFtM / totFtA) * 100) : 0;
 
                     const renderRows = (list) => {
-                        return list.map(p => `
-                            <tr class="hover:bg-slate-900/80 text-xs group">
-                                <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap flex items-center justify-between space-x-2">
-                                    <span>${p.name} #${p.no}</span>
-                                    ${isAdmin ? `
-                                        <button onclick="deleteSnapshotPlayer(event, '${game.id}', '${p.id}')" title="Delete player entry" class="text-xs font-bold text-red-400 bg-red-950/80 hover:bg-red-600 hover:text-white px-2 py-1 rounded transition-all">
-                                            <i class="fa-solid fa-trash mr-1"></i>Delete
-                                        </button>
-                                    ` : ''}
-                                </td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.min || 0}</td>
-                                <td class="py-2.5 px-2 text-center font-bold text-orange-400">${p.pts || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.fgM || 0}-${p.fgA || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.tpM || 0}-${p.tpA || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.ftM || 0}-${p.ftA || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.reb || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.ast || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.to || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.stl || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.blk || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.oreb || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.dreb || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.pf || 0}</td>
-                                <td class="py-2.5 px-2 text-center text-slate-300">${p.plusMinus || '+0'}</td>
-                            </tr>
-                        `).join('');
+                        return list.map(p => {
+                            let safeKey = (p.dictKey || p.id || "").replace(/'/g, "\\'");
+                            let safeId = (p.id || "").replace(/'/g, "\\'");
+                            return `
+                                <tr class="hover:bg-slate-900/80 text-xs group">
+                                    <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap flex items-center justify-between space-x-2">
+                                        <span>${p.name} #${p.no}</span>
+                                        ${isAdmin ? `
+                                            <button onclick="deleteSnapshotPlayer(event, '${game.id}', '${safeKey}', '${safeId}')" title="Delete player entry" class="text-xs font-bold text-red-400 bg-red-950/80 hover:bg-red-600 hover:text-white px-2 py-1 rounded transition-all shadow">
+                                                <i class="fa-solid fa-trash mr-1"></i>Delete
+                                            </button>
+                                        ` : ''}
+                                    </td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.min || 0}</td>
+                                    <td class="py-2.5 px-2 text-center font-bold text-orange-400">${p.pts || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.fgM || 0}-${p.fgA || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.tpM || 0}-${p.tpA || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.ftM || 0}-${p.ftA || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.reb || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.ast || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.to || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.stl || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.blk || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.oreb || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.dreb || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.pf || 0}</td>
+                                    <td class="py-2.5 px-2 text-center text-slate-300">${p.plusMinus || '+0'}</td>
+                                </tr>
+                            `;
+                        }).join('');
                     };
 
                     const renderDNPRows = (list) => {
-                        return list.map(p => `
-                            <tr class="hover:bg-slate-900/80 text-xs text-slate-400 italic group">
-                                <td class="py-2.5 px-3 font-bold text-slate-300 whitespace-nowrap flex items-center justify-between space-x-2">
-                                    <span>${p.name} #${p.no}</span>
-                                    ${isAdmin ? `
-                                        <button onclick="deleteSnapshotPlayer(event, '${game.id}', '${p.id}')" title="Delete player entry" class="text-xs font-bold text-red-400 bg-red-950/80 hover:bg-red-600 hover:text-white px-2 py-1 rounded transition-all">
-                                            <i class="fa-solid fa-trash mr-1"></i>Delete
-                                        </button>
-                                    ` : ''}
-                                </td>
-                                <td colspan="14" class="py-2.5 px-3 text-left text-slate-500 font-semibold tracking-wide">DNP-COACH'S DECISION</td>
-                            </tr>
-                        `).join('');
+                        return list.map(p => {
+                            let safeKey = (p.dictKey || p.id || "").replace(/'/g, "\\'");
+                            let safeId = (p.id || "").replace(/'/g, "\\'");
+                            return `
+                                <tr class="hover:bg-slate-900/80 text-xs text-slate-400 italic group">
+                                    <td class="py-2.5 px-3 font-bold text-slate-300 whitespace-nowrap flex items-center justify-between space-x-2">
+                                        <span>${p.name} #${p.no}</span>
+                                        ${isAdmin ? `
+                                            <button onclick="deleteSnapshotPlayer(event, '${game.id}', '${safeKey}', '${safeId}')" title="Delete player entry" class="text-xs font-bold text-red-400 bg-red-950/80 hover:bg-red-600 hover:text-white px-2 py-1 rounded transition-all shadow">
+                                                <i class="fa-solid fa-trash mr-1"></i>Delete
+                                            </button>
+                                        ` : ''}
+                                    </td>
+                                    <td colspan="14" class="py-2.5 px-3 text-left text-slate-500 font-semibold tracking-wide">DNP-COACH'S DECISION</td>
+                                </tr>
+                            `;
+                        }).join('');
                     };
 
                     return `
