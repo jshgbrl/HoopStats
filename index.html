@@ -739,14 +739,14 @@
                 alert(`${p.name} has been assigned to ${teamsData[targetTeam]?.name || targetTeam} with all stats carried over!`);
                 closeAssignPlayerModal();
                 
-                // Switch dropdown to the team assigned to view player immediately
                 document.getElementById("team-filter-select").value = targetTeam;
                 renderPlayerTable();
             }
         }
 
         // ================= DELETE INDIVIDUAL PLAYER FROM BOX SCORE SNAPSHOT =================
-        function deleteSnapshotPlayer(gameId, snapshotPlayerId) {
+        function deleteSnapshotPlayer(event, gameId, snapshotPlayerId) {
+            if (event) event.stopPropagation();
             if (!confirm("Are you sure you want to delete this player entry from the box score?")) return;
 
             let targetGame = null;
@@ -757,7 +757,6 @@
 
             if (!targetGame || !targetGame.boxscoreSnapshots) return;
 
-            // Remove player stats from global player totals & games played count
             let removedData = targetGame.boxscoreSnapshots[snapshotPlayerId];
             if (removedData && removedData.role !== 'DNP') {
                 let pRecord = playersDatabase.find(p => p.id === snapshotPlayerId);
@@ -783,9 +782,8 @@
 
             delete targetGame.boxscoreSnapshots[snapshotPlayerId];
 
-            // Re-tally team scores
-            let awaySum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.away && p.role !== 'DNP').reduce((acc, curr) => acc + curr.pts, 0);
-            let homeSum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.home && p.role !== 'DNP').reduce((acc, curr) => acc + curr.pts, 0);
+            let awaySum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.away && p.role !== 'DNP').reduce((acc, curr) => acc + (curr.pts || 0), 0);
+            let homeSum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.home && p.role !== 'DNP').reduce((acc, curr) => acc + (curr.pts || 0), 0);
             targetGame.awayScore = awaySum;
             targetGame.homeScore = homeSum;
 
@@ -891,8 +889,8 @@
                 }
             });
 
-            let awaySum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.away && p.role !== 'DNP').reduce((acc, curr) => acc + curr.pts, 0);
-            let homeSum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.home && p.role !== 'DNP').reduce((acc, curr) => acc + curr.pts, 0);
+            let awaySum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.away && p.role !== 'DNP').reduce((acc, curr) => acc + (curr.pts || 0), 0);
+            let homeSum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.home && p.role !== 'DNP').reduce((acc, curr) => acc + (curr.pts || 0), 0);
             if(awaySum > 0) targetGame.awayScore = awaySum;
             if(homeSum > 0) targetGame.homeScore = homeSum;
 
@@ -1335,14 +1333,33 @@
                     const bench = players.filter(p => p.role === 'BENCH');
                     const dnps = players.filter(p => p.role === 'DNP');
 
+                    // Calculate Team Box Score Totals (active players)
+                    let activePlayers = players.filter(p => p.role !== 'DNP');
+                    let totPts = 0, totFgM = 0, totFgA = 0, totTpM = 0, totTpA = 0, totFtM = 0, totFtA = 0;
+                    let totReb = 0, totAst = 0, totTo = 0, totStl = 0, totBlk = 0, totOreb = 0, totDreb = 0, totPf = 0;
+
+                    activePlayers.forEach(p => {
+                        totPts += (p.pts || 0);
+                        totFgM += (p.fgM || 0); totFgA += (p.fgA || 0);
+                        totTpM += (p.tpM || 0); totTpA += (p.tpA || 0);
+                        totFtM += (p.ftM || 0); totFtA += (p.ftA || 0);
+                        totReb += (p.reb || 0); totAst += (p.ast || 0);
+                        totTo += (p.to || 0); totStl += (p.stl || 0); totBlk += (p.blk || 0);
+                        totOreb += (p.oreb || 0); totDreb += (p.dreb || 0); totPf += (p.pf || 0);
+                    });
+
+                    let teamFgPct = totFgA > 0 ? Math.round((totFgM / totFgA) * 100) : 0;
+                    let teamTpPct = totTpA > 0 ? Math.round((totTpM / totTpA) * 100) : 0;
+                    let teamFtPct = totFtA > 0 ? Math.round((totFtM / totFtA) * 100) : 0;
+
                     const renderRows = (list) => {
                         return list.map(p => `
                             <tr class="hover:bg-slate-900/80 text-xs group">
                                 <td class="py-2.5 px-3 font-bold text-white whitespace-nowrap flex items-center justify-between space-x-2">
                                     <span>${p.name} #${p.no}</span>
                                     ${isAdmin ? `
-                                        <button onclick="deleteSnapshotPlayer('${game.id}', '${p.id}')" title="Delete player entry" class="text-slate-500 hover:text-red-400 transition-all opacity-0 group-hover:opacity-100 p-1">
-                                            <i class="fa-solid fa-trash"></i>
+                                        <button onclick="deleteSnapshotPlayer(event, '${game.id}', '${p.id}')" title="Delete player entry" class="text-xs font-bold text-red-400 bg-red-950/80 hover:bg-red-600 hover:text-white px-2 py-1 rounded transition-all">
+                                            <i class="fa-solid fa-trash mr-1"></i>Delete
                                         </button>
                                     ` : ''}
                                 </td>
@@ -1370,8 +1387,8 @@
                                 <td class="py-2.5 px-3 font-bold text-slate-300 whitespace-nowrap flex items-center justify-between space-x-2">
                                     <span>${p.name} #${p.no}</span>
                                     ${isAdmin ? `
-                                        <button onclick="deleteSnapshotPlayer('${game.id}', '${p.id}')" title="Delete player entry" class="text-slate-500 hover:text-red-400 transition-all opacity-0 group-hover:opacity-100 p-1">
-                                            <i class="fa-solid fa-trash"></i>
+                                        <button onclick="deleteSnapshotPlayer(event, '${game.id}', '${p.id}')" title="Delete player entry" class="text-xs font-bold text-red-400 bg-red-950/80 hover:bg-red-600 hover:text-white px-2 py-1 rounded transition-all">
+                                            <i class="fa-solid fa-trash mr-1"></i>Delete
                                         </button>
                                     ` : ''}
                                 </td>
@@ -1419,6 +1436,34 @@
                                             ${renderDNPRows(dnps)}
                                         ` : ''}
                                     </tbody>
+                                    <tfoot>
+                                        <tr class="border-t-2 border-slate-700 bg-slate-900/90 text-xs font-black text-white uppercase">
+                                            <td class="py-2.5 px-3 text-left">TEAM TOTALS</td>
+                                            <td class="py-2.5 px-2 text-center text-slate-400">-</td>
+                                            <td class="py-2.5 px-2 text-center font-black text-orange-400 text-sm">${totPts}</td>
+                                            <td class="py-2.5 px-2 text-center">${totFgM}-${totFgA}</td>
+                                            <td class="py-2.5 px-2 text-center">${totTpM}-${totTpA}</td>
+                                            <td class="py-2.5 px-2 text-center">${totFtM}-${totFtA}</td>
+                                            <td class="py-2.5 px-2 text-center">${totReb}</td>
+                                            <td class="py-2.5 px-2 text-center">${totAst}</td>
+                                            <td class="py-2.5 px-2 text-center">${totTo}</td>
+                                            <td class="py-2.5 px-2 text-center">${totStl}</td>
+                                            <td class="py-2.5 px-2 text-center">${totBlk}</td>
+                                            <td class="py-2.5 px-2 text-center">${totOreb}</td>
+                                            <td class="py-2.5 px-2 text-center">${totDreb}</td>
+                                            <td class="py-2.5 px-2 text-center">${totPf}</td>
+                                            <td class="py-2.5 px-2 text-center text-slate-400">-</td>
+                                        </tr>
+                                        <tr class="bg-slate-950 text-[11px] font-bold text-slate-400">
+                                            <td class="py-1.5 px-3 text-left text-slate-500 uppercase">Shooting Splits</td>
+                                            <td class="py-1.5 px-2 text-center">-</td>
+                                            <td class="py-1.5 px-2 text-center">-</td>
+                                            <td class="py-1.5 px-2 text-center font-mono text-orange-400">${teamFgPct}%</td>
+                                            <td class="py-1.5 px-2 text-center font-mono text-orange-400">${teamTpPct}%</td>
+                                            <td class="py-1.5 px-2 text-center font-mono text-orange-400">${teamFtPct}%</td>
+                                            <td colspan="9" class="py-1.5 px-2 text-right text-[10px] text-slate-500">All player stats auto-calculated</td>
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         </div>
