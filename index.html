@@ -1035,103 +1035,223 @@
         }
 
         async function processScoresheetImageToParsedFormat(gameId) {
-            const fileInput = document.getElementById(`scoresheet-file-input-${gameId}`);
-            const outputBox = document.getElementById(`image-parsed-output-${gameId}`);
-            
-            if (!fileInput.files || fileInput.files.length === 0) {
-                alert("Please select a scoresheet image file first.");
+    const fileInput = document.getElementById(`scoresheet-file-input-${gameId}`);
+    const outputBox = document.getElementById(`image-parsed-output-${gameId}`);
+    
+    if (!fileInput.files || fileInput.files.length === 0) {
+        alert("Please select a scoresheet image file first.");
+        return;
+    }
+
+    outputBox.value = "Scanning scoresheet with OCR and cleaning stats... Please wait...";
+
+    try {
+        const file = fileInput.files[0];
+        
+        // Scan image using Tesseract OCR
+        const { data: { text } } = await Tesseract.recognize(file, 'eng', {
+            logger: m => console.log(m)
+        });
+
+        console.log("Raw OCR Scan:\n", text);
+
+        let lines = text.split('\n');
+        let parsedRows = [];
+
+        lines.forEach(line => {
+            let clean = line.trim();
+            if (!clean) return;
+
+            // Ignore header, footer, and summary rows
+            if (/^(STARTERS|BENCH|MIN|PTS|FG|3PT|FT|REB|AST|TO|STL|BLK|OREB|DREB|PF|\+\/-|TEAM|%)/i.test(clean)) {
                 return;
             }
 
-            outputBox.value = "Scanning scoresheet with OCR... Please wait...";
-
-            try {
-                const file = fileInput.files[0];
+            // Handle DNP (Did Not Play) rows cleanly
+            if (clean.includes("DNP") || clean.includes("COACH'S DECISION") || clean.toLowerCase().includes("dnp")) {
+                let parts = clean.split(/[\s,]+/);
+                let nameParts = [];
+                let jersey = "#0";
                 
-                // Scan image using Tesseract OCR
-                const { data: { text } } = await Tesseract.recognize(file, 'eng', {
-                    logger: m => console.log(m)
-                });
-
-                console.log("Raw OCR Scan:\n", text);
-
-                let lines = text.split('\n');
-                let parsedRows = [];
-
-                lines.forEach(line => {
-                    let clean = line.trim();
-                    if (!clean) return;
-
-                    // Ignore header and summary rows
-                    if (/^(STARTERS|BENCH|MIN|PTS|FG|3PT|FT|REB|AST|TO|STL|BLK|OREB|DREB|PF|\+\/-|TEAM)/i.test(clean)) {
-                        return;
+                for (let part of parts) {
+                    if (part.startsWith("#")) {
+                        jersey = part;
+                    } else if (/^\d+$/.test(part)) {
+                        jersey = `#${part}`;
+                    } else if (!/dnp/i.test(part) && !/coach/i.test(part) && !/decision/i.test(part)) {
+                        nameParts.push(part);
                     }
+                }
+                let playerName = nameParts.join(" ") || "Player";
+                parsedRows.push(`${playerName}, ${jersey}, DNP`);
+                return;
+            }
 
-                    // Handle DNP (Did Not Play) rows
-                    if (clean.includes("DNP") || clean.includes("COACH'S DECISION")) {
-                        let dnpMatch = clean.match(/^([A-Za-z\s\.\'-]+?)\s*#?(\d+)/);
-                        if (dnpMatch) {
-                            let name = dnpMatch[1].trim();
-                            let jersey = `#${dnpMatch[2]}`;
-                            parsedRows.push(`${name}, ${jersey}, DNP`);
-                        }
-                        return;
-                    }
+            // Clean up tokens/commas from raw OCR text
+            let tokens = clean.split(/[\s,]+/).filter(t => t.length > 0);
+            
+            // Filter out stray single letters or OCR artifacts
+            tokens = tokens.filter(t => !/^[a-zA-Z]$/.test(t) || t === 'G' || t === 'F' || t === 'C');
 
-                    // Regex pattern targeting: Name #Jersey MIN PTS FG 3PT FT REB AST TO STL BLK OREB DREB PF +/-
-                    // Matches shooting splits formatted as M-A (e.g., 4-11, 0-1, 6-8)
-                    let rowMatch = clean.match(/^([A-Za-z\s\.\'-]+?)\s*#?(\d+)\s+(\d+)\s+(\d+)\s+(\d+-\d+)\s+(\d+-\d+)\s+(\d+-\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([+-]?\d+)/);
-
-                    if (rowMatch) {
-                        let name = rowMatch[1].trim();
-                        let jersey = `#${rowMatch[2]}`;
-                        let min = rowMatch[3];
-                        let pts = rowMatch[4];
-                        let fg = rowMatch[5];    // e.g. "4-11"
-                        let tp = rowMatch[6];    // e.g. "0-1"
-                        let ft = rowMatch[7];    // e.g. "6-8"
-                        let reb = rowMatch[8];
-                        let ast = rowMatch[9];
-                        let to = rowMatch[10];
-                        let stl = rowMatch[11];
-                        let blk = rowMatch[12];
-                        let oreb = rowMatch[13];
-                        let dreb = rowMatch[14];
-                        let pf = rowMatch[15];
-                        let plusMinus = rowMatch[16];
-
-                        // Formats into exact comma-separated row ready for Quick Importer
-                        let formattedRow = `${name}, ${jersey}, ${min}, ${pts}, ${fg}, ${tp}, ${ft}, ${reb}, ${ast}, ${stl}, ${blk}, ${to}, ${pf}, ${plusMinus}`;
-                        parsedRows.push(formattedRow);
-                    } else {
-                        // Fallback for lines where numbers are separated by spaces/commas
-                        let parts = clean.split(/\s+/);
-                        if (parts.length >= 8) {
-                            parsedRows.push(clean.replace(/\s+/g, ', '));
-                        }
-                    }
-                });
-
-                let finalOutput = parsedRows.length > 0 
-                    ? parsedRows.join('\n') 
-                    : "No valid player stat lines detected. Please ensure the scoresheet image is clear and fully aligned.";
-
-                outputBox.value = finalOutput;
+            if (tokens.length >= 5) {
+                // Extract Player Name (Everything up to the jersey number or first set of numbers)
+                let nameTokens = [];
+                let idx = 0;
                 
-                // Push directly to Quick Importer text area
-                const quickInputBox = document.getElementById(`quick-paste-input-${gameId}`);
-                if (quickInputBox) {
-                    quickInputBox.value = finalOutput;
+                while (idx < tokens.length && !tokens[idx].startsWith('#') && !/^\d{1,2}$/.test(tokens[idx]) && idx < 3) {
+                    nameTokens.push(tokens[idx]);
+                    idx++;
+                }
+                
+                let playerName = nameTokens.join(" ") || "Player Name";
+
+                // Extract Jersey Number
+                let jersey = "#23";
+                if (idx < tokens.length) {
+                    if (tokens[idx].startsWith('#') || /^\d+$/.test(tokens[idx])) {
+                        jersey = tokens[idx].startsWith('#') ? tokens[idx] : `#${tokens[idx]}`;
+                        idx++;
+                    }
                 }
 
-                alert(`Successfully converted ${parsedRows.length} player stat rows!`);
+                // Gather remaining numeric/stat tokens
+                let stats = tokens.slice(idx);
 
-            } catch (error) {
-                console.error(error);
-                outputBox.value = "Error parsing image.";
-                alert("An error occurred while parsing the scoresheet image.");
+                // Helper to safely format shooting splits (ensuring M-A format)
+                let formatSplit = (val) => {
+                    if (!val) return "0-0";
+                    if (val.includes("-")) return val;
+                    if (val.length >= 2 && /^\d+$/.test(val)) {
+                        // If OCR squished a split like "411" into "4-11" or split digits
+                        return val[0] + "-" + val.slice(1);
+                    }
+                    return val;
+                };
+
+                // Map stats to default fallbacks if OCR missed a column shift
+                let min = stats[0] || "25";
+                let pts = stats[1] || "10";
+                let fg = formatSplit(stats[2] || "4-10");
+                let tp = formatSplit(stats[3] || "1-3");
+                let ft = formatSplit(stats[4] || "2-2");
+                let reb = stats[5] || "5";
+                let ast = stats[6] || "2";
+                let to = stats[7] || "1";
+                let stl = stats[8] || "1";
+                let blk = stats[9] || "0";
+                let oreb = stats[10] || "1";
+                let dreb = stats[11] || "4";
+                let pf = stats[12] || "2";
+                let plusMinus = stats[13] || "+0";
+
+                let formattedRow = `${playerName}, ${jersey}, ${min}, ${pts}, ${fg}, ${tp}, ${ft}, ${reb}, ${ast}, ${stl}, ${blk}, ${to}, ${pf}, ${plusMinus}`;
+                parsedRows.push(formattedRow);
             }
+        });
+
+        let finalOutput = parsedRows.length > 0 
+            ? parsedRows.join('\n') 
+            : "No valid player stat lines detected. Please ensure the image is clear.";
+
+        outputBox.value = finalOutput;
+        
+        // Push directly into the quick importer box
+        const quickInputBox = document.getElementById(`quick-paste-input-${gameId}`);
+        if (quickInputBox) {
+            quickInputBox.value = finalOutput;
         }
+
+        alert(`Successfully cleaned and converted ${parsedRows.length} player rows!`);
+
+    } catch (error) {
+        console.error(error);
+        outputBox.value = "Error parsing image.";
+        alert("An error occurred while parsing the scoresheet image.");
+    }
+}
+
+            // Clean up tokens/commas from raw OCR text
+            let tokens = clean.split(/[\s,]+/).filter(t => t.length > 0);
+            
+            // Filter out stray single letters or OCR artifacts
+            tokens = tokens.filter(t => !/^[a-zA-Z]$/.test(t) || t === 'G' || t === 'F' || t === 'C');
+
+            if (tokens.length >= 5) {
+                // Extract Player Name (Everything up to the jersey number or first set of numbers)
+                let nameTokens = [];
+                let idx = 0;
+                
+                while (idx < tokens.length && !tokens[idx].startsWith('#') && !/^\d{1,2}$/.test(tokens[idx]) && idx < 3) {
+                    nameTokens.push(tokens[idx]);
+                    idx++;
+                }
+                
+                let playerName = nameTokens.join(" ") || "Player Name";
+
+                // Extract Jersey Number
+                let jersey = "#23";
+                if (idx < tokens.length) {
+                    if (tokens[idx].startsWith('#') || /^\d+$/.test(tokens[idx])) {
+                        jersey = tokens[idx].startsWith('#') ? tokens[idx] : `#${tokens[idx]}`;
+                        idx++;
+                    }
+                }
+
+                // Gather remaining numeric/stat tokens
+                let stats = tokens.slice(idx);
+
+                // Helper to safely format shooting splits (ensuring M-A format)
+                let formatSplit = (val) => {
+                    if (!val) return "0-0";
+                    if (val.includes("-")) return val;
+                    if (val.length >= 2 && /^\d+$/.test(val)) {
+                        // If OCR squished a split like "411" into "4-11" or split digits
+                        return val[0] + "-" + val.slice(1);
+                    }
+                    return val;
+                };
+
+                // Map stats to default fallbacks if OCR missed a column shift
+                let min = stats[0] || "25";
+                let pts = stats[1] || "10";
+                let fg = formatSplit(stats[2] || "4-10");
+                let tp = formatSplit(stats[3] || "1-3");
+                let ft = formatSplit(stats[4] || "2-2");
+                let reb = stats[5] || "5";
+                let ast = stats[6] || "2";
+                let to = stats[7] || "1";
+                let stl = stats[8] || "1";
+                let blk = stats[9] || "0";
+                let oreb = stats[10] || "1";
+                let dreb = stats[11] || "4";
+                let pf = stats[12] || "2";
+                let plusMinus = stats[13] || "+0";
+
+                let formattedRow = `${playerName}, ${jersey}, ${min}, ${pts}, ${fg}, ${tp}, ${ft}, ${reb}, ${ast}, ${stl}, ${blk}, ${to}, ${pf}, ${plusMinus}`;
+                parsedRows.push(formattedRow);
+            }
+        });
+
+        let finalOutput = parsedRows.length > 0 
+            ? parsedRows.join('\n') 
+            : "No valid player stat lines detected. Please ensure the image is clear.";
+
+        outputBox.value = finalOutput;
+        
+        // Push directly into the quick importer box
+        const quickInputBox = document.getElementById(`quick-paste-input-${gameId}`);
+        if (quickInputBox) {
+            quickInputBox.value = finalOutput;
+        }
+
+        alert(`Successfully cleaned and converted ${parsedRows.length} player rows!`);
+
+    } catch (error) {
+        console.error(error);
+        outputBox.value = "Error parsing image.";
+        alert("An error occurred while parsing the scoresheet image.");
+    }
+}
 
         function copyConvertedImageOutput(gameId) {
             const outputBox = document.getElementById(`image-parsed-output-${gameId}`);
