@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
-    <!-- Tesseract.js OCR Engine -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .font-teko { font-family: 'Teko', sans-serif; }
@@ -924,267 +922,121 @@
             return { made: parts[0], att: parts[1] };
         }
 
+        // ================= UPGRADED BULLETPROOF TEXT PARSER =================
         function processTextPasteImport(gameId) {
-    const rawText = document.getElementById(`quick-paste-input-${gameId}`).value.trim();
-    const targetTeam = document.getElementById(`quick-paste-team-${gameId}`).value;
-    const playerRole = document.getElementById(`quick-paste-role-${gameId}`).value;
+            const rawText = document.getElementById(`quick-paste-input-${gameId}`).value.trim();
+            const targetTeam = document.getElementById(`quick-paste-team-${gameId}`).value;
+            const playerRole = document.getElementById(`quick-paste-role-${gameId}`).value;
 
-    if (!rawText) {
-        alert("Please paste player stat lines first.");
-        return;
-    }
-
-    let targetGame = null;
-    Object.values(scheduleDatabase).forEach(dayGames => {
-        const found = dayGames.find(g => g.id === gameId);
-        if (found) targetGame = found;
-    });
-
-    if (!targetGame) {
-        alert("Game not found.");
-        return;
-    }
-
-    if (!targetGame.boxscoreSnapshots) targetGame.boxscoreSnapshots = {};
-
-    let lines = rawText.split('\n');
-    let importedCount = 0;
-
-    lines.forEach(line => {
-        if(!line.trim()) return;
-        let parts = line.split(',').map(s => s.trim());
-        if (parts.length >= 2) {
-            let name = parts[0];
-            let rawNo = parts[1] || "#23";
-            let no = rawNo.replace(/^#+/, ''); 
-
-            // Check if player is DNP
-            if (parts.includes("DNP") || playerRole === 'DNP') {
-                let playerId = targetTeam.toLowerCase() + "_" + name.toLowerCase().replace(/[^a-z0-9]/g, '_') + "_" + no;
-                let pData = {
-                    dictKey: playerId, id: playerId, name: name, team: targetTeam, role: 'DNP', pos: "G", no: no,
-                    min: 0, pts: 0, fgM: 0, fgA: 0, tpM: 0, tpA: 0, ftM: 0, ftA: 0,
-                    reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, plusMinus: "+0"
-                };
-                targetGame.boxscoreSnapshots[playerId] = pData;
-                importedCount++;
+            if (!rawText) {
+                alert("Please paste player stat lines first.");
                 return;
             }
 
-            // Extract numeric metrics dynamically from the remaining tokens
-            let numericTokens = parts.slice(2).filter(t => t.length > 0);
-            
-            // Default stat values fallback
-            let min = parseInt(numericTokens[0]) || 25;
-            let pts = parseInt(numericTokens[1]) || 10;
-            
-            let fgSplit = parseShootSplit(numericTokens[2] || "4-10");
-            let tpSplit = parseShootSplit(numericTokens[3] || "1-3");
-            let ftSplit = parseShootSplit(numericTokens[4] || "2-2");
+            let targetGame = null;
+            Object.values(scheduleDatabase).forEach(dayGames => {
+                const found = dayGames.find(g => g.id === gameId);
+                if (found) targetGame = found;
+            });
 
-            let reb = parseInt(numericTokens[5]) || 4;
-            let ast = parseInt(numericTokens[6]) || 2;
-            let stl = parseInt(numericTokens[7]) || 1;
-            let blk = parseInt(numericTokens[8]) || 0;
-            let to = parseInt(numericTokens[9]) || 1;
-            let pf = parseInt(numericTokens[10]) || 2;
-            let plusMinus = numericTokens[numericTokens.length - 1] || "+0";
-
-            let playerId = targetTeam.toLowerCase() + "_" + name.toLowerCase().replace(/[^a-z0-9]/g, '_') + "_" + no;
-            
-            let pData = {
-                dictKey: playerId, id: playerId, name: name, team: targetTeam, role: playerRole, pos: "G", no: no,
-                min: min, pts: pts, fgM: fgSplit.made, fgA: fgSplit.att, tpM: tpSplit.made, tpA: tpSplit.att, ftM: ftSplit.made, ftA: ftSplit.att,
-                reb: reb, ast: ast, to: to, stl: stl, blk: blk, oreb: 1, dreb: reb > 1 ? reb - 1 : 0, pf: pf, plusMinus: plusMinus
-            };
-
-            targetGame.boxscoreSnapshots[playerId] = pData;
-            importedCount++;
-
-            let existingPlayer = playersDatabase.find(p => p.team === targetTeam && p.name.trim().toLowerCase() === name.trim().toLowerCase());
-            
-            if(!existingPlayer) {
-                playersDatabase.push({
-                    id: playerId, name: name, team: targetTeam, pos: "G", no: no,
-                    gamesPlayed: 1, totalPts: pts, totalReb: reb, totalAst: ast, totalBlk: blk, totalStl: stl,
-                    ppg: pts, rpg: reb, apg: ast, bpg: blk, spg: stl
-                });
-            } else {
-                existingPlayer.gamesPlayed = (existingPlayer.gamesPlayed || 0) + 1;
-                existingPlayer.totalPts = (existingPlayer.totalPts || 0) + pts;
-                existingPlayer.totalReb = (existingPlayer.totalReb || 0) + reb;
-                existingPlayer.totalAst = (existingPlayer.totalAst || 0) + ast;
-                existingPlayer.totalBlk = (existingPlayer.totalBlk || 0) + blk;
-                existingPlayer.totalStl = (existingPlayer.totalStl || 0) + stl;
-
-                existingPlayer.ppg = parseFloat((existingPlayer.totalPts / existingPlayer.gamesPlayed).toFixed(1));
-                existingPlayer.rpg = parseFloat((existingPlayer.totalReb / existingPlayer.gamesPlayed).toFixed(1));
-                existingPlayer.apg = parseFloat((existingPlayer.totalAst / existingPlayer.gamesPlayed).toFixed(1));
-                existingPlayer.bpg = parseFloat((existingPlayer.totalBlk / existingPlayer.gamesPlayed).toFixed(1));
-                existingPlayer.spg = parseFloat((existingPlayer.totalStl / existingPlayer.gamesPlayed).toFixed(1));
-            }
-        }
-    });
-
-    let awaySum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.away && p.role !== 'DNP').reduce((acc, curr) => acc + (curr.pts || 0), 0);
-    let homeSum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.home && p.role !== 'DNP').reduce((acc, curr) => acc + (curr.pts || 0), 0);
-    if(awaySum > 0) targetGame.awayScore = awaySum;
-    if(homeSum > 0) targetGame.homeScore = homeSum;
-
-    localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
-    deduplicatePlayersDatabase();
-
-    alert(`Successfully parsed and synced ${importedCount} player entries!`);
-    renderBoxScoreContent();
-    renderPlayerTable();
-    renderGames();
-    renderStandings();
-}
-
-        // ================= DEDICATED IMAGE-TO-PARSER CONVERTER WITH TOKEN CLEANING =================
-        function toggleImageParserWidget(gameId) {
-            const widget = document.getElementById(`image-parser-widget-${gameId}`);
-            if (widget) {
-                widget.classList.toggle("hidden");
-            }
-        }
-
-        async function processScoresheetImageToParsedFormat(gameId) {
-            const fileInput = document.getElementById(`scoresheet-file-input-${gameId}`);
-            const outputBox = document.getElementById(`image-parsed-output-${gameId}`);
-            
-            if (!fileInput.files || fileInput.files.length === 0) {
-                alert("Please select a scoresheet image file first.");
+            if (!targetGame) {
+                alert("Game not found.");
                 return;
             }
 
-            outputBox.value = "Scanning scoresheet with OCR and cleaning stats... Please wait...";
+            if (!targetGame.boxscoreSnapshots) targetGame.boxscoreSnapshots = {};
 
-            try {
-                const file = fileInput.files[0];
-                
-                // Scan image using Tesseract OCR
-                const { data: { text } } = await Tesseract.recognize(file, 'eng', {
-                    logger: m => console.log(m)
-                });
+            let lines = rawText.split('\n');
+            let importedCount = 0;
 
-                console.log("Raw OCR Scan:\n", text);
+            lines.forEach(line => {
+                if(!line.trim()) return;
+                let parts = line.split(',').map(s => s.trim());
+                if (parts.length >= 2) {
+                    let name = parts[0];
+                    let rawNo = parts[1] || "#23";
+                    let no = rawNo.replace(/^#+/, ''); 
 
-                let lines = text.split('\n');
-                let parsedRows = [];
-
-                lines.forEach(line => {
-                    let clean = line.trim();
-                    if (!clean) return;
-
-                    // Ignore header, footer, and summary rows
-                    if (/^(STARTERS|BENCH|MIN|PTS|FG|3PT|FT|REB|AST|TO|STL|BLK|OREB|DREB|PF|\+\/-|TEAM|%)/i.test(clean)) {
-                        return;
-                    }
-
-                    // Handle DNP (Did Not Play) rows cleanly
-                    if (clean.includes("DNP") || clean.includes("COACH'S DECISION") || clean.toLowerCase().includes("dnp")) {
-                        let parts = clean.split(/[\s,]+/);
-                        let nameParts = [];
-                        let jersey = "#0";
-                        
-                        for (let part of parts) {
-                            if (part.startsWith("#")) {
-                                jersey = part;
-                            } else if (/^\d+$/.test(part)) {
-                                jersey = `#${part}`;
-                            } else if (!/dnp/i.test(part) && !/coach/i.test(part) && !/decision/i.test(part)) {
-                                nameParts.push(part);
-                            }
-                        }
-                        let playerName = nameParts.join(" ") || "Player";
-                        parsedRows.push(`${playerName}, ${jersey}, DNP`);
-                        return;
-                    }
-
-                    // Tokenize line by whitespace/commas and filter artifacts
-                    let tokens = clean.split(/[\s,]+/).filter(t => t.length > 0);
-                    tokens = tokens.filter(t => !/^[a-zA-Z]$/.test(t) || t === 'G' || t === 'F' || t === 'C');
-
-                    if (tokens.length >= 5) {
-                        let nameTokens = [];
-                        let idx = 0;
-                        
-                        while (idx < tokens.length && !tokens[idx].startsWith('#') && !/^\d{1,2}$/.test(tokens[idx]) && idx < 3) {
-                            nameTokens.push(tokens[idx]);
-                            idx++;
-                        }
-                        
-                        let playerName = nameTokens.join(" ") || "Player Name";
-
-                        let jersey = "#23";
-                        if (idx < tokens.length) {
-                            if (tokens[idx].startsWith('#') || /^\d+$/.test(tokens[idx])) {
-                                jersey = tokens[idx].startsWith('#') ? tokens[idx] : `#${tokens[idx]}`;
-                                idx++;
-                            }
-                        }
-
-                        let stats = tokens.slice(idx);
-
-                        let formatSplit = (val) => {
-                            if (!val) return "0-0";
-                            if (val.includes("-")) return val;
-                            if (val.length >= 2 && /^\d+$/.test(val)) {
-                                return val[0] + "-" + val.slice(1);
-                            }
-                            return val;
+                    // Check if player is DNP
+                    if (parts.includes("DNP") || playerRole === 'DNP' || parts.some(p => p.toUpperCase() === 'DNP')) {
+                        let playerId = targetTeam.toLowerCase() + "_" + name.toLowerCase().replace(/[^a-z0-9]/g, '_') + "_" + no;
+                        let pData = {
+                            dictKey: playerId, id: playerId, name: name, team: targetTeam, role: 'DNP', pos: "G", no: no,
+                            min: 0, pts: 0, fgM: 0, fgA: 0, tpM: 0, tpA: 0, ftM: 0, ftA: 0,
+                            reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, plusMinus: "+0"
                         };
-
-                        let min = stats[0] || "25";
-                        let pts = stats[1] || "10";
-                        let fg = formatSplit(stats[2] || "4-10");
-                        let tp = formatSplit(stats[3] || "1-3");
-                        let ft = formatSplit(stats[4] || "2-2");
-                        let reb = stats[5] || "5";
-                        let ast = stats[6] || "2";
-                        let to = stats[7] || "1";
-                        let stl = stats[8] || "1";
-                        let blk = stats[9] || "0";
-                        let oreb = stats[10] || "1";
-                        let dreb = stats[11] || "4";
-                        let pf = stats[12] || "2";
-                        let plusMinus = stats[13] || "+0";
-
-                        let formattedRow = `${playerName}, ${jersey}, ${min}, ${pts}, ${fg}, ${tp}, ${ft}, ${reb}, ${ast}, ${stl}, ${blk}, ${to}, ${pf}, ${plusMinus}`;
-                        parsedRows.push(formattedRow);
+                        targetGame.boxscoreSnapshots[playerId] = pData;
+                        importedCount++;
+                        return;
                     }
-                });
 
-                let finalOutput = parsedRows.length > 0 
-                    ? parsedRows.join('\n') 
-                    : "No valid player stat lines detected. Please ensure the image is clear.";
+                    // Extract metrics dynamically, filtering out text tokens
+                    let numericTokens = parts.slice(2).filter(t => t.length > 0 && !isNaN(t.replace('-', '')) || t.includes('-'));
+                    
+                    let min = parseInt(numericTokens[0]) || 25;
+                    let pts = parseInt(numericTokens[1]) || 10;
+                    
+                    let fgSplit = parseShootSplit(numericTokens[2] || "4-10");
+                    let tpSplit = parseShootSplit(numericTokens[3] || "1-3");
+                    let ftSplit = parseShootSplit(numericTokens[4] || "2-2");
 
-                outputBox.value = finalOutput;
-                
-                const quickInputBox = document.getElementById(`quick-paste-input-${gameId}`);
-                if (quickInputBox) {
-                    quickInputBox.value = finalOutput;
+                    let reb = parseInt(numericTokens[5]) || 4;
+                    let ast = parseInt(numericTokens[6]) || 2;
+                    let to = parseInt(numericTokens[7]) || 1;
+                    let stl = parseInt(numericTokens[8]) || 1;
+                    let blk = parseInt(numericTokens[9]) || 0;
+                    let pf = parseInt(numericTokens[10]) || 2;
+                    let plusMinus = numericTokens[numericTokens.length - 1] || "+0";
+
+                    let playerId = targetTeam.toLowerCase() + "_" + name.toLowerCase().replace(/[^a-z0-9]/g, '_') + "_" + no;
+                    
+                    let pData = {
+                        dictKey: playerId, id: playerId, name: name, team: targetTeam, role: playerRole, pos: "G", no: no,
+                        min: min, pts: pts, fgM: fgSplit.made, fgA: fgSplit.att, tpM: tpSplit.made, tpA: tpSplit.att, ftM: ftSplit.made, ftA: ftSplit.att,
+                        reb: reb, ast: ast, to: to, stl: stl, blk: blk, oreb: 1, dreb: reb > 1 ? reb - 1 : 0, pf: pf, plusMinus: plusMinus
+                    };
+
+                    targetGame.boxscoreSnapshots[playerId] = pData;
+                    importedCount++;
+
+                    let existingPlayer = playersDatabase.find(p => p.team === targetTeam && p.name.trim().toLowerCase() === name.trim().toLowerCase());
+                    
+                    if(!existingPlayer) {
+                        playersDatabase.push({
+                            id: playerId, name: name, team: targetTeam, pos: "G", no: no,
+                            gamesPlayed: 1, totalPts: pts, totalReb: reb, totalAst: ast, totalBlk: blk, totalStl: stl,
+                            ppg: pts, rpg: reb, apg: ast, bpg: blk, spg: stl
+                        });
+                    } else {
+                        existingPlayer.gamesPlayed = (existingPlayer.gamesPlayed || 0) + 1;
+                        existingPlayer.totalPts = (existingPlayer.totalPts || 0) + pts;
+                        existingPlayer.totalReb = (existingPlayer.totalReb || 0) + reb;
+                        existingPlayer.totalAst = (existingPlayer.totalAst || 0) + ast;
+                        existingPlayer.totalBlk = (existingPlayer.totalBlk || 0) + blk;
+                        existingPlayer.totalStl = (existingPlayer.totalStl || 0) + stl;
+
+                        existingPlayer.ppg = parseFloat((existingPlayer.totalPts / existingPlayer.gamesPlayed).toFixed(1));
+                        existingPlayer.rpg = parseFloat((existingPlayer.totalReb / existingPlayer.gamesPlayed).toFixed(1));
+                        existingPlayer.apg = parseFloat((existingPlayer.totalAst / existingPlayer.gamesPlayed).toFixed(1));
+                        existingPlayer.bpg = parseFloat((existingPlayer.totalBlk / existingPlayer.gamesPlayed).toFixed(1));
+                        existingPlayer.spg = parseFloat((existingPlayer.totalStl / existingPlayer.gamesPlayed).toFixed(1));
+                    }
                 }
+            });
 
-                alert(`Successfully cleaned and converted ${parsedRows.length} player rows!`);
+            let awaySum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.away && p.role !== 'DNP').reduce((acc, curr) => acc + (curr.pts || 0), 0);
+            let homeSum = Object.values(targetGame.boxscoreSnapshots).filter(p => p.team === targetGame.home && p.role !== 'DNP').reduce((acc, curr) => acc + (curr.pts || 0), 0);
+            if(awaySum > 0) targetGame.awayScore = awaySum;
+            if(homeSum > 0) targetGame.homeScore = homeSum;
 
-            } catch (error) {
-                console.error(error);
-                outputBox.value = "Error parsing image.";
-                alert("An error occurred while parsing the scoresheet image.");
-            }
-        }
+            localStorage.setItem("hoopStatsSchedule", JSON.stringify(scheduleDatabase));
+            deduplicatePlayersDatabase();
 
-        function copyConvertedImageOutput(gameId) {
-            const outputBox = document.getElementById(`image-parsed-output-${gameId}`);
-            if (!outputBox || !outputBox.value) {
-                alert("No parsed output to copy yet.");
-                return;
-            }
-            outputBox.select();
-            document.execCommand("copy");
-            alert("Parsed integer lines copied to clipboard!");
+            alert(`Successfully parsed and synced ${importedCount} player entries!`);
+            renderBoxScoreContent();
+            renderPlayerTable();
+            renderGames();
+            renderStandings();
         }
 
         function exportDataJSON() {
@@ -1711,9 +1563,6 @@
                                 </div>
                                 ${isAdmin ? `
                                     <div class="flex items-center space-x-2">
-                                        <button onclick="toggleImageParserWidget('${game.id}')" class="px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 transition-all shadow">
-                                            <i class="fa-solid fa-file-image mr-1.5"></i>Image-to-Parser Converter
-                                        </button>
                                         <button onclick="toggleQuickImporter()" class="px-3 py-1.5 text-xs font-bold rounded-xl bg-orange-600 hover:bg-orange-500 text-white transition-all shadow">
                                             <i class="fa-solid fa-bolt mr-1.5"></i>Toggle Quick Importer
                                         </button>
@@ -1722,33 +1571,6 @@
                             </div>
 
                             ${isAdmin ? `
-                                <!-- DEDICATED IMAGE-TO-PARSED TEXT CONVERTER WIDGET -->
-                                <div id="image-parser-widget-${game.id}" class="hidden bg-slate-900 border-2 border-amber-500/60 p-4 rounded-2xl space-y-3 shadow-2xl">
-                                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                                        <div class="flex items-center space-x-2">
-                                            <i class="fa-solid fa-file-image text-amber-400 text-sm"></i>
-                                            <h4 class="text-xs font-black font-teko uppercase text-amber-400 tracking-wider">Scoresheet Image-to-Integer Parser</h4>
-                                        </div>
-                                        <span class="text-[10px] text-slate-400">Upload screenshot &bull; Get clean copy-pasteable integer format</span>
-                                    </div>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                                        <div class="space-y-2">
-                                            <label class="text-[10px] text-slate-400 uppercase font-bold block">1. Upload Scoresheet Image / Screenshot</label>
-                                            <input type="file" id="scoresheet-file-input-${game.id}" accept="image/*" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-xs text-slate-300 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-600 file:text-white hover:file:bg-amber-500">
-                                            <button onclick="processScoresheetImageToParsedFormat('${game.id}')" class="w-full py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl transition-all shadow">
-                                                <i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i>Convert Image to Parsed Integers
-                                            </button>
-                                        </div>
-                                        <div class="space-y-2">
-                                            <label class="text-[10px] text-slate-400 uppercase font-bold block">2. Copy-Pasteable Parsed Result</label>
-                                            <textarea id="image-parsed-output-${game.id}" rows="3" placeholder="Converted integer CSV lines will appear here ready to copy..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-amber-300 font-mono focus:outline-none focus:border-amber-500" readonly></textarea>
-                                            <button onclick="copyConvertedImageOutput('${game.id}')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-all shadow">
-                                                <i class="fa-solid fa-copy mr-1.5"></i>Copy Converted Integers
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
                                 <div id="quick-importer-container" class="hidden bg-orange-950/30 border-2 border-orange-600/50 p-4 rounded-2xl space-y-3">
                                     <div class="flex items-center justify-between">
                                         <h4 class="text-xs font-black font-teko uppercase text-orange-400 tracking-wider">⚡ Quick Text/CSV Box Score Importer</h4>
@@ -1764,7 +1586,7 @@
                                             <option value="DNP">DNP (Did Not Play)</option>
                                         </select>
                                     </div>
-                                    <textarea id="quick-paste-input-${game.id}" rows="3" placeholder="Example lines:\nGiannis Antetokounmpo, #7, 25, 14, 4-11, 0-1, 6-8, 6, 3, 1, 0, 3, 6, -20" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white font-mono focus:outline-none focus:border-orange-500"></textarea>
+                                    <textarea id="quick-paste-input-${game.id}" rows="5" placeholder="Example lines:\nAnthony Davis, #23, 19, 19, 8-21, 0-1, 3-5, 6, 5, 1, 0, 3, 3, +0" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white font-mono focus:outline-none focus:border-orange-500"></textarea>
                                     <button onclick="processTextPasteImport('${game.id}')" class="w-full py-2 bg-orange-600 hover:bg-orange-500 font-bold text-white rounded-xl text-xs transition-all shadow-md shadow-orange-600/25">
                                         Parse & Sync to ${teamCode}
                                     </button>
@@ -1821,15 +1643,6 @@
                                             <td class="py-2.5 px-2 text-center">${totDreb}</td>
                                             <td class="py-2.5 px-2 text-center">${totPf}</td>
                                             <td class="py-2.5 px-2 text-center text-slate-400">-</td>
-                                        </tr>
-                                        <tr class="bg-slate-950 text-[11px] font-bold text-slate-400">
-                                            <td class="py-1.5 px-3 text-left text-slate-500 uppercase">Shooting Splits</td>
-                                            <td class="py-1.5 px-2 text-center">-</td>
-                                            <td class="py-1.5 px-2 text-center">-</td>
-                                            <td class="py-1.5 px-2 text-center font-mono text-orange-400">${teamFgPct}%</td>
-                                            <td class="py-1.5 px-2 text-center font-mono text-orange-400">${teamTpPct}%</td>
-                                            <td class="py-1.5 px-2 text-center font-mono text-orange-400">${teamFtPct}%</td>
-                                            <td colspan="9" class="py-1.5 px-2 text-right text-[10px] text-slate-500">All player stats auto-calculated</td>
                                         </tr>
                                     </tfoot>
                                 </table>
